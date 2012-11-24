@@ -535,7 +535,6 @@ public:
     stdstring read();                       ///< reads the value from the registry
     void    write();                    ///< writes the value to the registry
 
-    operator stdstring();
     CRegStdString& operator=(stdstring s);
     CRegStdString& operator+=(stdstring s) { return *this = (stdstring)*this + s; }
     operator LPCTSTR();
