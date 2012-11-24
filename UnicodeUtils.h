@@ -20,16 +20,7 @@
 
 #include <string>
 
-#pragma warning (push,1)
-#ifndef stdstring
-    typedef std::wstring wide_string;
-#   ifdef UNICODE
-#       define stdstring wide_string
-#   else
-#       define stdstring std::string
-#   endif
-#endif
-#pragma warning (pop)
+typedef std::basic_string<TCHAR> tstring;
 
 class CUnicodeUtils
 {
@@ -37,26 +28,26 @@ public:
     CUnicodeUtils(void);
     ~CUnicodeUtils(void);
 #ifdef UNICODE
-    static std::string StdGetUTF8(const wide_string& wide);
-    static wide_string StdGetUnicode(const std::string& multibyte);
-    static std::string StdGetANSI(const wide_string& wide);
+    static std::string StdGetUTF8(const std::wstring& wide);
+    static std::wstring StdGetUnicode(const std::string& multibyte);
+    static std::string StdGetANSI(const std::wstring& wide);
 #else
     static std::string StdGetUTF8(std::string str) {return str;}
     static std::string StdGetUnicode(std::string multibyte) {return multibyte;}
 #endif
 };
 
-std::string WideToMultibyte(const wide_string& wide);
-std::string WideToUTF8(const wide_string& wide);
-wide_string MultibyteToWide(const std::string& multibyte);
-wide_string UTF8ToWide(const std::string& multibyte);
+std::string WideToMultibyte(const std::wstring& wide);
+std::string WideToUTF8(const std::wstring& wide);
+std::wstring MultibyteToWide(const std::string& multibyte);
+std::wstring UTF8ToWide(const std::string& multibyte);
 
 #ifdef UNICODE
-    stdstring UTF8ToString(const std::string& string);
-    std::string StringToUTF8(const stdstring& string);
+    tstring UTF8ToString(const std::string& string);
+    std::string StringToUTF8(const tstring& string);
 #else
-    stdstring UTF8ToString(const std::string& string);
-    std::string StringToUTF8(const stdstring& string);
+    tstring UTF8ToString(const std::string& string);
+    std::string StringToUTF8(const tstring& string);
 #endif
 
 int LoadStringEx(HINSTANCE hInstance, UINT uID, LPTSTR lpBuffer, int nBufferMax, WORD wLanguage);

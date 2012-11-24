@@ -16,8 +16,10 @@
 // along with this program; if not, write to the Free Software Foundation,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
-#include "StdAfx.h"
-#include "unicodeutils.h"
+
+#include "stdafx.h"
+#include "UnicodeUtils.h"
+#include <memory>
 
 CUnicodeUtils::CUnicodeUtils(void)
 {
@@ -27,111 +29,102 @@ CUnicodeUtils::~CUnicodeUtils(void)
 {
 }
 
-
 #ifdef UNICODE
-std::string CUnicodeUtils::StdGetUTF8(const wide_string& wide)
+std::string CUnicodeUtils::StdGetUTF8(const std::wstring& wide)
 {
     int len = (int)wide.size();
     if (len==0)
         return std::string();
     int size = len*4;
-    char * narrow = new char[size];
-    int ret = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), len, narrow, size-1, NULL, NULL);
+    std::unique_ptr<char[]> narrow(new char[size]);
+    int ret = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), len, narrow.get(), size-1, NULL, NULL);
     narrow[ret] = 0;
-    std::string sRet = std::string(narrow);
-    delete [] narrow;
+    std::string sRet = std::string(narrow.get());
     return sRet;
 }
 
-std::string CUnicodeUtils::StdGetANSI(const wide_string& wide)
+std::string CUnicodeUtils::StdGetANSI(const std::wstring& wide)
 {
     int len = (int)wide.size();
     if (len==0)
         return std::string();
     int size = len*4;
-    char * narrow = new char[size];
-    int ret = WideCharToMultiByte(CP_ACP, 0, wide.c_str(), len, narrow, size-1, NULL, NULL);
+    std::unique_ptr<char[]> narrow(new char[size]);
+    int ret = WideCharToMultiByte(CP_ACP, 0, wide.c_str(), len, narrow.get(), size-1, NULL, NULL);
     narrow[ret] = 0;
-    std::string sRet = std::string(narrow);
-    delete [] narrow;
+    std::string sRet = std::string(narrow.get());
     return sRet;
 }
 
-wide_string CUnicodeUtils::StdGetUnicode(const std::string& multibyte)
+std::wstring CUnicodeUtils::StdGetUnicode(const std::string& multibyte)
 {
     int len = (int)multibyte.size();
     if (len==0)
-        return wide_string();
+        return std::wstring();
     int size = len*4;
-    wchar_t * wide = new wchar_t[size];
-    int ret = MultiByteToWideChar(CP_UTF8, 0, multibyte.c_str(), len, wide, size - 1);
+    std::unique_ptr<wchar_t[]> wide(new wchar_t[size]);
+    int ret = MultiByteToWideChar(CP_UTF8, 0, multibyte.c_str(), len, wide.get(), size - 1);
     wide[ret] = 0;
-    wide_string sRet = wide_string(wide);
-    delete [] wide;
+    std::wstring sRet = std::wstring(wide.get());
     return sRet;
 }
 #endif
 
-std::string WideToMultibyte(const wide_string& wide)
+std::string WideToMultibyte(const std::wstring& wide)
 {
-    char * narrow = new char[wide.length()*3+2];
+    std::unique_ptr<char[]> narrow(new char[wide.length()*3+2]);
     BOOL defaultCharUsed;
-    int ret = (int)WideCharToMultiByte(CP_ACP, 0, wide.c_str(), (int)wide.size(), narrow, (int)wide.length()*3 - 1, ".", &defaultCharUsed);
+    int ret = (int)WideCharToMultiByte(CP_ACP, 0, wide.c_str(), (int)wide.size(), narrow.get(), (int)wide.length()*3 - 1, ".", &defaultCharUsed);
     narrow[ret] = 0;
-    std::string str = narrow;
-    delete[] narrow;
+    std::string str = narrow.get();
     return str;
 }
 
-std::string WideToUTF8(const wide_string& wide)
+std::string WideToUTF8(const std::wstring& wide)
 {
-    char * narrow = new char[wide.length()*3+2];
-    int ret = (int)WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), (int)wide.size(), narrow, (int)wide.length()*3 - 1, NULL, NULL);
+    std::unique_ptr<char[]> narrow(new char[wide.length()*3+2]);
+    int ret = (int)WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), (int)wide.size(), narrow.get(), (int)wide.length()*3 - 1, NULL, NULL);
     narrow[ret] = 0;
-    std::string str = narrow;
-    delete[] narrow;
+    std::string str = narrow.get();
     return str;
 }
 
-wide_string MultibyteToWide(const std::string& multibyte)
+std::wstring MultibyteToWide(const std::string& multibyte)
 {
     size_t length = multibyte.length();
     if (length == 0)
-        return wide_string();
+        return std::wstring();
 
-    wchar_t * wide = new wchar_t[multibyte.length()*2+2];
+    std::unique_ptr<wchar_t[]> wide(new wchar_t[multibyte.length()*2+2]);
     if (wide == NULL)
-        return wide_string();
-    int ret = (int)MultiByteToWideChar(CP_ACP, 0, multibyte.c_str(), (int)multibyte.size(), wide, (int)length*2 - 1);
+        return std::wstring();
+    int ret = (int)MultiByteToWideChar(CP_ACP, 0, multibyte.c_str(), (int)multibyte.size(), wide.get(), (int)length*2 - 1);
     wide[ret] = 0;
-    wide_string str = wide;
-    delete[] wide;
+    std::wstring str = wide.get();
     return str;
 }
 
-wide_string UTF8ToWide(const std::string& multibyte)
+std::wstring UTF8ToWide(const std::string& multibyte)
 {
     size_t length = multibyte.length();
     if (length == 0)
-        return wide_string();
+        return std::wstring();
 
-    wchar_t * wide = new wchar_t[length*2+2];
+    std::unique_ptr<wchar_t[]> wide(new wchar_t[length*2+2]);
     if (wide == NULL)
-        return wide_string();
-    int ret = (int)MultiByteToWideChar(CP_UTF8, 0, multibyte.c_str(), (int)multibyte.size(), wide, (int)length*2 - 1);
+        return std::wstring();
+    int ret = (int)MultiByteToWideChar(CP_UTF8, 0, multibyte.c_str(), (int)multibyte.size(), wide.get(), (int)length*2 - 1);
     wide[ret] = 0;
-    wide_string str = wide;
-    delete[] wide;
+    std::wstring str = wide.get();
     return str;
 }
 #ifdef UNICODE
-stdstring UTF8ToString(const std::string& string) {return UTF8ToWide(string);}
-std::string StringToUTF8(const stdstring& string) {return WideToUTF8(string);}
+tstring UTF8ToString(const std::string& string) {return UTF8ToWide(string);}
+std::string StringToUTF8(const tstring& string) {return WideToUTF8(string);}
 #else
-stdstring UTF8ToString(const std::string& string) {return WideToMultibyte(UTF8ToWide(string));}
-std::string StringToUTF8(const stdstring& string) {return WideToUTF8(MultibyteToWide(string));}
+tstring UTF8ToString(const std::string& string) {return WideToMultibyte(UTF8ToWide(string));}
+std::string StringToUTF8(const tstring& string) {return WideToUTF8(MultibyteToWide(string));}
 #endif
-
 
 #pragma warning(push)
 #pragma warning(disable: 4200)
@@ -197,4 +190,3 @@ int LoadStringEx(HINSTANCE hInstance, UINT uID, LPTSTR lpBuffer, int nBufferMax,
 #endif
     return ret;
 }
-

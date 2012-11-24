@@ -29,6 +29,15 @@
 class CDialog
 {
 public:
+    CDialog()
+        : hResource(nullptr)
+        , m_hwnd(nullptr)
+        , m_bPseudoModal(false)
+        , m_bPseudoEnded(false)
+        , m_iPseudoRet(0)
+        , m_hToolTips(nullptr)
+    {
+    }
     INT_PTR DoModal(HINSTANCE hInstance, int resID, HWND hWndParent);
     INT_PTR DoModal(HINSTANCE hInstance, int resID, HWND hWndParent, UINT idAccel);
     HWND    Create(HINSTANCE hInstance, int resID, HWND hWndParent);
