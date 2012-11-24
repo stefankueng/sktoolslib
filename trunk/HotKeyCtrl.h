@@ -30,32 +30,32 @@ public:
     BOOL ConvertEditToHotKeyCtrl(HWND hwndCtl);
     BOOL ConvertEditToHotKeyCtrl(HWND hwndParent, UINT uiCtlId);
 
-	void SetHotKey(WPARAM hk);
-	WPARAM GetHotKey();
+    void SetHotKey(WPARAM hk);
+    WPARAM GetHotKey();
 
 protected:
 
 private:
-	HWND m_hWnd;
-	WNDPROC  m_pfnOrigCtlProc;
+    HWND m_hWnd;
+    WNDPROC  m_pfnOrigCtlProc;
 
-	static LRESULT CALLBACK _HotKeyProc(HWND hwnd, UINT message,
-		                                   WPARAM wParam, LPARAM lParam);
+    static LRESULT CALLBACK _HotKeyProc(HWND hwnd, UINT message,
+                                           WPARAM wParam, LPARAM lParam);
 
-	HHOOK kb_hook;
-	static LRESULT CALLBACK _KeyboardProc(int code, WPARAM wParam, LPARAM lParam);
+    HHOOK kb_hook;
+    static LRESULT CALLBACK _KeyboardProc(int code, WPARAM wParam, LPARAM lParam);
 
-	void SetHKText(WORD hk);
+    void SetHKText(WORD hk);
 
-	bool controldown;
-	bool shiftdown;
-	bool menudown;
-	bool lwindown;
+    bool controldown;
+    bool shiftdown;
+    bool menudown;
+    bool lwindown;
 
-	TCHAR controltext[MAX_PATH];
-	TCHAR shifttext[MAX_PATH];
-	TCHAR menutext[MAX_PATH];
-	TCHAR lwintext[MAX_PATH];
+    TCHAR controltext[MAX_PATH];
+    TCHAR shifttext[MAX_PATH];
+    TCHAR menutext[MAX_PATH];
+    TCHAR lwintext[MAX_PATH];
 
-	WORD hotkey;
+    WORD hotkey;
 };
