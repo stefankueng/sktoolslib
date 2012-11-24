@@ -54,6 +54,8 @@
 int strwildcmp(const char * wild, const char * string);
 int wcswildcmp(const wchar_t * wild, const wchar_t * string);
 
+bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd);
+void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::wstring& replacewith);
 
 template <typename Container>
 void stringtok(Container &container, const std::wstring  &in, bool trim,

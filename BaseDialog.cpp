@@ -386,3 +386,18 @@ void CDialog::ExtendFrameIntoClientArea(UINT leftControl, UINT topControl, UINT 
         m_Dwm.DwmExtendFrameIntoClientArea(*this, &m_margins);
     }
 }
+
+int CDialog::GetDlgItemTextLength( UINT nId )
+{
+    HWND hWnd = GetDlgItem(*this, nId);
+    return GetWindowTextLength(hWnd);
+}
+
+std::unique_ptr<TCHAR[]> CDialog::GetDlgItemText( UINT nId )
+{
+    int len = GetDlgItemTextLength(nId);
+    len++;
+    std::unique_ptr<TCHAR[]> buf(new TCHAR[len]);
+    ::GetDlgItemText(*this, nId, buf.get(), len);
+    return buf;
+}
