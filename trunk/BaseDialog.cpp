@@ -40,6 +40,8 @@ INT_PTR CDialog::DoModal(HINSTANCE hInstance, int resID, HWND hWndParent, UINT i
         ::EnableWindow(hWndParent, FALSE);
 
     ShowWindow(m_hwnd, SW_SHOW);
+    ::BringWindowToTop(m_hwnd);
+    ::SetForegroundWindow(m_hwnd);
 
     // Main message loop:
     MSG msg = {0};
@@ -130,7 +132,7 @@ void CDialog::AddToolTip(UINT ctrlID, LPTSTR text)
 {
     TOOLINFO tt;
     tt.cbSize = sizeof(TOOLINFO);
-    tt.uFlags = TTF_IDISHWND|TTF_CENTERTIP|TTF_SUBCLASS;
+    tt.uFlags = TTF_IDISHWND|TTF_SUBCLASS;
     tt.hwnd = GetDlgItem(*this, ctrlID);
     tt.uId = (UINT)GetDlgItem(*this, ctrlID);
     tt.lpszText = text;
