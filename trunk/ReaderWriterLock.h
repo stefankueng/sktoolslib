@@ -53,8 +53,8 @@ protect writers against indefinite blockage by readers..."
 // operation (see InitializeCriticalSectionAndSpinCount API)
 #ifndef READER_WRITER_SPIN_COUNT
 #define READER_WRITER_SPIN_COUNT 400
-#endif READER_WRITER_SPIN_COUNT
-#endif _WIN32_WINNT
+#endif // READER_WRITER_SPIN_COUNT
+#endif // _WIN32_WINNT
 
 // Forward reference
 class CReaderWriterLock;
@@ -173,7 +173,6 @@ protected:
 private:
     CAutoReadLockT & operator=( const CAutoReadLockT & )
     {
-
     }
 };
 
@@ -194,7 +193,6 @@ protected:
 private:
     CAutoWriteLockT & operator=( const CAutoWriteLockT & )
     {
-
     }
 };
 
