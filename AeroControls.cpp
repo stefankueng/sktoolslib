@@ -37,6 +37,7 @@ enum ControlType
 
 using namespace Gdiplus;
 #pragma comment(lib, "gdiplus.lib")
+#pragma comment(lib, "comctl32.lib")
 
 AeroControlBase::AeroControlBase()
 {

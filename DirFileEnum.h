@@ -195,7 +195,27 @@ public:
         return m_sPathPrefix + m_FindFileData.cFileName;
     }
 
-    /**
+   /**
+    * Get the last write time of the file
+    *
+    * \return the last write time
+    */
+   FILETIME GetLastWriteTime() const
+   {
+       return m_FindFileData.ftLastWriteTime;
+   }
+
+   /**
+    * Get the creation time of the file
+    *
+    * \return the creation time
+    */
+   FILETIME GetCreateTime() const
+   {
+       return m_FindFileData.ftCreationTime;
+   }
+
+   /**
      * Check if the current file is the "." or ".."
      * pseudo-directory.
      *
@@ -265,4 +285,30 @@ public:
     bool NextFile(std::wstring &result, bool* pbIsDirectory, bool recurse = true);
 
     const WIN32_FIND_DATA * GetFileInfo() {return m_seStack->GetFileFindData();}
+
+   /**
+    * Get the last write time of the file
+    *
+    * \return the last write time
+    */
+   FILETIME GetLastWriteTime() const
+   {
+       if (m_seStack)
+           return m_seStack->GetLastWriteTime();
+       FILETIME ft = {0};
+       return ft;
+   }
+
+   /**
+    * Get the creation time of the file
+    *
+    * \return the creation time
+    */
+   FILETIME GetCreateTime() const
+   {
+       if (m_seStack)
+           return m_seStack->GetCreateTime();
+       FILETIME ft = {0};
+       return ft;
+   }
 };
