@@ -232,12 +232,12 @@ void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::
     {
         std::wstring::size_type next = str.find(toreplace, pos);
         result.append(str, pos, next-pos);
-        if( next != std::string::npos ) 
+        if( next != std::string::npos )
         {
             result.append(replacewith);
             pos = next + toreplace.size();
-        } 
-        else 
+        }
+        else
         {
             break;  // exit loop
         }
