@@ -46,8 +46,9 @@ static CGlobalAtom ga;
 
 
 CHotKeyCtrl::CHotKeyCtrl(void)
+    : m_hWnd(NULL)
 {
-	m_pfnOrigCtlProc    = NULL;
+	m_pfnOrigCtlProc = NULL;
 	controldown = false;
 	shiftdown = false;
 	menudown = false;

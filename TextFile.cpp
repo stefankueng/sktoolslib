@@ -23,6 +23,7 @@
 CTextFile::CTextFile(void) : pFileBuf(NULL)
     , filelen(0)
     , hasBOM(false)
+    , encoding(AUTOTYPE)
 {
 }
 

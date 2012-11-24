@@ -29,8 +29,8 @@ CLIPFORMAT CF_PREFERREDDROPEFFECT = (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PR
 FileDataObject::FileDataObject(const std::vector<std::wstring>& paths) : m_bInOperation(FALSE)
     , m_bIsAsync(TRUE)
     , m_cRefCount(0)
+    , m_allPaths(paths)
 {
-    m_allPaths = paths;
 }
 
 FileDataObject::~FileDataObject()
