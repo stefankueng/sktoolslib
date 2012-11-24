@@ -43,6 +43,8 @@ public:
     bool    DialogEnableWindow(UINT nID, bool bEnable);
     void    OnCompositionChanged();
     void    ExtendFrameIntoClientArea(UINT leftControl, UINT topControl, UINT rightControl, UINT botomControl);
+    int     GetDlgItemTextLength(UINT nId);
+    std::unique_ptr<TCHAR[]> GetDlgItemText(UINT nId);
 
     virtual LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
     virtual bool PreTranslateMessage(MSG* pMsg);
@@ -70,3 +72,4 @@ private:
     INT_PTR     m_iPseudoRet;
     HWND        m_hToolTips;
 };
+

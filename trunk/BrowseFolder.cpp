@@ -18,6 +18,8 @@
 //
 #include "StdAfx.h"
 #include <windowsx.h>
+#include <Shobjidl.h>
+#include <Shlobj.h>
 #include "BrowseFolder.h"
 
 BOOL CBrowseFolder::m_bCheck = FALSE;

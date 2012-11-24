@@ -223,3 +223,24 @@ bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd)
     }
     return false;
 }
+
+void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::wstring& replacewith)
+{
+    std::wstring result;
+    std::wstring::size_type pos = 0;
+    for ( ; ; )	// while (true)
+    {
+        std::wstring::size_type next = str.find(toreplace, pos);
+        result.append(str, pos, next-pos);
+        if( next != std::string::npos ) 
+        {
+            result.append(replacewith);
+            pos = next + toreplace.size();
+        } 
+        else 
+        {
+            break;  // exit loop
+        }
+    }
+    str.swap(result);
+}

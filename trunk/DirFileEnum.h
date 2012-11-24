@@ -181,6 +181,8 @@ public:
         return m_FindFileData.cFileName;
     }
 
+    const WIN32_FIND_DATA * GetFileFindData() const {return &m_FindFileData;}
+
     /*
      * Get the current file name, including the path.
      *
@@ -261,4 +263,6 @@ public:
      * \return TRUE iff a file was found, false at end of the iteration.
      */
     bool NextFile(std::wstring &result, bool* pbIsDirectory, bool recurse = true);
+
+    const WIN32_FIND_DATA * GetFileInfo() {return m_seStack->GetFileFindData();}
 };

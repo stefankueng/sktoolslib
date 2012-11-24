@@ -25,7 +25,6 @@
 
 #include "RegHistory.h"
 
-using namespace std;
 
 /**
 * Helper class for the CAutoComplete class: implements the string enumerator.
@@ -33,8 +32,9 @@ using namespace std;
 class CAutoCompleteEnum : public IEnumString
 {
 public:
-    CAutoCompleteEnum(const vector<wstring*>& vec);
-    CAutoCompleteEnum(const vector<wstring>& vec);
+    CAutoCompleteEnum(const std::vector<std::wstring*>& vec);
+    CAutoCompleteEnum(const std::vector<std::wstring>& vec);
+    ~CAutoCompleteEnum() {}
     //IUnknown members
     STDMETHOD(QueryInterface)(REFIID, void**);
     STDMETHOD_(ULONG, AddRef)(void);
@@ -46,10 +46,10 @@ public:
     STDMETHOD(Reset)(void);
     STDMETHOD(Clone)(IEnumString**);
 
-    void Init(const vector<wstring*>& vec);
-    void Init(const vector<wstring>& vec);
+    void Init(const std::vector<std::wstring*>& vec);
+    void Init(const std::vector<std::wstring>& vec);
 private:
-    vector<wstring>             m_vecStrings;
+    std::vector<std::wstring>   m_vecStrings;
     ULONG                       m_cRefCount;
     size_t                      m_iCur;
 };
@@ -67,6 +67,7 @@ public:
     bool        AddEntry(LPCTSTR szText);
 
     bool        RemoveSelected();
+    void        SetOptions(DWORD dwFlags);
 private:
     CAutoCompleteEnum *         m_pcacs;
     IAutoComplete2 *            m_pac;
