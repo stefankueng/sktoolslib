@@ -16,6 +16,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
+
 #include "stdafx.h"
 #include <stdio.h>
 #include <string.h>
@@ -25,11 +26,11 @@
 #include "ResourceTextFile.h"
 
 CResourceTextFile::CResourceTextFile()
-  : m_pszText(NULL),
-    m_eBomAction(NoBomAction),
-    m_eConvertAction(NoConvertAction)
+    : m_pszText(NULL)
+    , m_eBomAction(NoBomAction)
+    , m_eConvertAction(NoConvertAction)
+    , m_bText(TRUE)
 {
-    m_bText = TRUE;
 }
 
 CResourceTextFile::CResourceTextFile(const CResourceTextFile& rf)
