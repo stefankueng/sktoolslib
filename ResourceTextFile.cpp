@@ -29,7 +29,6 @@ CResourceTextFile::CResourceTextFile()
     : m_pszText(NULL)
     , m_eBomAction(NoBomAction)
     , m_eConvertAction(NoConvertAction)
-    , m_bText(TRUE)
 {
 }
 
