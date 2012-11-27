@@ -16,15 +16,18 @@
 // along with this program; if not, write to the Free Software Foundation,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
+
 #include "stdafx.h"
 #include "FileDropTarget.h"
 #include <shlguid.h>
 #include <shobjidl.h >
 
-CIDropTarget::CIDropTarget(HWND hTargetWnd):
-    m_hTargetWnd(hTargetWnd),
-    m_cRefCount(0), m_bAllowDrop(false),
-    m_pDropTargetHelper(NULL), m_pSupportedFrmt(NULL)
+CIDropTarget::CIDropTarget(HWND hTargetWnd)
+	: m_hTargetWnd(hTargetWnd)
+	, m_cRefCount(0)
+	, m_bAllowDrop(false)
+	, m_pDropTargetHelper(NULL)
+	, m_pSupportedFrmt(NULL)
 {
     if(FAILED(CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
                      IID_IDropTargetHelper,(LPVOID*)&m_pDropTargetHelper)))
