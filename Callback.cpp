@@ -21,7 +21,7 @@
 #include "Callback.h"
 
 #include <urlmon.h>
-#include <shlwapi.h>                    // for StrFormatByteSize()
+#include <Shlwapi.h>                    // for StrFormatByteSize()
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -34,8 +34,8 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 
 CCallback::CCallback()
+    : m_cRef(0)
 {
-    m_cRef = 0;
 }
 
 CCallback::~CCallback()

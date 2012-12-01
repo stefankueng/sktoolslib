@@ -48,12 +48,12 @@ static CGlobalAtom ga;
 
 CHotKeyCtrl::CHotKeyCtrl(void)
     : m_hWnd(NULL)
+    , m_pfnOrigCtlProc(NULL)
+    , controldown(false)
+    , shiftdown(false)
+    , menudown(false)
+    , lwindown(false)
 {
-    m_pfnOrigCtlProc = NULL;
-    controldown = false;
-    shiftdown = false;
-    menudown = false;
-    lwindown = false;
 }
 
 CHotKeyCtrl::~CHotKeyCtrl(void)
@@ -153,7 +153,7 @@ LRESULT CALLBACK CHotKeyCtrl::_KeyboardProc(int code, WPARAM wParam, LPARAM lPar
     if (hWndFocus)
     {
         CHotKeyCtrl *pHyperLink = (CHotKeyCtrl *)GetProp(hWndFocus, PROP_OBJECT_PTR);
-        if ((pHyperLink)&&(pHyperLink->m_hWnd == hWndFocus))
+        if ((pHyperLink) && (pHyperLink->m_hWnd == hWndFocus))
         {
             if (lParam & 0x80000000)
             {

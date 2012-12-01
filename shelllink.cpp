@@ -36,12 +36,11 @@ static char THIS_FILE[] = __FILE__;
 //////////////// Implementation //////////////////////////////////////
 
 CShellLinkInfo::CShellLinkInfo()
+    : m_pidl(NULL)
+    , m_wHotkey(0)
+    , m_nIconIndex(0)
+    , m_nShowCmd(SW_SHOW)
 {
-    //Set up some reasonable defaults
-    m_pidl = NULL;
-    m_wHotkey = 0;
-    m_nIconIndex = 0;
-    m_nShowCmd = SW_SHOW;
 }
 
 CShellLinkInfo::CShellLinkInfo(const CShellLinkInfo& sli)
@@ -86,10 +85,10 @@ CShellLinkInfo& CShellLinkInfo::operator=(const CShellLinkInfo& sli)
 }
 
 CShellLink::CShellLink()
+    : m_psl(NULL)
+    , m_ppf(NULL)
+    , m_bAttemptedInitialise(FALSE)
 {
-    m_psl = NULL;
-    m_ppf = NULL;
-    m_bAttemptedInitialise = FALSE;
 }
 
 CShellLink::~CShellLink()
@@ -341,8 +340,8 @@ void CShellLink::SetWorkingDirectory(const std::wstring& sWorkingDirectory)
 
 
 CUrlShellLink::CUrlShellLink()
+    : m_pURL(NULL)
 {
-    m_pURL = NULL;
 }
 
 BOOL CUrlShellLink::Create(const CShellLinkInfo& sli)
@@ -531,4 +530,3 @@ void CUrlShellLink::SetPathIDList(LPITEMIDLIST /*pidl*/)
 {
     //pidls are not supported for Internet shortcuts
 }
-
