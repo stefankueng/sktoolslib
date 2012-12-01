@@ -196,7 +196,7 @@ bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd)
                 _tcscpy_s(pchData, sLen+1, sClipdata);
                 if (GlobalUnlock(hClipboardData))
                 {
-                    if (SetClipboardData(CF_UNICODETEXT, hClipboardData)==NULL)
+                    if (SetClipboardData(CF_UNICODETEXT, hClipboardData) == NULL)
                     {
                         CloseClipboard();
                         return true;
@@ -229,11 +229,11 @@ void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::
 {
     std::wstring result;
     std::wstring::size_type pos = 0;
-    for ( ; ; )	// while (true)
+    for (;;)    // while (true)
     {
         std::wstring::size_type next = str.find(toreplace, pos);
         result.append(str, pos, next-pos);
-        if( next != std::string::npos )
+        if (next != std::string::npos)
         {
             result.append(replacewith);
             pos = next + toreplace.size();

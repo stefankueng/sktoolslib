@@ -19,7 +19,7 @@
 
 #include "stdafx.h"
 #include "AeroColors.h"
-#include <GdiPlus.h>
+#include <gdiplus.h>
 #include <dwmapi.h>
 
 #pragma comment(lib, "dwmapi.lib")

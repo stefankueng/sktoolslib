@@ -18,6 +18,7 @@
 //
 
 #pragma once
+
 #include "stdafx.h"
 #include "DebugOutput.h"
 

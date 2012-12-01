@@ -91,7 +91,7 @@ public:
 protected:
     bool CleanUp()
     {
-        if ( m_Handle != NULL_VALUE )
+        if (m_Handle != NULL_VALUE)
         {
             bool b = Close(m_Handle);
             m_Handle = NULL_VALUE;

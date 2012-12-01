@@ -18,6 +18,7 @@
 //
 
 #pragma once
+
 #include "ResourceFile.h"
 
 class CResourceTextFile : public CResourceFile
@@ -29,17 +30,21 @@ public:
 
     enum ConvertAction
     {
-        NoConvertAction = 0, ConvertToUnicode, ConvertToAnsi
+        NoConvertAction = 0,
+        ConvertToUnicode,
+        ConvertToAnsi
     };
 
     enum BomAction
     {
-        NoBomAction = 0, RemoveBom, AddBom
+        NoBomAction = 0,
+        RemoveBom,
+        AddBom
     };
 
     TCHAR * DuplicateTextBuffer();
     TCHAR * GetTextBuffer()             { return m_pszText; }
-    BomAction   GetBomAction()          { return m_eBomAction; }
+    BomAction     GetBomAction()        { return m_eBomAction; }
     ConvertAction GetConvertAction()    { return m_eConvertAction; }
 
 public:
@@ -60,4 +65,3 @@ protected:
     BomAction       m_eBomAction;       // BOM action requested at file open
     ConvertAction   m_eConvertAction;   // conversion requested at file open
 };
-

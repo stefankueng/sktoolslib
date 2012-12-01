@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <shlobj.h>
-#include <intshcut.h>
+#include <Shlobj.h>
+#include <IntShCut.h>
 #include <string>
 
 
@@ -118,5 +118,3 @@ protected:
   BOOL Initialise();
   IUniformResourceLocator* m_pURL;
 };
-
-

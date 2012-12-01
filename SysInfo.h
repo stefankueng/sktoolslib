@@ -39,5 +39,5 @@ public:
     bool            IsWin7() const {return (GetFullVersion() == 0x0601);}
     bool            IsWin7OrLater() const {return (GetFullVersion() >= 0x0601);}
 private:
-    OSVERSIONINFOEX         inf;
+    OSVERSIONINFOEX inf;
 };

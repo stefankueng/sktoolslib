@@ -200,10 +200,10 @@ HRESULT CProgressDlg::ShowModeless(HWND hWndParent)
             // This process finds the hwnd for the progress window and gives it a kick...
             IOleWindow *pOleWindow;
             HRESULT hr2 = m_pIDlg->QueryInterface(IID_IOleWindow,(LPVOID *)&pOleWindow);
-            if(SUCCEEDED(hr2))
+            if (SUCCEEDED(hr2))
             {
                 hr2 = pOleWindow->GetWindow(&m_hWndProgDlg);
-                if(SUCCEEDED(hr2))
+                if (SUCCEEDED(hr2))
                 {
                     ShowWindow(m_hWndProgDlg, SW_NORMAL);
                 }
@@ -241,7 +241,7 @@ bool CProgressDlg::HasUserCancelled()
 
 void CProgressDlg::Stop()
 {
-    if ((m_isVisible)&&(m_bValid))
+    if ((m_isVisible) && (m_bValid))
     {
         m_pIDlg->StopProgressDialog();
         // Sometimes the progress dialog sticks around after stopping it,

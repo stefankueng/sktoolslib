@@ -18,6 +18,7 @@
 //
 
 #pragma once
+
 #include "AeroGlass.h"
 #include "Registry.h"
 #include <map>

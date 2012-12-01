@@ -22,7 +22,8 @@
 #include "RegHistory.h"
 
 
-CRegHistory::CRegHistory() : m_nMaxHistoryItems(25)
+CRegHistory::CRegHistory()
+    : m_nMaxHistoryItems(25)
 {
 }
 
@@ -35,7 +36,7 @@ bool CRegHistory::AddEntry(LPCTSTR szText)
     if (_tcslen(szText) == 0)
         return false;
 
-    if ((!m_sSection.empty())&&(!m_sKeyPrefix.empty()))
+    if ((!m_sSection.empty()) && (!m_sKeyPrefix.empty()))
     {
         // refresh the history from the registry
         Load(m_sSection.c_str(), m_sKeyPrefix.c_str());
@@ -43,7 +44,7 @@ bool CRegHistory::AddEntry(LPCTSTR szText)
 
     for (size_t i=0; i<m_arEntries.size(); ++i)
     {
-        if (_tcscmp(szText, m_arEntries[i].c_str())==0)
+        if (_tcscmp(szText, m_arEntries[i].c_str()) == 0)
         {
             m_arEntries.erase(m_arEntries.begin() + i);
             m_arEntries.insert(m_arEntries.begin(), szText);

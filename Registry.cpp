@@ -18,7 +18,7 @@
 //
 
 #include "stdafx.h"
-#include "registry.h"
+#include "Registry.h"
 
 #ifdef _MFC_VER
 //MFC is available - also use the MFC-based classes
@@ -67,13 +67,13 @@ CRegDWORD::~CRegDWORD(void)
 
 DWORD   CRegDWORD::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey))==ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = sizeof(m_value);
         DWORD type;
-        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) &m_value,(LPDWORD) &size))==ERROR_SUCCESS)
+        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) &m_value,(LPDWORD) &size)) == ERROR_SUCCESS)
         {
-            ASSERT(type==REG_DWORD);
+            ASSERT(type == REG_DWORD);
             m_read = TRUE;
             LastError = RegCloseKey(m_hKey);
             m_hKey = NULL;
@@ -95,11 +95,11 @@ DWORD   CRegDWORD::read()
 void CRegDWORD::write()
 {
     DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp))!=ERROR_SUCCESS)
+    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
     {
         return;
     }
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_DWORD,(const BYTE*) &m_value, sizeof(m_value)))==ERROR_SUCCESS)
+    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_DWORD,(const BYTE*) &m_value, sizeof(m_value))) == ERROR_SUCCESS)
     {
         m_read = TRUE;
         m_hKey = NULL;
@@ -112,7 +112,7 @@ void CRegDWORD::write()
 
 CRegDWORD::operator DWORD()
 {
-    if ((m_read)&&(!m_force))
+    if ((m_read) && (!m_force))
     {
         LastError = 0;
         return m_value;
@@ -125,7 +125,7 @@ CRegDWORD::operator DWORD()
 
 CRegDWORD& CRegDWORD::operator =(DWORD d)
 {
-    if ((d==m_value)&&(!m_force))
+    if ((d == m_value) && (!m_force))
     {
         //no write to the registry required, its the same value
         LastError = 0;
@@ -182,17 +182,17 @@ CRegString::~CRegString(void)
 
 CString CRegString::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey))==ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = 0;
         DWORD type;
         LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
         TCHAR* pStr = new TCHAR[size];
-        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) pStr,(LPDWORD) &size))==ERROR_SUCCESS)
+        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) pStr,(LPDWORD) &size)) == ERROR_SUCCESS)
         {
             m_value = CString(pStr);
             delete [] pStr;
-            ASSERT(type==REG_SZ || type==REG_EXPAND_SZ);
+            ASSERT(type == REG_SZ || type == REG_EXPAND_SZ);
             m_read = TRUE;
             LastError = RegCloseKey(m_hKey);
             m_hKey = NULL;
@@ -215,14 +215,14 @@ CString CRegString::read()
 void CRegString::write()
 {
     DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp))!=ERROR_SUCCESS)
+    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
     {
         return;
     }
 #ifdef _UNICODE
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_SZ, (BYTE *)(LPCTSTR)m_value, (m_value.GetLength()+1)*2))==ERROR_SUCCESS)
+    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_SZ, (BYTE *)(LPCTSTR)m_value, (m_value.GetLength()+1)*2)) == ERROR_SUCCESS)
 #else
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_SZ, (BYTE *)(LPCTSTR)m_value, m_value.GetLength()+1))==ERROR_SUCCESS)
+    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_SZ, (BYTE *)(LPCTSTR)m_value, m_value.GetLength()+1)) == ERROR_SUCCESS)
 #endif
     {
         m_read = TRUE;
@@ -233,7 +233,7 @@ void CRegString::write()
 
 CRegString::operator CString()
 {
-    if ((m_read)&&(!m_force))
+    if ((m_read) && (!m_force))
     {
         LastError = 0;
         return m_value;
@@ -246,7 +246,7 @@ CRegString::operator CString()
 
 CRegString& CRegString::operator =(const CString& s)
 {
-    if ((s==m_value)&&(!m_force))
+    if ((s == m_value) && (!m_force))
     {
         //no write to the registry required, its the same value
         LastError = 0;
@@ -303,17 +303,17 @@ CRegRect::~CRegRect(void)
 
 CRect   CRegRect::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey))==ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = 0;
         DWORD type;
         RegQueryValueEx(m_hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
         LPRECT pRect = (LPRECT)new char[size];
-        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) pRect,(LPDWORD) &size))==ERROR_SUCCESS)
+        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) pRect,(LPDWORD) &size)) == ERROR_SUCCESS)
         {
             m_value = CRect(pRect);
             delete [] pRect;
-            ASSERT(type==REG_BINARY);
+            ASSERT(type == REG_BINARY);
             m_read = TRUE;
             LastError = RegCloseKey(m_hKey);
             m_hKey = NULL;
@@ -336,12 +336,12 @@ CRect   CRegRect::read()
 void CRegRect::write()
 {
     DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp))!=ERROR_SUCCESS)
+    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
     {
         return;
     }
 
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_BINARY, (BYTE *)(LPRECT)m_value, sizeof(m_value)))==ERROR_SUCCESS)
+    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_BINARY, (BYTE *)(LPRECT)m_value, sizeof(m_value))) == ERROR_SUCCESS)
     {
         m_read = TRUE;
     }
@@ -351,7 +351,7 @@ void CRegRect::write()
 
 CRegRect::operator CRect()
 {
-    if ((m_read)&&(!m_force))
+    if ((m_read) && (!m_force))
     {
         LastError = 0;
         return m_value;
@@ -364,7 +364,7 @@ CRegRect::operator CRect()
 
 CRegRect& CRegRect::operator =(CRect s)
 {
-    if ((s==m_value)&&(!m_force))
+    if ((s == m_value) && (!m_force))
     {
         //no write to the registry required, its the same value
         LastError = 0;
@@ -421,17 +421,17 @@ CRegPoint::~CRegPoint(void)
 
 CPoint  CRegPoint::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey))==ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = 0;
         DWORD type;
         RegQueryValueEx(m_hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
         POINT* pPoint = (POINT *)new char[size];
-        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) pPoint,(LPDWORD) &size))==ERROR_SUCCESS)
+        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) pPoint,(LPDWORD) &size)) == ERROR_SUCCESS)
         {
             m_value = CPoint(*pPoint);
             delete [] pPoint;
-            ASSERT(type==REG_BINARY);
+            ASSERT(type == REG_BINARY);
             m_read = TRUE;
             LastError = RegCloseKey(m_hKey);
             m_hKey = NULL;
@@ -454,12 +454,12 @@ CPoint  CRegPoint::read()
 void CRegPoint::write()
 {
     DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp))!=ERROR_SUCCESS)
+    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
     {
         return;
     }
 
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_BINARY, (BYTE *)(POINT *)&m_value, sizeof(m_value)))==ERROR_SUCCESS)
+    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_BINARY, (BYTE *)(POINT *)&m_value, sizeof(m_value))) == ERROR_SUCCESS)
     {
         m_read = TRUE;
     }
@@ -469,7 +469,7 @@ void CRegPoint::write()
 
 CRegPoint::operator CPoint()
 {
-    if ((m_read)&&(!m_force))
+    if ((m_read) && (!m_force))
     {
         LastError = 0;
         return m_value;
@@ -482,7 +482,7 @@ CRegPoint::operator CPoint()
 
 CRegPoint& CRegPoint::operator =(CPoint s)
 {
-    if ((s==m_value)&&(!m_force))
+    if ((s == m_value) && (!m_force))
     {
         //no write to the registry required, its the same value
         LastError = 0;
@@ -530,7 +530,7 @@ bool CRegistryKey::getValues(CStringList& values)
 {
     values.RemoveAll();
 
-    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)==ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey) == ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {
@@ -551,7 +551,7 @@ bool CRegistryKey::getSubKeys(CStringList& subkeys)
 {
     subkeys.RemoveAll();
 
-    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)==ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey) == ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {
@@ -613,13 +613,13 @@ CRegStdString::~CRegStdString(void)
 
 stdstring   CRegStdString::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey))==ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = 0;
         DWORD type;
         RegQueryValueEx(m_hKey, m_key.c_str(), NULL, &type, NULL, (LPDWORD) &size);
         TCHAR* pStr = new TCHAR[size];
-        if ((LastError = RegQueryValueEx(m_hKey, m_key.c_str(), NULL, &type, (BYTE*) pStr,(LPDWORD) &size))==ERROR_SUCCESS)
+        if ((LastError = RegQueryValueEx(m_hKey, m_key.c_str(), NULL, &type, (BYTE*) pStr,(LPDWORD) &size)) == ERROR_SUCCESS)
         {
             m_value.assign(pStr);
             delete [] pStr;
@@ -645,11 +645,11 @@ stdstring   CRegStdString::read()
 void CRegStdString::write()
 {
     DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path.c_str(), 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp))!=ERROR_SUCCESS)
+    if ((LastError = RegCreateKeyEx(m_base, m_path.c_str(), 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
     {
         return;
     }
-    if ((LastError = RegSetValueEx(m_hKey, m_key.c_str(), 0, REG_SZ, (BYTE *)m_value.c_str(), ((DWORD)m_value.size()+1)*sizeof(TCHAR)))==ERROR_SUCCESS)
+    if ((LastError = RegSetValueEx(m_hKey, m_key.c_str(), 0, REG_SZ, (BYTE *)m_value.c_str(), ((DWORD)m_value.size()+1)*sizeof(TCHAR))) == ERROR_SUCCESS)
     {
         m_read = TRUE;
     }
@@ -659,7 +659,7 @@ void CRegStdString::write()
 
 CRegStdString::operator LPCTSTR()
 {
-    if ((m_read)&&(!m_force))
+    if ((m_read) && (!m_force))
     {
         LastError = 0;
         return m_value.c_str();
@@ -670,7 +670,7 @@ CRegStdString::operator LPCTSTR()
 
 CRegStdString& CRegStdString::operator =(stdstring s)
 {
-    if ((s.compare(m_value)==0)&&(!m_force))
+    if ((s.compare(m_value) == 0) && (!m_force))
     {
         //no write to the registry required, its the same value
         LastError = 0;
@@ -724,11 +724,11 @@ CRegStdDWORD::~CRegStdDWORD(void)
 
 DWORD CRegStdDWORD::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey))==ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = sizeof(m_value);
         DWORD type;
-        if ((LastError = RegQueryValueEx(m_hKey, m_key.c_str(), NULL, &type, (BYTE*) &m_value,(LPDWORD) &size))==ERROR_SUCCESS)
+        if ((LastError = RegQueryValueEx(m_hKey, m_key.c_str(), NULL, &type, (BYTE*) &m_value,(LPDWORD) &size)) == ERROR_SUCCESS)
         {
             m_read = TRUE;
             LastError = RegCloseKey(m_hKey);
@@ -751,11 +751,11 @@ DWORD CRegStdDWORD::read()
 void CRegStdDWORD::write()
 {
     DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path.c_str(), 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp))!=ERROR_SUCCESS)
+    if ((LastError = RegCreateKeyEx(m_base, m_path.c_str(), 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
     {
         return;
     }
-    if ((LastError = RegSetValueEx(m_hKey, m_key.c_str(), 0, REG_DWORD,(const BYTE*) &m_value, sizeof(m_value)))==ERROR_SUCCESS)
+    if ((LastError = RegSetValueEx(m_hKey, m_key.c_str(), 0, REG_DWORD,(const BYTE*) &m_value, sizeof(m_value))) == ERROR_SUCCESS)
     {
         m_read = TRUE;
     }
@@ -765,7 +765,7 @@ void CRegStdDWORD::write()
 
 CRegStdDWORD::operator DWORD()
 {
-    if ((m_read)&&(!m_force))
+    if ((m_read) && (!m_force))
     {
         LastError = 0;
         return m_value;
@@ -778,7 +778,7 @@ CRegStdDWORD::operator DWORD()
 
 CRegStdDWORD& CRegStdDWORD::operator =(DWORD d)
 {
-    if ((d==m_value)&&(!m_force))
+    if ((d == m_value) && (!m_force))
     {
         //no write to the registry required, its the same value
         LastError = 0;
@@ -825,7 +825,7 @@ bool CStdRegistryKey::getValues(stdregistrykeylist& values)
 {
     values.clear();
 
-    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey)==ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey) == ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {
@@ -846,7 +846,7 @@ bool CStdRegistryKey::getSubKeys(stdregistrykeylist& subkeys)
 {
     subkeys.clear();
 
-    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey)==ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey) == ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {

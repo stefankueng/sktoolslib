@@ -24,7 +24,7 @@
 LPITEMIDLIST CPidl::GetNextItemID(LPCITEMIDLIST pidl)
 {
     // Check for valid pidl.
-    if(pidl == NULL)
+    if (pidl == NULL)
         return NULL;
 
     // Get the size of the specified item identifier.
@@ -95,9 +95,9 @@ BOOL CPidl::GetParentID(LPITEMIDLIST pidl)
 
 LPITEMIDLIST CPidl::Append(LPITEMIDLIST pidlBase, LPCITEMIDLIST pidlAdd)
 {
-    if(pidlBase == NULL)
+    if (pidlBase == NULL)
         return NULL;
-    if(pidlAdd == NULL)
+    if (pidlAdd == NULL)
         return pidlBase;
 
     LPITEMIDLIST pidlNew;
@@ -113,4 +113,3 @@ LPITEMIDLIST CPidl::Append(LPITEMIDLIST pidlBase, LPCITEMIDLIST pidlAdd)
     }
     return pidlNew;
 }
-

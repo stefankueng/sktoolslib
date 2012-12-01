@@ -104,23 +104,28 @@ public:
         /* [in] */ REFIID riid,
         /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR * ppvObject)
     {
-        if ( riid == IID_IAuthenticate ) {
+        if (riid == IID_IAuthenticate)
+        {
             *ppvObject = (void*) (IAuthenticate*)this;
             return S_OK;
         }
-        else if ( riid == IID_IUnknown ) {
+        else if (riid == IID_IUnknown)
+        {
             *ppvObject = (void*) (IUnknown*)(IBindStatusCallback*)this;
             return S_OK;
         }
-        else if ( riid == IID_IBindStatusCallback ) {
+        else if (riid == IID_IBindStatusCallback)
+        {
             *ppvObject = (void*) (IBindStatusCallback*)this;
             return S_OK;
         }
-        else if ( riid == IID_IHttpSecurity ) {
+        else if (riid == IID_IHttpSecurity)
+        {
             *ppvObject = (void*) (IHttpSecurity*)this;
             return S_OK;
         }
-        else if ( riid == IID_IWindowForBindingUI ) {
+        else if (riid == IID_IWindowForBindingUI)
+        {
             *ppvObject = (void*) (IWindowForBindingUI*)this;
             return S_OK;
         }

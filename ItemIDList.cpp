@@ -21,10 +21,10 @@
 #include "ItemIDList.h"
 
 
-ItemIDList::ItemIDList(LPCITEMIDLIST item, LPCITEMIDLIST parent) :
-      item_ (item)
-    , parent_ (parent)
-    , count_ (-1)
+ItemIDList::ItemIDList(LPCITEMIDLIST item, LPCITEMIDLIST parent)
+    : item_(item)
+    , parent_(parent)
+    , count_(-1)
 {
 }
 
@@ -98,7 +98,7 @@ tstring ItemIDList::toString()
         parentFolder = shellFolder;
     }
 
-    if ((parentFolder != 0)&&(item_ != 0))
+    if ((parentFolder != 0) && (item_ != 0))
     {
         hr = parentFolder->GetDisplayNameOf(item_, SHGDN_NORMAL | SHGDN_FORPARSING, &name);
         if (!SUCCEEDED(hr))

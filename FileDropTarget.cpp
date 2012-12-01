@@ -19,24 +19,24 @@
 
 #include "stdafx.h"
 #include "FileDropTarget.h"
-#include <shlguid.h>
-#include <shobjidl.h >
+#include <ShlGuid.h>
+#include <ShObjIdl.h >
 
 CIDropTarget::CIDropTarget(HWND hTargetWnd)
-	: m_hTargetWnd(hTargetWnd)
-	, m_cRefCount(0)
-	, m_bAllowDrop(false)
-	, m_pDropTargetHelper(NULL)
-	, m_pSupportedFrmt(NULL)
+    : m_hTargetWnd(hTargetWnd)
+    , m_cRefCount(0)
+    , m_bAllowDrop(false)
+    , m_pDropTargetHelper(NULL)
+    , m_pSupportedFrmt(NULL)
 {
-    if(FAILED(CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
+    if (FAILED(CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
                      IID_IDropTargetHelper,(LPVOID*)&m_pDropTargetHelper)))
         m_pDropTargetHelper = NULL;
 }
 
 CIDropTarget::~CIDropTarget()
 {
-    if(m_pDropTargetHelper != NULL)
+    if (m_pDropTargetHelper != NULL)
     {
         m_pDropTargetHelper->Release();
         m_pDropTargetHelper = NULL;
@@ -47,7 +47,7 @@ HRESULT STDMETHODCALLTYPE CIDropTarget::QueryInterface( /* [in] */ REFIID riid,
                         /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject)
 {
    *ppvObject = NULL;
-   if (IID_IUnknown==riid || IID_IDropTarget==riid)
+   if (IID_IUnknown == riid || IID_IDropTarget == riid)
              *ppvObject=this;
 
     if (*ppvObject != NULL)
@@ -62,7 +62,7 @@ ULONG STDMETHODCALLTYPE CIDropTarget::Release( void)
 {
    long nTemp;
    nTemp = --m_cRefCount;
-   if(nTemp==0)
+   if (nTemp == 0)
       delete this;
    return nTemp;
 }
@@ -114,17 +114,17 @@ HRESULT STDMETHODCALLTYPE CIDropTarget::DragEnter(
     /* [in] */ POINTL pt,
     /* [out][in] */ DWORD __RPC_FAR *pdwEffect)
 {
-    if(pDataObj == NULL)
+    if (pDataObj == NULL)
         return E_INVALIDARG;
 
-    if(m_pDropTargetHelper)
+    if (m_pDropTargetHelper)
         m_pDropTargetHelper->DragEnter(m_hTargetWnd, pDataObj, (LPPOINT)&pt, *pdwEffect);
 
     m_pSupportedFrmt = NULL;
-    for(size_t i =0; i<m_formatetc.size(); ++i)
+    for (size_t i =0; i<m_formatetc.size(); ++i)
     {
         m_bAllowDrop = (pDataObj->QueryGetData(&m_formatetc[i]) == S_OK)?true:false;
-        if(m_bAllowDrop)
+        if (m_bAllowDrop)
         {
             m_pSupportedFrmt = &m_formatetc[i];
             break;
@@ -140,7 +140,7 @@ HRESULT STDMETHODCALLTYPE CIDropTarget::DragOver(
         /* [in] */ POINTL pt,
         /* [out][in] */ DWORD __RPC_FAR *pdwEffect)
 {
-    if(m_pDropTargetHelper)
+    if (m_pDropTargetHelper)
         m_pDropTargetHelper->DragOver((LPPOINT)&pt, *pdwEffect);
     QueryDrop(grfKeyState, pdwEffect);
     return S_OK;
@@ -148,7 +148,7 @@ HRESULT STDMETHODCALLTYPE CIDropTarget::DragOver(
 
 HRESULT STDMETHODCALLTYPE CIDropTarget::DragLeave( void)
 {
-    if(m_pDropTargetHelper)
+    if (m_pDropTargetHelper)
         m_pDropTargetHelper->DragLeave();
 
     m_bAllowDrop = false;
@@ -164,17 +164,17 @@ HRESULT STDMETHODCALLTYPE CIDropTarget::Drop(
     if (pDataObj == NULL)
         return E_INVALIDARG;
 
-    if(m_pDropTargetHelper)
+    if (m_pDropTargetHelper)
         m_pDropTargetHelper->Drop(pDataObj, (LPPOINT)&pt, *pdwEffect);
 
-    if(QueryDrop(grfKeyState, pdwEffect))
+    if (QueryDrop(grfKeyState, pdwEffect))
     {
-        if(m_bAllowDrop && m_pSupportedFrmt != NULL)
+        if (m_bAllowDrop && m_pSupportedFrmt != NULL)
         {
             STGMEDIUM medium;
-            if(pDataObj->GetData(m_pSupportedFrmt, &medium) == S_OK)
+            if (pDataObj->GetData(m_pSupportedFrmt, &medium) == S_OK)
             {
-                if(OnDrop(m_pSupportedFrmt, medium, pdwEffect)) //does derive class wants us to free medium?
+                if (OnDrop(m_pSupportedFrmt, medium, pdwEffect)) //does derive class wants us to free medium?
                     ReleaseStgMedium(&medium);
             }
         }
@@ -184,4 +184,3 @@ HRESULT STDMETHODCALLTYPE CIDropTarget::Drop(
     m_pSupportedFrmt = NULL;
     return S_OK;
 }
-

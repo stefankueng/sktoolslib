@@ -96,4 +96,3 @@ LRESULT CALLBACK CEditDoubleClick::_HyperlinkProc(HWND hwnd, UINT message,
     return CallWindowProc(pCtrl->m_pfnOrigCtlProc, hwnd, message,
                           wParam, lParam);
 }
-

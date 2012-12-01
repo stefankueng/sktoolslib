@@ -152,7 +152,7 @@ void CDlgResizer::UpdateGripPos()
 
     // maximized windows cannot be resized
 
-    if ( ::IsZoomed(m_hDlg) )
+    if (::IsZoomed(m_hDlg))
     {
         ::EnableWindow(m_wndGrip, FALSE);
         ShowSizeGrip(false);
@@ -163,4 +163,3 @@ void CDlgResizer::UpdateGripPos()
         ShowSizeGrip(false);
     }
 }
-

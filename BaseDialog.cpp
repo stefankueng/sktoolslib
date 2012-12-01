@@ -19,7 +19,7 @@
 
 #include "stdafx.h"
 #include "BaseDialog.h"
-#include "commctrl.h"
+#include <CommCtrl.h>
 #include <WindowsX.h>
 
 INT_PTR CDialog::DoModal(HINSTANCE hInstance, int resID, HWND hWndParent)
@@ -107,7 +107,7 @@ void CDialog::InitDialog(HWND hwndDlg, UINT iconID)
 
     hwndOwner = ::GetParent(hwndDlg);
     GetWindowPlacement(hwndOwner, &placement);
-    if ((hwndOwner == NULL)||(placement.showCmd == SW_SHOWMINIMIZED)||(placement.showCmd == SW_SHOWMINNOACTIVE))
+    if ((hwndOwner == NULL) || (placement.showCmd == SW_SHOWMINIMIZED) || (placement.showCmd == SW_SHOWMINNOACTIVE))
         hwndOwner = ::GetDesktopWindow();
 
     GetWindowRect(hwndOwner, &rcOwner);
@@ -374,9 +374,9 @@ void CDialog::ExtendFrameIntoClientArea(UINT leftControl, UINT topControl, UINT 
     else
         m_margins.cyBottomHeight = 0;
 
-    if ((m_margins.cxLeftWidth == 0)&&
-        (m_margins.cyTopHeight == 0)&&
-        (m_margins.cxRightWidth == 0)&&
+    if ((m_margins.cxLeftWidth == 0) &&
+        (m_margins.cyTopHeight == 0) &&
+        (m_margins.cxRightWidth == 0) &&
         (m_margins.cyBottomHeight == 0))
     {
         m_margins.cxLeftWidth = -1;

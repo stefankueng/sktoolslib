@@ -18,7 +18,8 @@
 //
 
 #pragma once
-#include "windows.h"
+
+#include <windows.h>
 
 
 // does not implement HKM_SETRULES
@@ -37,11 +38,11 @@ public:
 protected:
 
 private:
-    HWND m_hWnd;
-    WNDPROC  m_pfnOrigCtlProc;
+    HWND    m_hWnd;
+    WNDPROC m_pfnOrigCtlProc;
 
     static LRESULT CALLBACK _HotKeyProc(HWND hwnd, UINT message,
-                                           WPARAM wParam, LPARAM lParam);
+                                        WPARAM wParam, LPARAM lParam);
 
     HHOOK kb_hook;
     static LRESULT CALLBACK _KeyboardProc(int code, WPARAM wParam, LPARAM lParam);
