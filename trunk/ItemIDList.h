@@ -40,4 +40,3 @@ private:
     LPCITEMIDLIST parent_;
     mutable int count_;
 };
-

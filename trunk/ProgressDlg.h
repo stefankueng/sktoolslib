@@ -18,7 +18,8 @@
 //
 
 #pragma once
-#include <shlobj.h>
+
+#include <Shlobj.h>
 
 #pragma comment(lib, "shell32.lib")
 /**

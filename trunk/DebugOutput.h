@@ -18,7 +18,8 @@
 //
 
 #pragma once
-#include "registry.h"
+
+#include "Registry.h"
 
 
 class CTraceToOutputDebugString
@@ -71,8 +72,8 @@ private:
         delete m_pInstance;
     }
 
-    DWORD m_LastTick;
-    bool    m_bActive;
+    DWORD  m_LastTick;
+    bool   m_bActive;
     static CTraceToOutputDebugString * m_pInstance;
 
     // Non Unicode output helper

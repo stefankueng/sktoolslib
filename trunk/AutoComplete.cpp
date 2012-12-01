@@ -175,7 +175,7 @@ void CAutoCompleteEnum::Init(const std::vector<std::wstring*>& vec)
 STDMETHODIMP  CAutoCompleteEnum::QueryInterface(REFIID refiid, void** ppv)
 {
     *ppv = NULL;
-    if (IID_IUnknown==refiid || IID_IEnumString==refiid)
+    if (IID_IUnknown == refiid || IID_IEnumString == refiid)
         *ppv=this;
 
     if (*ppv != NULL)

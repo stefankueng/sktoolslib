@@ -27,7 +27,8 @@ CLIPFORMAT CF_FILECONTENTS = (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTE
 CLIPFORMAT CF_FILEDESCRIPTOR = (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR);
 CLIPFORMAT CF_PREFERREDDROPEFFECT = (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
 
-FileDataObject::FileDataObject(const std::vector<std::wstring>& paths) : m_bInOperation(FALSE)
+FileDataObject::FileDataObject(const std::vector<std::wstring>& paths)
+    : m_bInOperation(FALSE)
     , m_bIsAsync(TRUE)
     , m_cRefCount(0)
     , m_allPaths(paths)
@@ -53,12 +54,12 @@ FileDataObject::~FileDataObject()
 STDMETHODIMP FileDataObject::QueryInterface(REFIID riid, void** ppvObject)
 {
     *ppvObject = NULL;
-    if (IID_IUnknown==riid || IID_IDataObject==riid)
+    if (IID_IUnknown == riid || IID_IDataObject == riid)
         *ppvObject=this;
     if (riid == IID_IAsyncOperation)
         *ppvObject = (IAsyncOperation*)this;
 
-    if (NULL!=*ppvObject)
+    if (NULL != *ppvObject)
     {
         ((LPUNKNOWN)*ppvObject)->AddRef();
         return S_OK;
@@ -332,7 +333,7 @@ void FileDataObject::CopyMedium(STGMEDIUM* pMedDest, STGMEDIUM* pMedSrc, FORMATE
     }
     pMedDest->tymed = pMedSrc->tymed;
     pMedDest->pUnkForRelease = NULL;
-    if(pMedSrc->pUnkForRelease != NULL)
+    if (pMedSrc->pUnkForRelease != NULL)
     {
         pMedDest->pUnkForRelease = pMedSrc->pUnkForRelease;
         pMedSrc->pUnkForRelease->AddRef();
@@ -384,7 +385,7 @@ HRESULT STDMETHODCALLTYPE FileDataObject::EndOperation(HRESULT /*hResult*/, IBin
 
 HRESULT STDMETHODCALLTYPE FileDataObject::SetDropDescription(DROPIMAGETYPE image, LPCTSTR format, LPCTSTR insert)
 {
-    if(format == NULL || insert == NULL)
+    if (format == NULL || insert == NULL)
         return E_INVALIDARG;
 
     FORMATETC fetc = {0};
@@ -396,7 +397,7 @@ HRESULT STDMETHODCALLTYPE FileDataObject::SetDropDescription(DROPIMAGETYPE image
 
     STGMEDIUM medium = {0};
     medium.hGlobal = GlobalAlloc(GHND, sizeof(DROPDESCRIPTION));
-    if(medium.hGlobal == 0)
+    if (medium.hGlobal == 0)
         return E_OUTOFMEMORY;
 
     DROPDESCRIPTION* pDropDescription = (DROPDESCRIPTION*)GlobalLock(medium.hGlobal);
@@ -442,7 +443,7 @@ CSVNEnumFormatEtc::CSVNEnumFormatEtc(const std::vector<FORMATETC*>& vec) : m_cRe
 STDMETHODIMP  CSVNEnumFormatEtc::QueryInterface(REFIID refiid, void** ppv)
 {
     *ppv = NULL;
-    if (IID_IUnknown==refiid || IID_IEnumFORMATETC==refiid)
+    if (IID_IUnknown == refiid || IID_IEnumFORMATETC == refiid)
         *ppv=this;
 
     if (*ppv != NULL)
@@ -471,11 +472,11 @@ STDMETHODIMP_(ULONG) CSVNEnumFormatEtc::Release(void)
 
 STDMETHODIMP CSVNEnumFormatEtc::Next(ULONG celt, LPFORMATETC lpFormatEtc, ULONG* pceltFetched)
 {
-    if(celt <= 0)
+    if (celt <= 0)
         return E_INVALIDARG;
     if (pceltFetched == NULL && celt != 1) // pceltFetched can be NULL only for 1 item request
         return E_POINTER;
-    if(lpFormatEtc == NULL)
+    if (lpFormatEtc == NULL)
         return E_POINTER;
 
     if (pceltFetched != NULL)
@@ -625,7 +626,7 @@ STDMETHODIMP_(ULONG) CIDropSource::Release( void)
     long nTemp;
     nTemp = --m_cRefCount;
 
-    if(nTemp==0)
+    if (nTemp == 0)
         delete this;
     return nTemp;
 }
@@ -634,7 +635,7 @@ STDMETHODIMP CIDropSource::QueryContinueDrag(
     /* [in] */ BOOL fEscapePressed,
     /* [in] */ DWORD grfKeyState)
 {
-    if(fEscapePressed)
+    if (fEscapePressed)
         return DRAGDROP_S_CANCEL;
     if(!(grfKeyState & (MK_LBUTTON|MK_RBUTTON)))
     {

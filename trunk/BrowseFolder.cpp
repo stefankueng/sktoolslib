@@ -18,7 +18,7 @@
 //
 
 #include "stdafx.h"
-#include <windowsx.h>
+#include <WindowsX.h>
 #include <Shobjidl.h>
 #include <Shlobj.h>
 #include "BrowseFolder.h"
@@ -36,8 +36,8 @@ bool CBrowseFolder::m_DisableCheckbox2WhenCheckbox1IsChecked = false;
 
 
 CBrowseFolder::CBrowseFolder(void)
-:   m_style(0),
-    m_root(NULL)
+    : m_style(0)
+    , m_root(NULL)
 {
     memset(m_displayName, 0, sizeof(m_displayName));
     memset(m_title, 0, sizeof(m_title));
@@ -64,7 +64,7 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
 {
     retVal ret = OK;        //assume OK
     m_sDefaultPath = sDefaultPath;
-    if ((m_sDefaultPath.size()==0) && path.size())
+    if ((m_sDefaultPath.size() == 0) && path.size())
     {
         // if the result path already contains a path, use that as the default path
         m_sDefaultPath = path;
@@ -181,7 +181,7 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
         browseInfo.lpfn             = NULL;
         browseInfo.lParam           = (LPARAM)this;
 
-        if ((_tcslen(m_CheckText) > 0)||(m_sDefaultPath.size()))
+        if ((_tcslen(m_CheckText) > 0) || (m_sDefaultPath.size()))
         {
             browseInfo.lpfn = BrowseCallBackProc;
         }
@@ -262,7 +262,7 @@ int CBrowseFolder::BrowseCallBackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARA
     {
         if (_tcslen(m_CheckText) > 0)
         {
-            bool bSecondCheckbox = (_tcslen(m_CheckText2)!=0);
+            bool bSecondCheckbox = (_tcslen(m_CheckText2) != 0);
             //Rectangles for getting the positions
             checkbox = CreateWindowEx(  0,
                 _T("BUTTON"),
@@ -387,7 +387,7 @@ LRESULT CBrowseFolder::CheckBoxSubclassProc(HWND hwnd,UINT uMsg,WPARAM wParam,LP
 {
     if (uMsg == WM_LBUTTONUP)
     {
-        m_bCheck = (SendMessage(hwnd,BM_GETCHECK,0,0)==BST_UNCHECKED);
+        m_bCheck = (SendMessage(hwnd,BM_GETCHECK,0,0) == BST_UNCHECKED);
         if (m_bCheck && m_DisableCheckbox2WhenCheckbox1IsChecked)
         {
             ::EnableWindow(checkbox2, !m_bCheck);
@@ -404,10 +404,9 @@ LRESULT CBrowseFolder::CheckBoxSubclassProc2(HWND hwnd,UINT uMsg,WPARAM wParam,L
 {
     if (uMsg == WM_LBUTTONUP)
     {
-        m_bCheck2 = (SendMessage(hwnd,BM_GETCHECK,0,0)==BST_UNCHECKED);
+        m_bCheck2 = (SendMessage(hwnd,BM_GETCHECK,0,0) == BST_UNCHECKED);
     }
 
     return CallWindowProc(CBProc, hwnd, uMsg,
         wParam, lParam);
 }
-

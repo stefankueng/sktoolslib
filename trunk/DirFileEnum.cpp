@@ -18,15 +18,15 @@
 //
 
 #include "stdafx.h"
-#include <shlwapi.h>
+#include <Shlwapi.h>
 #include "DirFileEnum.h"
 
 #pragma comment(lib, "shlwapi.lib")
 
-CSimpleFileFind::CSimpleFileFind(const std::wstring &sPath, LPCTSTR pPattern) :
-    m_dError(ERROR_SUCCESS),
-    m_bFirst(true),
-    m_sPathPrefix(sPath)
+CSimpleFileFind::CSimpleFileFind(const std::wstring &sPath, LPCTSTR pPattern)
+    : m_dError(ERROR_SUCCESS)
+    , m_bFirst(true)
+    , m_sPathPrefix(sPath)
 {
     if (PathIsDirectory(sPath.c_str()))
     {
@@ -124,8 +124,8 @@ bool CSimpleFileFind::FindNextFileNoDirectories()
 
 
 CDirFileEnum::CDirStackEntry::CDirStackEntry(CDirStackEntry * seNext, const std::wstring& sDirName)
-    : CSimpleFileFind(sDirName),
-      m_seNext(seNext)
+    : CSimpleFileFind(sDirName)
+    , m_seNext(seNext)
 {
 }
 

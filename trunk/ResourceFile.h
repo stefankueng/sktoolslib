@@ -56,4 +56,3 @@ protected:
     BOOL        m_bDoNotDeleteBuffer;   // TRUE = buffer allocated externally
                                         // or detached; do not delete
 };
-

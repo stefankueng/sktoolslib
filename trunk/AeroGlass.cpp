@@ -25,13 +25,14 @@ typedef HRESULT (__stdcall *DWM_EXTEND_FRAME_INTO_CLIENT_AREA)(HWND ,const MARGI
 typedef HRESULT (__stdcall *DWM_IS_COMPOSITION_ENABLED)(BOOL *pfEnabled);
 typedef HRESULT (__stdcall *DWM_ENABLE_COMPOSITION)(UINT uCompositionAction);
 
-CDwmApiImpl::CDwmApiImpl(void):m_hDwmApiLib(NULL)
+CDwmApiImpl::CDwmApiImpl(void)
+    : m_hDwmApiLib(NULL)
 {
 }
 
 BOOL CDwmApiImpl::Initialize(void)
 {
-    if(m_hDwmApiLib)
+    if (m_hDwmApiLib)
     {
         SetLastError(ERROR_ALREADY_INITIALIZED);
         return FALSE;
@@ -43,12 +44,12 @@ BOOL CDwmApiImpl::Initialize(void)
 
 BOOL CDwmApiImpl::IsInitialized(void)
 {
-    return (NULL!=m_hDwmApiLib);
+    return (NULL != m_hDwmApiLib);
 }
 
 CDwmApiImpl::~CDwmApiImpl(void)
 {
-    if(IsInitialized())
+    if (IsInitialized())
     {
         FreeLibrary(m_hDwmApiLib);
         m_hDwmApiLib = NULL;
@@ -97,13 +98,14 @@ HRESULT CDwmApiImpl::DwmEnableComposition(UINT uCompositionAction)
     return pfnDwmEnableComposition(uCompositionAction);
 }
 
-CUxThemeAeroImpl::CUxThemeAeroImpl(void) : m_hUxThemeLib(NULL)
+CUxThemeAeroImpl::CUxThemeAeroImpl(void)
+    : m_hUxThemeLib(NULL)
 {
 }
 
 BOOL CUxThemeAeroImpl::Initialize(void)
 {
-    if(m_hUxThemeLib)
+    if (m_hUxThemeLib)
     {
         SetLastError(ERROR_ALREADY_INITIALIZED);
         return FALSE;
@@ -138,12 +140,12 @@ typedef HRESULT (__stdcall *GET_THEME_RECT)(HTHEME hTheme, int iPartId, int iSta
 
 BOOL CUxThemeAeroImpl::IsInitialized(void)
 {
-    return (NULL!=m_hUxThemeLib);
+    return (NULL != m_hUxThemeLib);
 }
 
 CUxThemeAeroImpl::~CUxThemeAeroImpl(void)
 {
-    if(IsInitialized())
+    if (IsInitialized())
     {
         FreeLibrary(m_hUxThemeLib);
         m_hUxThemeLib = NULL;

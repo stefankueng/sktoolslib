@@ -18,6 +18,7 @@
 //
 
 #pragma once
+
 #include <vector>
 #include <ole2.h>
 #include <ShellApi.h>
@@ -74,15 +75,15 @@ public:
     CFileDropTarget(HWND hTargetWnd):CIDropTarget(hTargetWnd){}
     virtual bool OnDrop(FORMATETC* pFmtEtc, STGMEDIUM& medium, DWORD * /*pdwEffect*/)
     {
-        if(pFmtEtc->cfFormat == CF_TEXT && medium.tymed == TYMED_ISTREAM)
+        if (pFmtEtc->cfFormat == CF_TEXT && medium.tymed == TYMED_ISTREAM)
         {
-            if(medium.pstm != NULL)
+            if (medium.pstm != NULL)
             {
                 const int BUF_SIZE = 10000;
                 std::unique_ptr<char[]> buff(new char[BUF_SIZE+1]);
                 ULONG cbRead=0;
                 HRESULT hr = medium.pstm->Read(buff.get(), BUF_SIZE, &cbRead);
-                if( SUCCEEDED(hr) && cbRead > 0 && cbRead < BUF_SIZE)
+                if (SUCCEEDED(hr) && cbRead > 0 && cbRead < BUF_SIZE)
                 {
                     buff[cbRead]=0;
                     LRESULT nLen = ::SendMessage(m_hTargetWnd, WM_GETTEXTLENGTH, 0, 0);
@@ -91,7 +92,7 @@ public:
                     ::SendMessage(m_hTargetWnd, EM_REPLACESEL, TRUE, (LPARAM)str.c_str());
                 }
                 else
-                    for(;(hr==S_OK && cbRead >0) && SUCCEEDED(hr) ;)
+                    for(;(hr == S_OK && cbRead >0) && SUCCEEDED(hr) ;)
                     {
                         buff[cbRead]=0;
                         LRESULT nLen = ::SendMessage(m_hTargetWnd, WM_GETTEXTLENGTH, 0, 0);
@@ -103,15 +104,15 @@ public:
                     }
             }
         }
-        if(pFmtEtc->cfFormat == CF_UNICODETEXT && medium.tymed == TYMED_ISTREAM)
+        if (pFmtEtc->cfFormat == CF_UNICODETEXT && medium.tymed == TYMED_ISTREAM)
         {
-            if(medium.pstm != NULL)
+            if (medium.pstm != NULL)
             {
                 const int BUF_SIZE = 10000;
                 std::unique_ptr<char[]> buff(new char[BUF_SIZE+1]);
                 ULONG cbRead=0;
                 HRESULT hr = medium.pstm->Read(buff.get(), BUF_SIZE, &cbRead);
-                if( SUCCEEDED(hr) && cbRead > 0 && cbRead < BUF_SIZE)
+                if (SUCCEEDED(hr) && cbRead > 0 && cbRead < BUF_SIZE)
                 {
                     buff[cbRead]=0;
                     LRESULT nLen = ::SendMessage(m_hTargetWnd, WM_GETTEXTLENGTH, 0, 0);
@@ -119,7 +120,7 @@ public:
                     ::SendMessage(m_hTargetWnd, EM_REPLACESEL, TRUE, (LPARAM)buff.get());
                 }
                 else
-                    for(;(hr==S_OK && cbRead >0) && SUCCEEDED(hr) ;)
+                    for(;(hr == S_OK && cbRead >0) && SUCCEEDED(hr) ;)
                     {
                         buff[cbRead]=0;
                         LRESULT nLen = ::SendMessage(m_hTargetWnd, WM_GETTEXTLENGTH, 0, 0);
@@ -130,10 +131,10 @@ public:
                     }
             }
         }
-        if(pFmtEtc->cfFormat == CF_TEXT && medium.tymed == TYMED_HGLOBAL)
+        if (pFmtEtc->cfFormat == CF_TEXT && medium.tymed == TYMED_HGLOBAL)
         {
             char* pStr = (char*)GlobalLock(medium.hGlobal);
-            if(pStr != NULL)
+            if (pStr != NULL)
             {
                 LRESULT nLen = ::SendMessage(m_hTargetWnd, WM_GETTEXTLENGTH, 0, 0);
                 ::SendMessage(m_hTargetWnd, EM_SETSEL, nLen, -1);
@@ -142,10 +143,10 @@ public:
             }
             GlobalUnlock(medium.hGlobal);
         }
-        if(pFmtEtc->cfFormat == CF_UNICODETEXT && medium.tymed == TYMED_HGLOBAL)
+        if (pFmtEtc->cfFormat == CF_UNICODETEXT && medium.tymed == TYMED_HGLOBAL)
         {
             WCHAR* pStr = (WCHAR*)GlobalLock(medium.hGlobal);
-            if(pStr != NULL)
+            if (pStr != NULL)
             {
                 LRESULT nLen = ::SendMessage(m_hTargetWnd, WM_GETTEXTLENGTH, 0, 0);
                 ::SendMessage(m_hTargetWnd, EM_SETSEL, nLen, -1);
@@ -153,15 +154,15 @@ public:
             }
             GlobalUnlock(medium.hGlobal);
         }
-        if(pFmtEtc->cfFormat == CF_HDROP && medium.tymed == TYMED_HGLOBAL)
+        if (pFmtEtc->cfFormat == CF_HDROP && medium.tymed == TYMED_HGLOBAL)
         {
             HDROP hDrop = (HDROP)GlobalLock(medium.hGlobal);
-            if(hDrop != NULL)
+            if (hDrop != NULL)
             {
                 std::unique_ptr<TCHAR[]> szFileName(new TCHAR[MAX_PATH_NEW]);
 
                 UINT cFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
-                for(UINT i = 0; i < cFiles; ++i)
+                for (UINT i = 0; i < cFiles; ++i)
                 {
                     DragQueryFile(hDrop, i, szFileName.get(), MAX_PATH_NEW);
                     ::SendMessage(m_hTargetWnd, WM_SETTEXT, 0, (LPARAM)szFileName.get());

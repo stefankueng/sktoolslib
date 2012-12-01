@@ -24,12 +24,12 @@
 #include "ResourceFile.h"
 
 CResourceFile::CResourceFile()
-  : m_pBytes(NULL),
-    m_bText(FALSE),
-    m_nBufLen(0),
-    m_nPosition(0),
-    m_bIsOpen(FALSE),
-    m_bDoNotDeleteBuffer(FALSE)
+  : m_pBytes(NULL)
+  , m_bText(FALSE)
+  , m_nBufLen(0)
+  , m_nPosition(0)
+  , m_bIsOpen(FALSE)
+  , m_bDoNotDeleteBuffer(FALSE)
 {
 }
 

@@ -18,9 +18,10 @@
 //
 
 #pragma once
+
 #include <string>
 #include <list>
-#include "shlwapi.h"
+#include <Shlwapi.h>
 #ifdef _MFC_VER
 
 /**
@@ -663,5 +664,3 @@ public: //members
     HKEY m_hKey;            ///< handle to the open registry key
     stdstring m_path;       ///< the path to the key
 };
-
-

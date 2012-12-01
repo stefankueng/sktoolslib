@@ -18,6 +18,7 @@
 //
 
 #pragma once
+
 #include <string>
 #include "AeroGlass.h"
 #include <memory>
@@ -82,4 +83,3 @@ private:
     INT_PTR     m_iPseudoRet;
     HWND        m_hToolTips;
 };
-

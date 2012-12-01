@@ -18,6 +18,7 @@
 //
 
 #pragma once
+
 #include <windows.h>
 
 #define WM_EDITDBLCLICK (WM_USER+1)

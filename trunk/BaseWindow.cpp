@@ -19,7 +19,7 @@
 
 #include "stdafx.h"
 #include "BaseWindow.h"
-#include <shlwapi.h>
+#include <Shlwapi.h>
 
 #pragma comment(lib, "shlwapi.lib")
 
@@ -33,7 +33,7 @@ ResString::ResString (HINSTANCE hInst, int resId)
 
 
 bool CWindow::RegisterWindow(UINT style, HICON hIcon, HCURSOR hCursor, HBRUSH hbrBackground,
-                                    LPCTSTR lpszMenuName, LPCTSTR lpszClassName, HICON hIconSm)
+                             LPCTSTR lpszMenuName, LPCTSTR lpszClassName, HICON hIconSm)
 {
     WNDCLASSEX wcx;
 
@@ -91,7 +91,7 @@ LRESULT CALLBACK CWindow::stWinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
         switch (uMsg)
         {
         case WM_ACTIVATE:
-            if ((wParam == WA_ACTIVE)&&(!pWnd->bWindowRestored)&&(!pWnd->sRegistryPath.empty()))
+            if ((wParam == WA_ACTIVE) && (!pWnd->bWindowRestored) && (!pWnd->sRegistryPath.empty()))
             {
                 WINDOWPLACEMENT wpl = {0};
                 DWORD size = sizeof(wpl);

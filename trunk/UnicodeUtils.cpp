@@ -33,7 +33,7 @@ CUnicodeUtils::~CUnicodeUtils(void)
 std::string CUnicodeUtils::StdGetUTF8(const std::wstring& wide)
 {
     int len = (int)wide.size();
-    if (len==0)
+    if (len == 0)
         return std::string();
     int size = len*4;
     std::unique_ptr<char[]> narrow(new char[size]);
@@ -46,7 +46,7 @@ std::string CUnicodeUtils::StdGetUTF8(const std::wstring& wide)
 std::string CUnicodeUtils::StdGetANSI(const std::wstring& wide)
 {
     int len = (int)wide.size();
-    if (len==0)
+    if (len == 0)
         return std::string();
     int size = len*4;
     std::unique_ptr<char[]> narrow(new char[size]);
@@ -59,7 +59,7 @@ std::string CUnicodeUtils::StdGetANSI(const std::wstring& wide)
 std::wstring CUnicodeUtils::StdGetUnicode(const std::string& multibyte)
 {
     int len = (int)multibyte.size();
-    if (len==0)
+    if (len == 0)
         return std::wstring();
     int size = len*4;
     std::unique_ptr<wchar_t[]> wide(new wchar_t[size]);

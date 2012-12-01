@@ -48,7 +48,6 @@ CListCtrl::CListCtrl()
     , m_bInfoTextPermanent(false)
     , m_hwnd(NULL)
 {
-
 }
 
 bool CListCtrl::SubClassListCtrl(HWND hWnd)
@@ -116,7 +115,7 @@ LRESULT CALLBACK CListCtrl::stWinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_LBUTTONDBLCLK:
         {
-            if ((!pListCtrl->m_bInfoTextPermanent)&&(!pListCtrl->m_sInfoText.empty()))
+            if ((!pListCtrl->m_bInfoTextPermanent) && (!pListCtrl->m_sInfoText.empty()))
             {
                 pListCtrl->m_sInfoText.clear();
                 ::InvalidateRect(*pListCtrl, NULL, FALSE);

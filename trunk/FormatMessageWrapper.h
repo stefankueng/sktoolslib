@@ -34,8 +34,8 @@ private:
     void obtainMessage(DWORD errorCode);
 
 public:
-    CFormatMessageWrapper() : buffer(0), result(0) {obtainMessage();}
-    CFormatMessageWrapper(DWORD lastError) : buffer(0), result(0) {obtainMessage(lastError);}
+    CFormatMessageWrapper() : buffer(0), result(0) { obtainMessage(); }
+    CFormatMessageWrapper(DWORD lastError) : buffer(0), result(0) { obtainMessage(lastError); }
     ~CFormatMessageWrapper() { release(); }
     operator LPCTSTR() { return buffer; }
     operator bool() { return result != 0; }
@@ -61,7 +61,7 @@ inline void CFormatMessageWrapper::obtainMessage(DWORD errorCode)
 
 inline void CFormatMessageWrapper::release()
 {
-    if(buffer != 0)
+    if (buffer != 0)
     {
         LocalFree(buffer);
         buffer = 0;

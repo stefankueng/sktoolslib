@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <shlobj.h>
+#include <Shlobj.h>
 #include <string>
 #include <vector>
 
@@ -58,6 +58,7 @@ protected:
     std::vector<std::wstring> m_arFiles;
 };
 
+
 class CDragSourceNotify : IDropSourceNotify
 {
 private:
@@ -80,11 +81,13 @@ public:
             return E_POINTER;
         }
 
-        if(riid == IID_IUnknown) {
+        if (riid == IID_IUnknown) {
             *ppvObject = (IUnknown*) dynamic_cast<IDropSourceNotify*>(this);
-        } else if(riid == IID_IDropSourceNotify) {
+        }
+        else if (riid == IID_IDropSourceNotify) {
             *ppvObject = dynamic_cast<IDropSourceNotify*>(this);
-        } else {
+        }
+        else {
             *ppvObject = NULL;
             return E_NOINTERFACE;
         }
@@ -118,6 +121,7 @@ public:
     }
 
 };
+
 
 class CIDropSource : public IDropSource
 {
@@ -263,14 +267,14 @@ public:
     {
         pDragSourceHelper = NULL;
         pDragSourceHelper2 = NULL;
-        if(FAILED(CoCreateInstance(CLSID_DragDropHelper,
+        if (FAILED(CoCreateInstance(CLSID_DragDropHelper,
             NULL,
             CLSCTX_INPROC_SERVER,
             IID_IDragSourceHelper2,
             (void**)&pDragSourceHelper2)))
         {
             pDragSourceHelper2 = NULL;
-            if(FAILED(CoCreateInstance(CLSID_DragDropHelper,
+            if (FAILED(CoCreateInstance(CLSID_DragDropHelper,
                 NULL,
                 CLSCTX_INPROC_SERVER,
                 IID_IDragSourceHelper,
@@ -280,12 +284,12 @@ public:
     }
     virtual ~CDragSourceHelper()
     {
-        if( pDragSourceHelper2!= NULL )
+        if (pDragSourceHelper2 != NULL)
         {
             pDragSourceHelper2->Release();
             pDragSourceHelper2=NULL;
         }
-        if( pDragSourceHelper!= NULL )
+        if (pDragSourceHelper != NULL)
         {
             pDragSourceHelper->Release();
             pDragSourceHelper=NULL;
@@ -301,10 +305,10 @@ public:
         COLORREF crColorKey=GetSysColor(COLOR_WINDOW)// color of the window used for transparent effect.
         )
     {
-        if((pDragSourceHelper == NULL)&&(pDragSourceHelper2 == NULL))
+        if((pDragSourceHelper == NULL) && (pDragSourceHelper2 == NULL))
             return E_FAIL;
 
-        if ((allowDropDescription)&&(pDragSourceHelper2))
+        if ((allowDropDescription) && (pDragSourceHelper2))
             pDragSourceHelper2->SetFlags(DSH_ALLOWDROPDESCRIPTIONTEXT);
 
         SHDRAGIMAGE di;
@@ -322,9 +326,9 @@ public:
     }
     HRESULT InitializeFromWindow(HWND hwnd, POINT& pt, IDataObject* pDataObject, BOOL allowDropDescription=TRUE)
     {
-        if((pDragSourceHelper == NULL)&&(pDragSourceHelper2 == NULL))
+        if((pDragSourceHelper == NULL) && (pDragSourceHelper2 == NULL))
             return E_FAIL;
-        if ((allowDropDescription)&&(pDragSourceHelper2))
+        if ((allowDropDescription) && (pDragSourceHelper2))
             pDragSourceHelper2->SetFlags(DSH_ALLOWDROPDESCRIPTIONTEXT);
         if (pDragSourceHelper2)
             return pDragSourceHelper2->InitializeFromWindow(hwnd, &pt, pDataObject);

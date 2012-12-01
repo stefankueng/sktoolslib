@@ -18,6 +18,7 @@
 //
 
 #pragma once
+
 #include <string>
 #include <vector>
 
@@ -37,7 +38,7 @@ public:
         BINARY,
         ANSI,
         UNICODE_LE,
-        UTF8,
+        UTF8
     };
 
     /**

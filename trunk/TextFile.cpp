@@ -65,7 +65,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     HANDLE hFile = INVALID_HANDLE_VALUE;
     int retrycounter = 0;
 
-    if ((_tcslen(path) > 2 )&&(path[0] == '\\')&&(path[1] == '\\'))
+    if ((_tcslen(path) > 2 ) && (path[0] == '\\') && (path[1] == '\\'))
     {
         // UNC path
         _tcscpy_s(pathbuf.get(), MAX_PATH_NEW, _T("\\\\?\\UNC"));
@@ -113,7 +113,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     // to do the encoding check. Then only load the full file in case
     // the encoding is UNICODE_LE since that's the only encoding we have
     // to convert first to do a proper search with.
-    if ((bytestoread < lint.LowPart)&&((memex.ullAvailPhys>>32UL)==0))
+    if ((bytestoread < lint.LowPart) && ((memex.ullAvailPhys>>32UL) == 0))
     {
         std::unique_ptr<BYTE[]> tempfilebuf(new BYTE[bytestoread+1]);
         if (!ReadFile(hFile, tempfilebuf.get(), bytestoread, &bytesread, NULL))
@@ -144,7 +144,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     {
         pFileBuf = new (std::nothrow) BYTE[lint.LowPart];
     }
-    if ((pFileBuf==NULL) || (!ReadFile(hFile, pFileBuf, lint.LowPart, &bytesread, NULL)))
+    if ((pFileBuf == NULL) || (!ReadFile(hFile, pFileBuf, lint.LowPart, &bytesread, NULL)))
     {
         delete [] pFileBuf;
         pFileBuf = NULL;
@@ -156,10 +156,10 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
 
     // we have the file read into memory, now we have to find out what
     // kind of text file we have here.
-    if (encoding==AUTOTYPE)
+    if (encoding == AUTOTYPE)
     {
         encoding = CheckUnicodeType(pFileBuf, bytesread);
-        if ((bUTF8)&&(encoding != BINARY))
+        if ((bUTF8) && (encoding != BINARY))
             encoding = UTF8;
     }
 
@@ -174,11 +174,11 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
         else
             textcontent = std::wstring((wchar_t*)pFileBuf, bytesread/sizeof(wchar_t));
     }
-    else if ((encoding == UTF8)||((encoding == BINARY)&&(bUTF8)))
+    else if ((encoding == UTF8) || ((encoding == BINARY) && (bUTF8)))
     {
         int ret = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pFileBuf, bytesread, NULL, 0);
         wchar_t * pWideBuf = new (std::nothrow) wchar_t[ret+1];
-        if (pWideBuf==NULL)
+        if (pWideBuf == NULL)
             return false;
         int ret2 = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pFileBuf, bytesread, pWideBuf, ret+1);
         if (ret2 == ret)
@@ -276,7 +276,7 @@ void CTextFile::SetFileContent(const std::wstring& content)
             }
         }
     }
-    else if ((encoding == ANSI)||(encoding == BINARY))
+    else if ((encoding == ANSI) || (encoding == BINARY))
     {
         int ret = WideCharToMultiByte(CP_ACP, 0, content.c_str(), (int)content.size()+1, NULL, 0, NULL, NULL);
         pFileBuf = new (std::nothrow) BYTE[ret];
@@ -325,7 +325,7 @@ CTextFile::UnicodeType CTextFile::CheckUnicodeType(BYTE * pBuffer, int cb)
         if (0x00 == *pVal8++)
             bNull = true;
     }
-    if ((bNull)&&((cb % 2)==0))
+    if ((bNull) && ((cb % 2) == 0))
         return UNICODE_LE;
     pVal16 = (UINT16 *)pBuffer;
     pVal8 = (UINT8 *)(pVal16+1);
@@ -342,7 +342,7 @@ CTextFile::UnicodeType CTextFile::CheckUnicodeType(BYTE * pBuffer, int cb)
     pVal8 = (UINT8 *)pBuffer;
     for (int i=0; i<cb; ++i)
     {
-        if ((*pVal8 == 0xC0)||(*pVal8 == 0xC1)||(*pVal8 >= 0xF5))
+        if ((*pVal8 == 0xC0) || (*pVal8 == 0xC1) || (*pVal8 >= 0xF5))
             return ANSI;
         pVal8++;
     }
@@ -350,14 +350,14 @@ CTextFile::UnicodeType CTextFile::CheckUnicodeType(BYTE * pBuffer, int cb)
     bool bUTF8 = false;
     for (int i=0; i<(cb-4); ++i)
     {
-        if ((*pVal8 & 0xE0)==0xC0)
+        if ((*pVal8 & 0xE0) == 0xC0)
         {
             pVal8++;i++;
             if ((*pVal8 & 0xC0)!=0x80)
                 return ANSI;
             bUTF8 = true;
         }
-        if ((*pVal8 & 0xF0)==0xE0)
+        if ((*pVal8 & 0xF0) == 0xE0)
         {
             pVal8++;i++;
             if ((*pVal8 & 0xC0)!=0x80)
@@ -367,7 +367,7 @@ CTextFile::UnicodeType CTextFile::CheckUnicodeType(BYTE * pBuffer, int cb)
                 return ANSI;
             bUTF8 = true;
         }
-        if ((*pVal8 & 0xF8)==0xF0)
+        if ((*pVal8 & 0xF8) == 0xF0)
         {
             pVal8++;i++;
             if ((*pVal8 & 0xC0)!=0x80)
