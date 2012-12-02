@@ -64,9 +64,9 @@ CHotKeyCtrl::~CHotKeyCtrl(void)
 BOOL CHotKeyCtrl::ConvertEditToHotKeyCtrl(HWND hwndCtl)
 {
     // Subclass the existing control.
-    m_pfnOrigCtlProc = (WNDPROC) GetWindowLong(hwndCtl, GWL_WNDPROC);
+    m_pfnOrigCtlProc = (WNDPROC)GetWindowLong(hwndCtl, GWLP_WNDPROC);
     SetProp(hwndCtl, PROP_OBJECT_PTR, (HANDLE) this);
-    SetWindowLong(hwndCtl, GWL_WNDPROC, (LONG) (WNDPROC) _HotKeyProc);
+    SetWindowLongPtr(hwndCtl, GWLP_WNDPROC, (LONG_PTR)(WNDPROC)_HotKeyProc);
 
     kb_hook = SetWindowsHookEx(WH_KEYBOARD, _KeyboardProc, NULL, GetCurrentThreadId());
     m_hWnd = hwndCtl;
@@ -274,8 +274,8 @@ LRESULT CALLBACK CHotKeyCtrl::_HotKeyProc(HWND hwnd, UINT message,
         return 0;
     case WM_DESTROY:
         {
-            SetWindowLong(hwnd, GWL_WNDPROC,
-                          (LONG) pHyperLink->m_pfnOrigCtlProc);
+            SetWindowLongPtr(hwnd, GWLP_WNDPROC,
+                            (LONG_PTR)pHyperLink->m_pfnOrigCtlProc);
 
             RemoveProp(hwnd, PROP_OBJECT_PTR);
             break;
