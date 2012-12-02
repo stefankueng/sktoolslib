@@ -27,8 +27,8 @@ public:
     virtual ~CResourceFile();
 
     BYTE *  GetByteBuffer()         { return m_pBytes; }
-    int     GetLength()             { return m_nBufLen; }
-    int     GetPosition()           { return m_nPosition; }
+    size_t  GetLength()             { return m_nBufLen; }
+    size_t  GetPosition()           { return m_nPosition; }
     BOOL    IsAtEOF()               { return m_nPosition >= GetLength(); }
     BOOL    IsOpen()                { return m_bIsOpen; }
 
@@ -39,17 +39,17 @@ public:
     virtual BOOL    Open(HINSTANCE hInstance,
                     LPCTSTR lpszResId,
                     LPCTSTR lpszResType);
-    virtual int     Read(BYTE *buf, int nBufLen);
-    virtual int     Seek(int offset, int origin);
-    virtual int     SeekToBegin();
-    virtual int     SeekToEnd();
+    virtual size_t  Read(BYTE *buf, int nBufLen);
+    virtual size_t  Seek(int offset, int origin);
+    virtual size_t  SeekToBegin();
+    virtual size_t  SeekToEnd();
     virtual void    SetByteBuffer(BYTE * buf, DWORD len);
 
 protected:
     BYTE  *     m_pBytes;               // binary buffer
-    int         m_nBufLen;              // size of m_pszResource: TCHARs for text,
+    size_t      m_nBufLen;              // size of m_pszResource: TCHARs for text,
                                         // bytes for binary
-    int         m_nPosition;            // buffer position: TCHARs for text,
+    size_t      m_nPosition;            // buffer position: TCHARs for text,
                                         // bytes for binary
     BOOL        m_bText;                // TRUE = text, FALSE = binary
     BOOL        m_bIsOpen;              // TRUE = text file resource is open
