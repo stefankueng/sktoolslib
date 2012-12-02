@@ -175,7 +175,7 @@ void CResourceFile::SetByteBuffer(BYTE * buf, DWORD len)
     }
 }
 
-size_t CResourceFile::Read(BYTE *buf, int nBufLen)
+size_t CResourceFile::Read(BYTE *buf, size_t nBufLen)
 {
     size_t nOldPosition = m_nPosition;
     size_t nIndex = 0;
@@ -212,7 +212,7 @@ size_t CResourceFile::SeekToEnd()
     return Seek(0, SEEK_END);
 }
 
-size_t CResourceFile::Seek(int offset, int origin)
+size_t CResourceFile::Seek(size_t offset, size_t origin)
 {
     size_t rc = (size_t)-1;
 
