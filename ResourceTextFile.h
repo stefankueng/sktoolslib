@@ -55,7 +55,7 @@ public:
                  LPCTSTR lpszResType = _T("TEXT"),
                  ConvertAction eConvert = NoConvertAction,
                  BomAction eBomAction = NoBomAction);
-    size_t  ReadLine(TCHAR *buf, int nBufLen);
+    size_t  ReadLine(TCHAR *buf, size_t nBufLen);
     BOOL    SetTextBuffer(TCHAR * buf, DWORD len,
                           ConvertAction eConvert = NoConvertAction,
                           BomAction eBomAction = NoBomAction);

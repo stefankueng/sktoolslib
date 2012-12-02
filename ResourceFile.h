@@ -39,8 +39,8 @@ public:
     virtual BOOL    Open(HINSTANCE hInstance,
                     LPCTSTR lpszResId,
                     LPCTSTR lpszResType);
-    virtual size_t  Read(BYTE *buf, int nBufLen);
-    virtual size_t  Seek(int offset, int origin);
+    virtual size_t  Read(BYTE *buf, size_t nBufLen);
+    virtual size_t  Seek(size_t offset, size_t origin);
     virtual size_t  SeekToBegin();
     virtual size_t  SeekToEnd();
     virtual void    SetByteBuffer(BYTE * buf, DWORD len);

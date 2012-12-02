@@ -225,7 +225,7 @@ BOOL CResourceTextFile::SetTextBuffer(TCHAR * inbuf,
     return rc;
 }
 
-size_t CResourceTextFile::ReadLine(TCHAR *buf, int nBufLen)
+size_t CResourceTextFile::ReadLine(TCHAR *buf, size_t nBufLen)
 {
     size_t nOldPosition = m_nPosition;
     size_t nIndex = 0;
