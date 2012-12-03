@@ -31,6 +31,7 @@ CRegDWORD::CRegDWORD(void)
     m_base = HKEY_CURRENT_USER;
     m_read = FALSE;
     m_force = FALSE;
+    m_sam = 0;
     LastError = ERROR_SUCCESS;
 }
 
@@ -41,7 +42,7 @@ CRegDWORD::CRegDWORD(void)
  * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
  * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
  */
-CRegDWORD::CRegDWORD(const CString& key, DWORD def, BOOL force, HKEY base)
+CRegDWORD::CRegDWORD(const CString& key, DWORD def, BOOL force, HKEY base, REGSAM sam)
 {
     m_value = 0;
     m_defaultvalue = def;
@@ -49,6 +50,7 @@ CRegDWORD::CRegDWORD(const CString& key, DWORD def, BOOL force, HKEY base)
     m_base = base;
     m_read = FALSE;
     m_key = key;
+    m_sam = sam;
     m_key.TrimLeft(_T("\\"));
     int backslashpos = m_key.ReverseFind('\\');
     m_path = m_key.Left(backslashpos);
@@ -67,7 +69,7 @@ CRegDWORD::~CRegDWORD(void)
 
 DWORD   CRegDWORD::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = sizeof(m_value);
         DWORD type;
@@ -146,6 +148,7 @@ CRegString::CRegString(void)
     m_base = HKEY_CURRENT_USER;
     m_read = FALSE;
     m_force = FALSE;
+    m_sam = 0;
     LastError = ERROR_SUCCESS;
 }
 
@@ -156,7 +159,7 @@ CRegString::CRegString(void)
  * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
  * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
  */
-CRegString::CRegString(const CString& key, const CString& def, BOOL force, HKEY base)
+CRegString::CRegString(const CString& key, const CString& def, BOOL force, HKEY base, REGSAM sam)
 {
     m_value = "";
     m_defaultvalue = def;
@@ -164,6 +167,7 @@ CRegString::CRegString(const CString& key, const CString& def, BOOL force, HKEY 
     m_base = base;
     m_read = FALSE;
     m_key = key;
+    m_sam = sam;
     m_key.TrimLeft(_T("\\"));
     int backslashpos = m_key.ReverseFind('\\');
     m_path = m_key.Left(backslashpos);
@@ -182,7 +186,7 @@ CRegString::~CRegString(void)
 
 CString CRegString::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = 0;
         DWORD type;
@@ -267,6 +271,7 @@ CRegRect::CRegRect(void)
     m_base = HKEY_CURRENT_USER;
     m_read = FALSE;
     m_force = FALSE;
+    m_sam = 0;
     LastError = ERROR_SUCCESS;
 }
 
@@ -277,7 +282,7 @@ CRegRect::CRegRect(void)
  * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
  * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
  */
-CRegRect::CRegRect(const CString& key, CRect def, BOOL force, HKEY base)
+CRegRect::CRegRect(const CString& key, CRect def, BOOL force, HKEY base, REGSAM sam)
 {
     m_value = CRect(0,0,0,0);
     m_defaultvalue = def;
@@ -285,6 +290,7 @@ CRegRect::CRegRect(const CString& key, CRect def, BOOL force, HKEY base)
     m_base = base;
     m_read = FALSE;
     m_key = key;
+    m_sam = sam;
     m_key.TrimLeft(_T("\\"));
     int backslashpos = m_key.ReverseFind('\\');
     m_path = m_key.Left(backslashpos);
@@ -303,7 +309,7 @@ CRegRect::~CRegRect(void)
 
 CRect   CRegRect::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = 0;
         DWORD type;
@@ -385,6 +391,7 @@ CRegPoint::CRegPoint(void)
     m_base = HKEY_CURRENT_USER;
     m_read = FALSE;
     m_force = FALSE;
+    m_sam = 0;
     LastError = ERROR_SUCCESS;
 }
 
@@ -395,7 +402,7 @@ CRegPoint::CRegPoint(void)
  * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
  * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
  */
-CRegPoint::CRegPoint(const CString& key, CPoint def, BOOL force, HKEY base)
+CRegPoint::CRegPoint(const CString& key, CPoint def, BOOL force, HKEY base, REGSAM sam)
 {
     m_value = CPoint(0,0);
     m_defaultvalue = def;
@@ -403,6 +410,7 @@ CRegPoint::CRegPoint(const CString& key, CPoint def, BOOL force, HKEY base)
     m_base = base;
     m_read = FALSE;
     m_key = key;
+    m_sam = sam;
     m_key.TrimLeft(_T("\\"));
     int backslashpos = m_key.ReverseFind('\\');
     m_path = m_key.Left(backslashpos);
@@ -421,7 +429,7 @@ CRegPoint::~CRegPoint(void)
 
 CPoint  CRegPoint::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = 0;
         DWORD type;
@@ -495,11 +503,12 @@ CRegPoint& CRegPoint::operator =(CPoint s)
 
 /////////////////////////////////////////////////////////////////////
 
-CRegistryKey::CRegistryKey(const CString& key, HKEY base)
+CRegistryKey::CRegistryKey(const CString& key, HKEY base, REGSAM sam)
 {
     m_base = base;
     m_hKey = NULL;
     m_path = key;
+    m_sam  = sam;
     m_path.TrimLeft(_T("\\"));
 }
 
@@ -522,7 +531,7 @@ DWORD CRegistryKey::createKey()
 
 DWORD CRegistryKey::removeKey()
 {
-    RegOpenKeyEx(m_base, m_path, 0, KEY_WRITE, &m_hKey);
+    RegOpenKeyEx(m_base, m_path, 0, KEY_WRITE | m_sam, &m_hKey);
     return SHDeleteKey(m_base, (LPCTSTR)m_path);
 }
 
@@ -530,7 +539,7 @@ bool CRegistryKey::getValues(CStringList& values)
 {
     values.RemoveAll();
 
-    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey) == ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey) == ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {
@@ -551,7 +560,7 @@ bool CRegistryKey::getSubKeys(CStringList& subkeys)
 {
     subkeys.RemoveAll();
 
-    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE, &m_hKey) == ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey) == ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {
@@ -577,6 +586,7 @@ CRegStdString::CRegStdString(void)
     , m_defaultvalue(_T(""))
     , m_read(FALSE)
     , m_force(FALSE)
+    , m_sam(0)
 {
     m_key = _T("");
     m_base = HKEY_CURRENT_USER;
@@ -590,13 +600,14 @@ CRegStdString::CRegStdString(void)
  * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
  * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
  */
-CRegStdString::CRegStdString(const stdstring& key, const stdstring& def, BOOL force, HKEY base)
+CRegStdString::CRegStdString(const stdstring& key, const stdstring& def, BOOL force, HKEY base, REGSAM sam)
 {
     m_value = _T("");
     m_defaultvalue = def;
     m_force = force;
     m_base = base;
     m_read = FALSE;
+    m_sam = sam;
 
     stdstring::size_type pos = key.find_last_of(_T('\\'));
     m_path = key.substr(0, pos);
@@ -613,7 +624,7 @@ CRegStdString::~CRegStdString(void)
 
 stdstring   CRegStdString::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = 0;
         DWORD type;
@@ -691,6 +702,7 @@ CRegStdDWORD::CRegStdDWORD(void)
     m_base = HKEY_CURRENT_USER;
     m_read = FALSE;
     m_force = FALSE;
+    m_sam = 0;
     LastError = ERROR_SUCCESS;
 }
 
@@ -701,13 +713,14 @@ CRegStdDWORD::CRegStdDWORD(void)
  * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
  * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
  */
-CRegStdDWORD::CRegStdDWORD(const stdstring& key, DWORD def, BOOL force, HKEY base)
+CRegStdDWORD::CRegStdDWORD(const stdstring& key, DWORD def, BOOL force, HKEY base, REGSAM sam)
 {
     m_value = 0;
     m_defaultvalue = def;
     m_force = force;
     m_base = base;
     m_read = FALSE;
+    m_sam = sam;
 
     stdstring::size_type pos = key.find_last_of(_T('\\'));
     m_path = key.substr(0, pos);
@@ -724,7 +737,7 @@ CRegStdDWORD::~CRegStdDWORD(void)
 
 DWORD CRegStdDWORD::read()
 {
-    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey)) == ERROR_SUCCESS)
+    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
     {
         int size = sizeof(m_value);
         DWORD type;
@@ -789,11 +802,12 @@ CRegStdDWORD& CRegStdDWORD::operator =(DWORD d)
     return *this;
 }
 
-CStdRegistryKey::CStdRegistryKey(const stdstring& key, HKEY base)
+CStdRegistryKey::CStdRegistryKey(const stdstring& key, HKEY base, REGSAM sam)
 {
     m_base = base;
     m_hKey = NULL;
     m_path = key;
+    m_sam = sam;
     stdstring::size_type pos = key.find_last_of(_T('\\'));
     m_path = key.substr(0, pos);
 }
@@ -817,7 +831,7 @@ DWORD CStdRegistryKey::createKey()
 
 DWORD CStdRegistryKey::removeKey()
 {
-    RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_WRITE, &m_hKey);
+    RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_WRITE | m_sam, &m_hKey);
     return SHDeleteKey(m_base, m_path.c_str());
 }
 
@@ -825,7 +839,7 @@ bool CStdRegistryKey::getValues(stdregistrykeylist& values)
 {
     values.clear();
 
-    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey) == ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE | m_sam, &m_hKey) == ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {
@@ -846,7 +860,7 @@ bool CStdRegistryKey::getSubKeys(stdregistrykeylist& subkeys)
 {
     subkeys.clear();
 
-    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE, &m_hKey) == ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE | m_sam, &m_hKey) == ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {
