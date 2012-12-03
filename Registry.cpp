@@ -679,6 +679,19 @@ CRegStdString::operator LPCTSTR()
         return read().c_str();
 }
 
+CRegStdString::operator const stdstring()
+{
+    if ((m_read)&&(!m_force))
+    {
+        LastError = 0;
+        return m_value;
+    }
+    else
+    {
+        return read();
+    }
+}
+
 CRegStdString& CRegStdString::operator =(stdstring s)
 {
     if ((s.compare(m_value) == 0) && (!m_force))
