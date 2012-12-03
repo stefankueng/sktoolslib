@@ -545,6 +545,7 @@ public:
     CRegStdString& operator=(stdstring s);
     CRegStdString& operator+=(stdstring s) { return *this = (stdstring)*this + s; }
     operator LPCTSTR();
+    operator const stdstring();
 
 protected:
 
