@@ -131,7 +131,7 @@ public:
      * \param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
      * \param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
      */
-    CRegDWORD(const CString& key, DWORD def = 0, BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER);
+    CRegDWORD(const CString& key, DWORD def = 0, BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER, REGSAM sam = 0);
     ~CRegDWORD(void);
     /**
      * reads the assigned value from the registry. Use this method only if you think the registry
@@ -160,6 +160,7 @@ protected:
     DWORD   m_defaultvalue;             ///< the default value to use
     BOOL    m_read;                     ///< indicates if the value has already been read from the registry
     BOOL    m_force;                    ///< indicates if no cache should be used, i.e. always read and write directly from registry
+    REGSAM  m_sam;
 };
 
 /**
@@ -219,7 +220,7 @@ public:
      * \param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
      * \param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
      */
-    CRegString(const CString& key, const CString& def = _T(""), BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER);
+    CRegString(const CString& key, const CString& def = _T(""), BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER, REGSAM sam = 0);
     ~CRegString(void);
 
     CString read();                     ///< reads the value from the registry
@@ -235,6 +236,7 @@ protected:
     CString m_defaultvalue;             ///< the default value to use
     BOOL    m_read;                     ///< indicates if the value has already been read from the registry
     BOOL    m_force;                    ///< indicates if no cache should be used, i.e. always read and write directly from registry
+    REGSAM  m_sam;
 };
 
 /**
@@ -291,11 +293,11 @@ public:
     /**
      * Constructor.
      * \param key the path to the key, including the key. example: "Software\\Company\\SubKey\\MyValue"
-     * \param def the default value used when the key does not exist or a read error occured
+     * \param def the default value used when the key does not exist or a read error occurred
      * \param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
      * \param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
      */
-    CRegRect(const CString& key, CRect def = CRect(), BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER);
+    CRegRect(const CString& key, CRect def = CRect(), BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER, REGSAM sam = 0);
     ~CRegRect(void);
 
     CRect read();                       ///< reads the value from the registry
@@ -321,6 +323,7 @@ protected:
     CRect   m_defaultvalue;             ///< the default value to use
     BOOL    m_read;                     ///< indicates if the value has already been read from the registry
     BOOL    m_force;                    ///< indicates if no cache should be used, i.e. always read and write directly from registry
+    REGSAM  m_sam;
 };
 
 /**
@@ -380,7 +383,7 @@ public:
      * \param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
      * \param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
      */
-    CRegPoint(const CString& key, CPoint def = CPoint(), BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER);
+    CRegPoint(const CString& key, CPoint def = CPoint(), BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER, REGSAM sam = 0);
     ~CRegPoint(void);
 
     CPoint read();
@@ -398,6 +401,7 @@ protected:
     CPoint  m_defaultvalue;             ///< the default value to use
     BOOL    m_read;                     ///< indicates if the value has already been read from the registry
     BOOL    m_force;                    ///< indicates if no cache should be used, i.e. always read and write directly from registry
+    REGSAM  m_sam;
 };
 
 /**
@@ -413,7 +417,7 @@ public: //methods
      * \param key the path to the key, including the key. example: "Software\\Company\\SubKey"
      * \param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
      */
-    CRegistryKey(const CString& key, HKEY base = HKEY_CURRENT_USER);
+    CRegistryKey(const CString& key, HKEY base = HKEY_CURRENT_USER, REGSAM sam = 0);
     ~CRegistryKey();
 
     /**
@@ -436,6 +440,7 @@ public: //members
     HKEY m_base;        ///< handle to the registry base
     HKEY m_hKey;        ///< handle to the open registry key
     CString m_path;     ///< the path to the key
+    REGSAM  m_sam;
 };
 #endif
 
@@ -531,7 +536,7 @@ public:
      * \param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
      * \param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
      */
-    CRegStdString(const stdstring& key, const stdstring& def = _T(""), BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER);
+    CRegStdString(const stdstring& key, const stdstring& def = _T(""), BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER, REGSAM sam = 0);
     ~CRegStdString(void);
 
     stdstring read();                       ///< reads the value from the registry
@@ -547,6 +552,7 @@ protected:
     stdstring   m_defaultvalue;         ///< the default value to use
     BOOL    m_read;                     ///< indicates if the value has already been read from the registry
     BOOL    m_force;                    ///< indicates if no cache should be used, i.e. always read and write directly from registry
+    REGSAM  m_sam;
 };
 
 /**
@@ -598,7 +604,7 @@ public:
      * \param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
      * \param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
      */
-    CRegStdDWORD(const stdstring& key, DWORD def = 0, BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER);
+    CRegStdDWORD(const stdstring& key, DWORD def = 0, BOOL force = FALSE, HKEY base = HKEY_CURRENT_USER, REGSAM sam = 0);
     ~CRegStdDWORD(void);
 
     DWORD read();                       ///< reads the value from the registry
@@ -623,6 +629,7 @@ protected:
     DWORD   m_defaultvalue;         ///< the default value to use
     BOOL    m_read;                 ///< indicates if the value has already been read from the registry
     BOOL    m_force;                ///< indicates if no cache should be used, i.e. always read and write directly from registry
+    REGSAM  m_sam;
 };
 
 typedef std::list<stdstring> stdregistrykeylist;
@@ -640,7 +647,7 @@ public: //methods
      * \param key the path to the key, including the key. example: "Software\\Company\\SubKey"
      * \param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
      */
-    CStdRegistryKey(const stdstring& key, HKEY base = HKEY_CURRENT_USER);
+    CStdRegistryKey(const stdstring& key, HKEY base = HKEY_CURRENT_USER, REGSAM sam = 0);
     ~CStdRegistryKey();
 
     /**
@@ -662,5 +669,6 @@ public: //methods
 public: //members
     HKEY m_base;            ///< handle to the registry base
     HKEY m_hKey;            ///< handle to the open registry key
+    REGSAM m_sam;
     stdstring m_path;       ///< the path to the key
 };
