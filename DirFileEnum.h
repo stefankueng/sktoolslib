@@ -241,7 +241,8 @@ class CDirFileEnum
 {
 private:
 
-    class CDirStackEntry : public CSimpleFileFind {
+    class CDirStackEntry : public CSimpleFileFind
+    {
     public:
         CDirStackEntry(CDirStackEntry * seNext, const std::wstring& sDirName);
         ~CDirStackEntry();

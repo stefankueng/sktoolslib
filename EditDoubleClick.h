@@ -31,9 +31,6 @@ public:
 
     BOOL Subclass(HWND hwndParent, UINT uiCtlId);
 
-
-protected:
-
 private:
     UINT     m_ctrlId;
     WNDPROC  m_pfnOrigCtlProc;

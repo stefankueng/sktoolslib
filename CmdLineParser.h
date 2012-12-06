@@ -62,7 +62,7 @@ class CCmdLineParser
 public:
     typedef std::map<stdstring, stdstring> CValsMap;
     typedef CValsMap::const_iterator ITERPOS;
-public:
+
     /**
      * Creates a CCmdLineParser object and parses the parameters in.
      * \param sCmdLine the command line
@@ -134,7 +134,7 @@ private:
     BOOL Parse(LPCTSTR sCmdLine);
     CValsMap::const_iterator findKey(LPCTSTR sKey) const;
     const CValsMap& getVals() const { return m_valueMap; }
-private:
+
     stdstring   m_sCmdLine;
     CValsMap    m_valueMap;
 

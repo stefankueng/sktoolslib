@@ -44,8 +44,9 @@ private:
 class CWindow
 {
 public:
-    virtual bool RegisterWindow(UINT style, HICON hIcon, HCURSOR hCursor, HBRUSH hbrBackground,
-        LPCTSTR lpszMenuName, LPCTSTR lpszClassName, HICON hIconSm);
+    virtual bool RegisterWindow(UINT style, HICON hIcon, HCURSOR hCursor,
+                                HBRUSH hbrBackground, LPCTSTR lpszMenuName,
+                                LPCTSTR lpszClassName, HICON hIconSm);
     virtual bool RegisterWindow(CONST WNDCLASSEX* wcx);
 
     /// static message handler to put in WNDCLASSEX structure
