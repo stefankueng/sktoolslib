@@ -35,8 +35,6 @@ public:
     void SetHotKey(WPARAM hk);
     WPARAM GetHotKey();
 
-protected:
-
 private:
     HWND    m_hWnd;
     WNDPROC m_pfnOrigCtlProc;

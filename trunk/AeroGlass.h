@@ -42,15 +42,6 @@ public:
     HRESULT DwmEnableComposition(UINT uCompositionAction);
 };
 
-/// macros stolen from dwmapi.h:
-#ifndef DWM_EC_DISABLECOMPOSITION
-#define DWM_EC_DISABLECOMPOSITION 0
-#endif /// DWM_EC_DISABLECOMPOSITION
-
-#ifndef DWM_EC_ENABLECOMPOSITION
-#define DWM_EC_ENABLECOMPOSITION 1
-#endif /// DWM_EC_ENABLECOMPOSITION
-
 
 class CUxThemeAeroImpl
 {

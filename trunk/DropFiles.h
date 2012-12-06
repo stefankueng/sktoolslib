@@ -217,9 +217,6 @@ public:
 private:
     void CopyMedium(STGMEDIUM* pMedDest, STGMEDIUM* pMedSrc, FORMATETC* pFmtSrc);
 
-private:
-
-private:
     std::vector<std::wstring>   m_allPaths;
     long                        m_cRefCount;
     BOOL                        m_bInOperation;
@@ -250,7 +247,7 @@ public:
     STDMETHOD(Clone)(IEnumFORMATETC**);
 private:
     void                        Init();
-private:
+
     std::vector<FORMATETC>      m_vecFormatEtc;
     FORMATETC                   m_formats[DRAG_NUMFORMATS];
     ULONG                       m_cRefCount;
