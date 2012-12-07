@@ -1079,3 +1079,11 @@ typedef CKeyList<CRegStdDWORD> CRegStdDWORDList;
 CKeyList<CRegStdString>;
 typedef CKeyList<CRegStdString> CRegStdStringList;
 #endif
+
+// to avoid a C4505 compiler warning, this dummy
+// function is added.
+void CRegStdCompilerWarningDummyFunction()
+{
+    std::wstring(CRegStdString(_T("TEST"))).empty();
+    CRegStdDWORD(_T("TEST"));
+}
