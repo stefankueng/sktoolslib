@@ -20,6 +20,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <ole2.h>
 #include <ShellApi.h>
 #include <ShlObj.h>
