@@ -148,7 +148,7 @@ BOOL CShellLink::Save(const std::wstring& sFilename)
     //Convert the path to a UNICODE string
     WCHAR wszPath[MAX_PATH];
 
-    _tcscpy_s(wszPath, MAX_PATH, sFilename.c_str());
+    _tcscpy_s(wszPath, _countof(wszPath), sFilename.c_str());
 
     //Set the various link values
     if (m_sli.m_pidl)
@@ -190,7 +190,7 @@ BOOL CShellLink::Load(const std::wstring& sFilename)
     //Convert the path to a UNICODE string
     WCHAR wszPath[MAX_PATH];
 
-    _tcscpy_s(wszPath, MAX_PATH, sFilename.c_str());
+    _tcscpy_s(wszPath, _countof(wszPath), sFilename.c_str());
 
     //Load the link from file
     HRESULT hRes = m_ppf->Load(wszPath, STGM_READ);
@@ -200,25 +200,25 @@ BOOL CShellLink::Load(const std::wstring& sFilename)
         TCHAR szBuf[MAX_PATH];
         WIN32_FIND_DATA fd;
 
-        hRes = m_psl->GetPath(szBuf, MAX_PATH, &fd, SLGP_UNCPRIORITY);
+        hRes = m_psl->GetPath(szBuf, _countof(szBuf), &fd, SLGP_UNCPRIORITY);
         if (SUCCEEDED(hRes))
             m_sli.m_sTarget = szBuf;
 
         hRes = m_psl->GetIDList(&m_sli.m_pidl);
 
-        hRes = m_psl->GetWorkingDirectory(szBuf, MAX_PATH);
+        hRes = m_psl->GetWorkingDirectory(szBuf, _countof(szBuf));
         if (SUCCEEDED(hRes))
             m_sli.m_sWorkingDirectory = szBuf;
 
-        hRes = m_psl->GetIconLocation(szBuf, MAX_PATH, &m_sli.m_nIconIndex);
+        hRes = m_psl->GetIconLocation(szBuf, _countof(szBuf), &m_sli.m_nIconIndex);
         if (SUCCEEDED(hRes))
             m_sli.m_sIconLocation = szBuf;
 
-        hRes = m_psl->GetDescription(szBuf, MAX_PATH);
+        hRes = m_psl->GetDescription(szBuf, _countof(szBuf));
         if (SUCCEEDED(hRes))
             m_sli.m_sDescription = szBuf;
 
-        hRes = m_psl->GetArguments(szBuf, MAX_PATH);
+        hRes = m_psl->GetArguments(szBuf, _countof(szBuf));
         if (SUCCEEDED(hRes))
             m_sli.m_sArguments = szBuf;
 
@@ -411,7 +411,7 @@ BOOL CUrlShellLink::Save(const std::wstring& sFilename)
     //Convert the path to a UNICODE string
     WCHAR wszPath[MAX_PATH];
 
-    _tcscpy_s(wszPath, MAX_PATH, sFilename.c_str());
+    _tcscpy_s(wszPath, _countof(wszPath), sFilename.c_str());
 
     //Set the various arguments
     HRESULT hRes = m_pURL->SetURL(m_sli.m_sTarget.c_str(), 0);
@@ -440,7 +440,7 @@ BOOL CUrlShellLink::Load(const std::wstring& sFilename)
     //Convert the path to a UNICODE string
     WCHAR wszPath[MAX_PATH];
 
-    _tcscpy_s(wszPath, MAX_PATH, sFilename.c_str());
+    _tcscpy_s(wszPath, _countof(wszPath), sFilename.c_str());
 
     //Load the link from file
     HRESULT hRes = m_ppf->Load(wszPath, STGM_READ);
@@ -465,17 +465,17 @@ BOOL CUrlShellLink::Load(const std::wstring& sFilename)
         }
 
         TCHAR szBuf[MAX_PATH];
-        hRes = m_psl->GetWorkingDirectory(szBuf, MAX_PATH);
+        hRes = m_psl->GetWorkingDirectory(szBuf, _countof(szBuf));
         if (SUCCEEDED(hRes))
             m_sli.m_sWorkingDirectory = szBuf;
 
-        hRes = m_psl->GetIconLocation(szBuf, MAX_PATH, &m_sli.m_nIconIndex);
+        hRes = m_psl->GetIconLocation(szBuf, _countof(szBuf), &m_sli.m_nIconIndex);
         if (SUCCEEDED(hRes))
             m_sli.m_sIconLocation = szBuf;
 
         //WINBUG: URL shortcuts always seem to return a description the same as the name of
         //file in which the shortcut is stored
-        hRes = m_psl->GetDescription(szBuf, MAX_PATH);
+        hRes = m_psl->GetDescription(szBuf, _countof(szBuf));
         if (SUCCEEDED(hRes))
             m_sli.m_sDescription = szBuf;
 

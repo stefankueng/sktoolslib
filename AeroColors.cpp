@@ -53,7 +53,7 @@ CAeroColors::~CAeroColors(void)
 std::wstring CAeroColors::AdjustColorsFromWallpaper()
 {
     WCHAR wallPaperPath[MAX_PATH] = {0};
-    SystemParametersInfo(SPI_GETDESKWALLPAPER, MAX_PATH, wallPaperPath, 0);
+    SystemParametersInfo(SPI_GETDESKWALLPAPER, _countof(wallPaperPath), wallPaperPath, 0);
     if (wallPaperPath[0] == 0)
     {
         // no wallpaper - no nothing
