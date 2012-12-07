@@ -56,8 +56,8 @@ STDMETHODIMP FileDataObject::QueryInterface(REFIID riid, void** ppvObject)
     *ppvObject = NULL;
     if (IID_IUnknown == riid || IID_IDataObject == riid)
         *ppvObject=this;
-    if (riid == IID_IAsyncOperation)
-        *ppvObject = (IAsyncOperation*)this;
+    if (riid == IID_IDataObjectAsyncCapability)
+        *ppvObject = (IDataObjectAsyncCapability*)this;
 
     if (NULL != *ppvObject)
     {
@@ -342,7 +342,7 @@ void FileDataObject::CopyMedium(STGMEDIUM* pMedDest, STGMEDIUM* pMedSrc, FORMATE
 
 
 //////////////////////////////////////////////////////////////////////////
-// IAsyncOperation
+// IDataObjectAsyncCapability
 //////////////////////////////////////////////////////////////////////////
 HRESULT STDMETHODCALLTYPE FileDataObject::SetAsyncMode(BOOL fDoOpAsync)
 {
