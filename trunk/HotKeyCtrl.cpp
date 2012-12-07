@@ -88,39 +88,39 @@ void CHotKeyCtrl::SetHKText(WORD hk)
     {
         LONG sc = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC);
         sc <<= 16;
-        GetKeyNameText(sc, buf, MAX_PATH);
-        _tcscat_s(result, MAX_PATH, buf);
+        GetKeyNameText(sc, buf, _countof(buf));
+        _tcscat_s(result, _countof(result), buf);
     }
     if (h & HOTKEYF_SHIFT)
     {
         if (result[0])
-            _tcscat_s(result, MAX_PATH, _T(" + "));
+            _tcscat_s(result, _countof(result), _T(" + "));
         LONG sc = MapVirtualKey(VK_SHIFT, MAPVK_VK_TO_VSC);
         sc <<= 16;
-        GetKeyNameText(sc, buf, MAX_PATH);
-        _tcscat_s(result, MAX_PATH, buf);
+        GetKeyNameText(sc, buf, _countof(buf));
+        _tcscat_s(result, _countof(result), buf);
     }
     if (h & HOTKEYF_ALT)
     {
         if (result[0])
-            _tcscat_s(result, MAX_PATH, _T(" + "));
+            _tcscat_s(result, _countof(result), _T(" + "));
         LONG sc = MapVirtualKey(VK_MENU, MAPVK_VK_TO_VSC);
         sc <<= 16;
-        GetKeyNameText(sc, buf, MAX_PATH);
-        _tcscat_s(result, MAX_PATH, buf);
+        GetKeyNameText(sc, buf, _countof(buf));
+        _tcscat_s(result, _countof(result), buf);
     }
     if (h & HOTKEYF_EXT)
     {
         if (result[0])
-            _tcscat_s(result, MAX_PATH, _T(" + "));
+            _tcscat_s(result, _countof(result), _T(" + "));
         LONG sc = MapVirtualKey(VK_LWIN, MAPVK_VK_TO_VSC);
         sc |= 0x0100;
         sc <<= 16;
-        GetKeyNameText(sc, buf, MAX_PATH);
-        _tcscat_s(result, MAX_PATH, buf);
+        GetKeyNameText(sc, buf, _countof(buf));
+        _tcscat_s(result, _countof(result), buf);
     }
     if (result[0])
-        _tcscat_s(result, MAX_PATH, _T(" + "));
+        _tcscat_s(result, _countof(result), _T(" + "));
 
     LONG nScanCode = MapVirtualKey(LOBYTE(hk), MAPVK_VK_TO_VSC);
     switch(LOBYTE(hk))
@@ -140,10 +140,10 @@ void CHotKeyCtrl::SetHKText(WORD hk)
         nScanCode |= 0x0100; // Add extended bit
     }
     nScanCode <<= 16;
-    GetKeyNameText(nScanCode, buf, MAX_PATH);
+    GetKeyNameText(nScanCode, buf, _countof(buf));
 
 
-    _tcscat_s(result, MAX_PATH, buf);
+    _tcscat_s(result, _countof(result), buf);
     ::SetWindowText(m_hWnd, result);
 }
 
