@@ -23,6 +23,11 @@
 #include <string>
 #include <vector>
 
+#include <Shldisp.h>
+
+#ifndef __IDataObjectAsyncCapability_FWD_DEFINED__
+#define IDataObjectAsyncCapability IAsyncOperation
+#endif
 
 #define DRAG_NUMFORMATS 2
 
@@ -179,7 +184,7 @@ extern  CLIPFORMAT  CF_PREFERREDDROPEFFECT;
  * This can be used for drag and drop operations to other applications like
  * the shell itself.
  */
-class FileDataObject : public IDataObject, public IAsyncOperation
+class FileDataObject : public IDataObject, public IDataObjectAsyncCapability
 {
 public:
     /**
@@ -205,7 +210,7 @@ public:
     virtual HRESULT STDMETHODCALLTYPE DUnadvise(DWORD dwConnection);
     virtual HRESULT STDMETHODCALLTYPE EnumDAdvise(IEnumSTATDATA** ppenumAdvise);
 
-    //IAsyncOperation
+    //IDataObjectAsyncCapability
     virtual HRESULT STDMETHODCALLTYPE SetAsyncMode(BOOL fDoOpAsync);
     virtual HRESULT STDMETHODCALLTYPE GetAsyncMode(BOOL* pfIsOpAsync);
     virtual HRESULT STDMETHODCALLTYPE StartOperation(IBindCtx* pbcReserved);
