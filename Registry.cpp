@@ -16,499 +16,126 @@
 // along with this program; if not, write to the Free Software Foundation,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
-
 #include "stdafx.h"
-#include "Registry.h"
-
-#ifdef _MFC_VER
-//MFC is available - also use the MFC-based classes
-
-CRegDWORD::CRegDWORD(void)
-{
-    m_value = 0;
-    m_defaultvalue = 0;
-    m_key = "";
-    m_base = HKEY_CURRENT_USER;
-    m_read = FALSE;
-    m_force = FALSE;
-    m_sam = 0;
-    LastError = ERROR_SUCCESS;
-}
-
-/**
- * Constructor.
- * @param key the path to the key, including the key. example: "Software\\Company\\SubKey\\MyValue"
- * @param def the default value used when the key does not exist or a read error occured
- * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
- * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
- */
-CRegDWORD::CRegDWORD(const CString& key, DWORD def, BOOL force, HKEY base, REGSAM sam)
-{
-    m_value = 0;
-    m_defaultvalue = def;
-    m_force = force;
-    m_base = base;
-    m_read = FALSE;
-    m_key = key;
-    m_sam = sam;
-    m_key.TrimLeft(_T("\\"));
-    int backslashpos = m_key.ReverseFind('\\');
-    m_path = m_key.Left(backslashpos);
-    m_path.TrimRight(_T("\\"));
-    m_key = m_key.Mid(backslashpos);
-    m_key.Trim(_T("\\"));
-    read();
-    LastError = ERROR_SUCCESS;
-}
-
-CRegDWORD::~CRegDWORD(void)
-{
-    if (m_hKey)
-        RegCloseKey(m_hKey);
-}
-
-DWORD   CRegDWORD::read()
-{
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
-    {
-        int size = sizeof(m_value);
-        DWORD type;
-        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) &m_value,(LPDWORD) &size)) == ERROR_SUCCESS)
-        {
-            ASSERT(type == REG_DWORD);
-            m_read = TRUE;
-            LastError = RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            return m_value;
-        }
-        else
-        {
-            LastError = RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            m_value = m_defaultvalue;
-            m_read = TRUE;
-            return m_defaultvalue;
-        }
-    }
-    m_value = m_defaultvalue;
-    return m_defaultvalue;
-}
-
-void CRegDWORD::write()
-{
-    DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
-    {
-        return;
-    }
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_DWORD,(const BYTE*) &m_value, sizeof(m_value))) == ERROR_SUCCESS)
-    {
-        m_read = TRUE;
-        m_hKey = NULL;
-        return;
-    }
-    LastError = RegCloseKey(m_hKey);
-    m_hKey = NULL;
-}
-
-
-CRegDWORD::operator DWORD()
-{
-    if ((m_read) && (!m_force))
-    {
-        LastError = 0;
-        return m_value;
-    }
-    else
-    {
-        return read();
-    }
-}
-
-CRegDWORD& CRegDWORD::operator =(DWORD d)
-{
-    if ((d == m_value) && (!m_force))
-    {
-        //no write to the registry required, its the same value
-        LastError = 0;
-        return *this;
-    }
-    m_value = d;
-    write();
-    return *this;
-}
+#include "registry.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-CRegString::CRegString(void)
+#ifdef __CSTRINGT_H__
+CRegBase::CRegBase()
 {
-    m_value = _T("");
-    m_defaultvalue = _T("");
-    m_key = _T("");
-    m_base = HKEY_CURRENT_USER;
-    m_read = FALSE;
-    m_force = FALSE;
-    m_sam = 0;
-    LastError = ERROR_SUCCESS;
 }
 
-/**
- * Constructor.
- * @param key the path to the key, including the key. example: "Software\\Company\\SubKey\\MyValue"
- * @param def the default value used when the key does not exist or a read error occured
- * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
- * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
- */
-CRegString::CRegString(const CString& key, const CString& def, BOOL force, HKEY base, REGSAM sam)
+CRegBase::CRegBase (const CString& key, bool force, HKEY base, REGSAM sam)
+    : CRegBaseCommon<CString> (key, force, base, sam)
 {
-    m_value = "";
-    m_defaultvalue = def;
-    m_force = force;
-    m_base = base;
-    m_read = FALSE;
-    m_key = key;
-    m_sam = sam;
     m_key.TrimLeft(_T("\\"));
     int backslashpos = m_key.ReverseFind('\\');
     m_path = m_key.Left(backslashpos);
     m_path.TrimRight(_T("\\"));
     m_key = m_key.Mid(backslashpos);
     m_key.Trim(_T("\\"));
-    read();
-    LastError = ERROR_SUCCESS;
 }
-
-CRegString::~CRegString(void)
-{
-    if (m_hKey)
-        RegCloseKey(m_hKey);
-}
-
-CString CRegString::read()
-{
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
-    {
-        int size = 0;
-        DWORD type;
-        LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
-        TCHAR* pStr = new TCHAR[size];
-        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) pStr,(LPDWORD) &size)) == ERROR_SUCCESS)
-        {
-            m_value = CString(pStr);
-            delete [] pStr;
-            ASSERT(type == REG_SZ || type == REG_EXPAND_SZ);
-            m_read = TRUE;
-            LastError = RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            return m_value;
-        }
-        else
-        {
-            delete [] pStr;
-            RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            m_value = m_defaultvalue;
-            m_read = TRUE;
-            return m_defaultvalue;
-        }
-    }
-    m_value = m_defaultvalue;
-    return m_defaultvalue;
-}
-
-void CRegString::write()
-{
-    DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
-    {
-        return;
-    }
-#ifdef _UNICODE
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_SZ, (BYTE *)(LPCTSTR)m_value, (m_value.GetLength()+1)*2)) == ERROR_SUCCESS)
-#else
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_SZ, (BYTE *)(LPCTSTR)m_value, m_value.GetLength()+1)) == ERROR_SUCCESS)
 #endif
-    {
-        m_read = TRUE;
-    }
-    RegCloseKey(m_hKey);
-    m_hKey = NULL;
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+CRegStdBase::CRegStdBase()
+{
 }
 
-CRegString::operator CString()
+CRegStdBase::CRegStdBase (const tstring& key, bool force, HKEY base, REGSAM sam)
+    : CRegBaseCommon<tstring> (key, force, base, sam)
 {
-    if ((m_read) && (!m_force))
-    {
-        LastError = 0;
-        return m_value;
-    }
-    else
-    {
-        return read();
-    }
-}
-
-CRegString& CRegString::operator =(const CString& s)
-{
-    if ((s == m_value) && (!m_force))
-    {
-        //no write to the registry required, its the same value
-        LastError = 0;
-        return *this;
-    }
-    m_value = s;
-    write();
-    return *this;
+    tstring::size_type pos = key.find_last_of(_T('\\'));
+    m_path = key.substr(0, pos);
+    m_key = key.substr(pos + 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifdef __ATLTYPES_H__   // defines CRect
 CRegRect::CRegRect(void)
+    : CRegTypedBase<CRect, CRegBase>(CRect(0,0,0,0))
 {
-    m_value = CRect(0,0,0,0);
-    m_defaultvalue = CRect(0,0,0,0);
-    m_key = _T("");
-    m_base = HKEY_CURRENT_USER;
-    m_read = FALSE;
-    m_force = FALSE;
-    m_sam = 0;
-    LastError = ERROR_SUCCESS;
 }
 
-/**
- * Constructor.
- * @param key the path to the key, including the key. example: "Software\\Company\\SubKey\\MyValue"
- * @param def the default value used when the key does not exist or a read error occured
- * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
- * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
- */
-CRegRect::CRegRect(const CString& key, CRect def, BOOL force, HKEY base, REGSAM sam)
+CRegRect::CRegRect(const CString& key, const CRect& def, bool force, HKEY base, REGSAM sam)
+    : CRegTypedBase<CRect, CRegBase> (key, def, force, base, sam)
 {
-    m_value = CRect(0,0,0,0);
-    m_defaultvalue = def;
-    m_force = force;
-    m_base = base;
-    m_read = FALSE;
-    m_key = key;
-    m_sam = sam;
-    m_key.TrimLeft(_T("\\"));
-    int backslashpos = m_key.ReverseFind('\\');
-    m_path = m_key.Left(backslashpos);
-    m_path.TrimRight(_T("\\"));
-    m_key = m_key.Mid(backslashpos);
-    m_key.Trim(_T("\\"));
     read();
-    LastError = ERROR_SUCCESS;
 }
 
-CRegRect::~CRegRect(void)
+void CRegRect::InternalRead (HKEY hKey, CRect& value)
 {
-    if (m_hKey)
-        RegCloseKey(m_hKey);
-}
+    DWORD size = 0;
+    DWORD type = 0;
+    LastError = RegQueryValueEx(hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
 
-CRect   CRegRect::read()
-{
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
+    if (LastError == ERROR_SUCCESS)
     {
-        int size = 0;
-        DWORD type;
-        RegQueryValueEx(m_hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
-        LPRECT pRect = (LPRECT)new char[size];
-        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) pRect,(LPDWORD) &size)) == ERROR_SUCCESS)
+        std::unique_ptr<char[]> buffer (new char[size]);
+        if ((LastError = RegQueryValueEx(hKey, m_key, NULL, &type, (BYTE*) buffer.get(), &size))==ERROR_SUCCESS)
         {
-            m_value = CRect(pRect);
-            delete [] pRect;
-            ASSERT(type == REG_BINARY);
-            m_read = TRUE;
-            LastError = RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            return m_value;
-        }
-        else
-        {
-            delete [] pRect;
-            RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            m_value = m_defaultvalue;
-            m_read = TRUE;
-            return m_defaultvalue;
+            ASSERT(type==REG_BINARY);
+            value = CRect((LPRECT)buffer.get());
         }
     }
-    m_value = m_defaultvalue;
-    return m_defaultvalue;
 }
 
-void CRegRect::write()
+void CRegRect::InternalWrite (HKEY hKey, const CRect& value)
 {
-    DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
-    {
-        return;
-    }
-
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_BINARY, (BYTE *)(LPRECT)m_value, sizeof(m_value))) == ERROR_SUCCESS)
-    {
-        m_read = TRUE;
-    }
-    RegCloseKey(m_hKey);
-    m_hKey = NULL;
+    LastError = RegSetValueEx(hKey, m_key, 0, REG_BINARY, (BYTE *)(LPCRECT)value, sizeof(value));
 }
 
-CRegRect::operator CRect()
-{
-    if ((m_read) && (!m_force))
-    {
-        LastError = 0;
-        return m_value;
-    }
-    else
-    {
-        return read();
-    }
-}
-
-CRegRect& CRegRect::operator =(CRect s)
-{
-    if ((s == m_value) && (!m_force))
-    {
-        //no write to the registry required, its the same value
-        LastError = 0;
-        return *this;
-    }
-    m_value = s;
-    write();
-    return *this;
-}
+#endif
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifdef __ATLTYPES_H__   // defines CPoint
 CRegPoint::CRegPoint(void)
+    : CRegTypedBase<CPoint, CRegBase>(CPoint(0,0))
 {
-    m_value = CPoint(0,0);
-    m_defaultvalue = CPoint(0,0);
-    m_key = "";
-    m_base = HKEY_CURRENT_USER;
-    m_read = FALSE;
-    m_force = FALSE;
-    m_sam = 0;
-    LastError = ERROR_SUCCESS;
 }
 
-/**
- * Constructor.
- * @param key the path to the key, including the key. example: "Software\\Company\\SubKey\\MyValue"
- * @param def the default value used when the key does not exist or a read error occured
- * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
- * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
- */
-CRegPoint::CRegPoint(const CString& key, CPoint def, BOOL force, HKEY base, REGSAM sam)
+CRegPoint::CRegPoint(const CString& key, const CPoint& def, bool force, HKEY base, REGSAM sam)
+    : CRegTypedBase<CPoint, CRegBase> (key, def, force, base, sam)
 {
-    m_value = CPoint(0,0);
-    m_defaultvalue = def;
-    m_force = force;
-    m_base = base;
-    m_read = FALSE;
-    m_key = key;
-    m_sam = sam;
-    m_key.TrimLeft(_T("\\"));
-    int backslashpos = m_key.ReverseFind('\\');
-    m_path = m_key.Left(backslashpos);
-    m_path.TrimRight(_T("\\"));
-    m_key = m_key.Mid(backslashpos);
-    m_key.Trim(_T("\\"));
     read();
-    LastError = ERROR_SUCCESS;
 }
 
-CRegPoint::~CRegPoint(void)
+void CRegPoint::InternalRead (HKEY hKey, CPoint& value)
 {
-    if (m_hKey)
-        RegCloseKey(m_hKey);
-}
+    DWORD size = 0;
+    DWORD type = 0;
+    LastError = RegQueryValueEx(hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
 
-CPoint  CRegPoint::read()
-{
-    if ((LastError = RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
+    if (LastError == ERROR_SUCCESS)
     {
-        int size = 0;
-        DWORD type;
-        RegQueryValueEx(m_hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
-        POINT* pPoint = (POINT *)new char[size];
-        if ((LastError = RegQueryValueEx(m_hKey, m_key, NULL, &type, (BYTE*) pPoint,(LPDWORD) &size)) == ERROR_SUCCESS)
+        std::unique_ptr<char[]> buffer(new char[size]);
+        if ((LastError = RegQueryValueEx(hKey, m_key, NULL, &type, (BYTE*) buffer.get(), &size))==ERROR_SUCCESS)
         {
-            m_value = CPoint(*pPoint);
-            delete [] pPoint;
-            ASSERT(type == REG_BINARY);
-            m_read = TRUE;
-            LastError = RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            return m_value;
-        }
-        else
-        {
-            delete [] pPoint;
-            RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            m_value = m_defaultvalue;
-            m_read = TRUE;
-            return m_defaultvalue;
+            ASSERT(type==REG_BINARY);
+            value = CPoint(*(POINT*)buffer.get());
         }
     }
-    m_value = m_defaultvalue;
-    return m_defaultvalue;
 }
 
-void CRegPoint::write()
+void CRegPoint::InternalWrite (HKEY hKey, const CPoint& value)
 {
-    DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
-    {
-        return;
-    }
-
-    if ((LastError = RegSetValueEx(m_hKey, m_key, 0, REG_BINARY, (BYTE *)(POINT *)&m_value, sizeof(m_value))) == ERROR_SUCCESS)
-    {
-        m_read = TRUE;
-    }
-    RegCloseKey(m_hKey);
-    m_hKey = NULL;
+    LastError = RegSetValueEx(hKey, m_key, 0, REG_BINARY, (BYTE *)&value, sizeof(value));
 }
-
-CRegPoint::operator CPoint()
-{
-    if ((m_read) && (!m_force))
-    {
-        LastError = 0;
-        return m_value;
-    }
-    else
-    {
-        return read();
-    }
-}
-
-CRegPoint& CRegPoint::operator =(CPoint s)
-{
-    if ((s == m_value) && (!m_force))
-    {
-        //no write to the registry required, its the same value
-        LastError = 0;
-        return *this;
-    }
-    m_value = s;
-    write();
-    return *this;
-}
+#endif
 
 /////////////////////////////////////////////////////////////////////
 
+#ifdef __AFXCOLL_H__   // defines CStringList
 CRegistryKey::CRegistryKey(const CString& key, HKEY base, REGSAM sam)
 {
     m_base = base;
     m_hKey = NULL;
+    m_sam = sam;
     m_path = key;
-    m_sam  = sam;
     m_path.TrimLeft(_T("\\"));
 }
 
@@ -521,7 +148,7 @@ CRegistryKey::~CRegistryKey()
 DWORD CRegistryKey::createKey()
 {
     DWORD disp;
-    DWORD rc = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp);
+    DWORD rc = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE|m_sam, NULL, &m_hKey, &disp);
     if (rc != ERROR_SUCCESS)
     {
         return rc;
@@ -531,7 +158,7 @@ DWORD CRegistryKey::createKey()
 
 DWORD CRegistryKey::removeKey()
 {
-    RegOpenKeyEx(m_base, m_path, 0, KEY_WRITE | m_sam, &m_hKey);
+    RegOpenKeyEx(m_base, m_path, 0, KEY_WRITE|m_sam, &m_hKey);
     return SHDeleteKey(m_base, (LPCTSTR)m_path);
 }
 
@@ -539,12 +166,12 @@ bool CRegistryKey::getValues(CStringList& values)
 {
     values.RemoveAll();
 
-    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey) == ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE|m_sam, &m_hKey)==ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {
             TCHAR value[255];
-            DWORD size = sizeof value / sizeof TCHAR;
+            DWORD size = _countof(value);
             rc = RegEnumValue(m_hKey, i, value, &size, NULL, NULL, NULL, NULL);
             if (rc == ERROR_SUCCESS)
             {
@@ -560,12 +187,12 @@ bool CRegistryKey::getSubKeys(CStringList& subkeys)
 {
     subkeys.RemoveAll();
 
-    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE | m_sam, &m_hKey) == ERROR_SUCCESS)
+    if (RegOpenKeyEx(m_base, m_path, 0, KEY_EXECUTE|m_sam, &m_hKey)==ERROR_SUCCESS)
     {
         for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
         {
             TCHAR value[1024];
-            DWORD size = sizeof value / sizeof TCHAR;
+            DWORD size = _countof(value);
             FILETIME last_write_time;
             rc = RegEnumKeyEx(m_hKey, i, value, &size, NULL, NULL, NULL, &last_write_time);
             if (rc == ERROR_SUCCESS)
@@ -579,314 +206,3 @@ bool CRegistryKey::getSubKeys(CStringList& subkeys)
 }
 #endif
 
-/////////////////////////////////////////////////////////////////////
-
-CRegStdString::CRegStdString(void)
-    : m_value(_T(""))
-    , m_defaultvalue(_T(""))
-    , m_read(FALSE)
-    , m_force(FALSE)
-    , m_sam(0)
-{
-    m_key = _T("");
-    m_base = HKEY_CURRENT_USER;
-    LastError = ERROR_SUCCESS;
-}
-
-/**
- * Constructor.
- * @param key the path to the key, including the key. example: "Software\\Company\\SubKey\\MyValue"
- * @param def the default value used when the key does not exist or a read error occured
- * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
- * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
- */
-CRegStdString::CRegStdString(const stdstring& key, const stdstring& def, BOOL force, HKEY base, REGSAM sam)
-{
-    m_value = _T("");
-    m_defaultvalue = def;
-    m_force = force;
-    m_base = base;
-    m_read = FALSE;
-    m_sam = sam;
-
-    stdstring::size_type pos = key.find_last_of(_T('\\'));
-    m_path = key.substr(0, pos);
-    m_key = key.substr(pos + 1);
-    read();
-    LastError = ERROR_SUCCESS;
-}
-
-CRegStdString::~CRegStdString(void)
-{
-    if (m_hKey)
-        RegCloseKey(m_hKey);
-}
-
-stdstring   CRegStdString::read()
-{
-    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
-    {
-        int size = 0;
-        DWORD type;
-        RegQueryValueEx(m_hKey, m_key.c_str(), NULL, &type, NULL, (LPDWORD) &size);
-        TCHAR* pStr = new TCHAR[size];
-        if ((LastError = RegQueryValueEx(m_hKey, m_key.c_str(), NULL, &type, (BYTE*) pStr,(LPDWORD) &size)) == ERROR_SUCCESS)
-        {
-            m_value.assign(pStr);
-            delete [] pStr;
-            m_read = TRUE;
-            LastError = RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            return m_value;
-        }
-        else
-        {
-            delete [] pStr;
-            RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            m_value = m_defaultvalue;
-            m_read = TRUE;
-            return m_defaultvalue;
-        }
-    }
-    m_value = m_defaultvalue;
-    return m_defaultvalue;
-}
-
-void CRegStdString::write()
-{
-    DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path.c_str(), 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
-    {
-        return;
-    }
-    if ((LastError = RegSetValueEx(m_hKey, m_key.c_str(), 0, REG_SZ, (BYTE *)m_value.c_str(), ((DWORD)m_value.size()+1)*sizeof(TCHAR))) == ERROR_SUCCESS)
-    {
-        m_read = TRUE;
-    }
-    RegCloseKey(m_hKey);
-    m_hKey = NULL;
-}
-
-CRegStdString::operator LPCTSTR()
-{
-    if ((m_read) && (!m_force))
-    {
-        LastError = 0;
-        return m_value.c_str();
-    }
-    else
-        return read().c_str();
-}
-
-CRegStdString::operator const stdstring()
-{
-    if ((m_read)&&(!m_force))
-    {
-        LastError = 0;
-        return m_value;
-    }
-    else
-    {
-        return read();
-    }
-}
-
-CRegStdString& CRegStdString::operator =(stdstring s)
-{
-    if ((s.compare(m_value) == 0) && (!m_force))
-    {
-        //no write to the registry required, its the same value
-        LastError = 0;
-        return *this;
-    }
-    m_value = s;
-    write();
-    return *this;
-}
-
-/////////////////////////////////////////////////////////////////////
-
-CRegStdDWORD::CRegStdDWORD(void)
-{
-    m_value = 0;
-    m_defaultvalue = 0;
-    m_key = _T("");
-    m_base = HKEY_CURRENT_USER;
-    m_read = FALSE;
-    m_force = FALSE;
-    m_sam = 0;
-    LastError = ERROR_SUCCESS;
-}
-
-/**
- * Constructor.
- * @param key the path to the key, including the key. example: "Software\\Company\\SubKey\\MyValue"
- * @param def the default value used when the key does not exist or a read error occured
- * @param force set to TRUE if no cache should be used, i.e. always read and write directly from/to registry
- * @param base a predefined base key like HKEY_LOCAL_MACHINE. see the SDK documentation for more information.
- */
-CRegStdDWORD::CRegStdDWORD(const stdstring& key, DWORD def, BOOL force, HKEY base, REGSAM sam)
-{
-    m_value = 0;
-    m_defaultvalue = def;
-    m_force = force;
-    m_base = base;
-    m_read = FALSE;
-    m_sam = sam;
-
-    stdstring::size_type pos = key.find_last_of(_T('\\'));
-    m_path = key.substr(0, pos);
-    m_key = key.substr(pos + 1);
-    read();
-    LastError = ERROR_SUCCESS;
-}
-
-CRegStdDWORD::~CRegStdDWORD(void)
-{
-    if (m_hKey)
-        RegCloseKey(m_hKey);
-}
-
-DWORD CRegStdDWORD::read()
-{
-    if ((LastError = RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE | m_sam, &m_hKey)) == ERROR_SUCCESS)
-    {
-        int size = sizeof(m_value);
-        DWORD type;
-        if ((LastError = RegQueryValueEx(m_hKey, m_key.c_str(), NULL, &type, (BYTE*) &m_value,(LPDWORD) &size)) == ERROR_SUCCESS)
-        {
-            m_read = TRUE;
-            LastError = RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            return m_value;
-        }
-        else
-        {
-            RegCloseKey(m_hKey);
-            m_hKey = NULL;
-            m_value = m_defaultvalue;
-            m_read = TRUE;
-            return m_defaultvalue;
-        }
-    }
-    m_value = m_defaultvalue;
-    return m_defaultvalue;
-}
-
-void CRegStdDWORD::write()
-{
-    DWORD disp;
-    if ((LastError = RegCreateKeyEx(m_base, m_path.c_str(), 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp)) != ERROR_SUCCESS)
-    {
-        return;
-    }
-    if ((LastError = RegSetValueEx(m_hKey, m_key.c_str(), 0, REG_DWORD,(const BYTE*) &m_value, sizeof(m_value))) == ERROR_SUCCESS)
-    {
-        m_read = TRUE;
-    }
-    RegCloseKey(m_hKey);
-    m_hKey = NULL;
-}
-
-CRegStdDWORD::operator DWORD()
-{
-    if ((m_read) && (!m_force))
-    {
-        LastError = 0;
-        return m_value;
-    }
-    else
-    {
-        return read();
-    }
-}
-
-CRegStdDWORD& CRegStdDWORD::operator =(DWORD d)
-{
-    if ((d == m_value) && (!m_force))
-    {
-        //no write to the registry required, its the same value
-        LastError = 0;
-        return *this;
-    }
-    m_value = d;
-    write();
-    return *this;
-}
-
-CStdRegistryKey::CStdRegistryKey(const stdstring& key, HKEY base, REGSAM sam)
-{
-    m_base = base;
-    m_hKey = NULL;
-    m_path = key;
-    m_sam = sam;
-    stdstring::size_type pos = key.find_last_of(_T('\\'));
-    m_path = key.substr(0, pos);
-}
-
-CStdRegistryKey::~CStdRegistryKey()
-{
-    if (m_hKey)
-        RegCloseKey(m_hKey);
-}
-
-DWORD CStdRegistryKey::createKey()
-{
-    DWORD disp;
-    DWORD rc = RegCreateKeyEx(m_base, m_path.c_str(), 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &m_hKey, &disp);
-    if (rc != ERROR_SUCCESS)
-    {
-        return rc;
-    }
-    return RegCloseKey(m_hKey);
-}
-
-DWORD CStdRegistryKey::removeKey()
-{
-    RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_WRITE | m_sam, &m_hKey);
-    return SHDeleteKey(m_base, m_path.c_str());
-}
-
-bool CStdRegistryKey::getValues(stdregistrykeylist& values)
-{
-    values.clear();
-
-    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE | m_sam, &m_hKey) == ERROR_SUCCESS)
-    {
-        for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
-        {
-            TCHAR value[255];
-            DWORD size = sizeof value / sizeof TCHAR;
-            rc = RegEnumValue(m_hKey, i, value, &size, NULL, NULL, NULL, NULL);
-            if (rc == ERROR_SUCCESS)
-            {
-                values.push_back(value);
-            }
-        }
-    }
-
-    return !values.empty();
-}
-
-bool CStdRegistryKey::getSubKeys(stdregistrykeylist& subkeys)
-{
-    subkeys.clear();
-
-    if (RegOpenKeyEx(m_base, m_path.c_str(), 0, KEY_EXECUTE | m_sam, &m_hKey) == ERROR_SUCCESS)
-    {
-        for (int i = 0, rc = ERROR_SUCCESS; rc == ERROR_SUCCESS; i++)
-        {
-            TCHAR value[1024];
-            DWORD size = sizeof value / sizeof TCHAR;
-            FILETIME last_write_time;
-            rc = RegEnumKeyEx(m_hKey, i, value, &size, NULL, NULL, NULL, &last_write_time);
-            if (rc == ERROR_SUCCESS)
-            {
-                subkeys.push_back(value);
-            }
-        }
-    }
-
-    return !subkeys.empty();
-}
