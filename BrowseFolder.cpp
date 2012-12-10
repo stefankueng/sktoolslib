@@ -201,7 +201,6 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
             path = p;
 
             LPMALLOC    shellMalloc;
-            HRESULT     hr;
 
             hr = SHGetMalloc(&shellMalloc);
 
