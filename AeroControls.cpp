@@ -823,7 +823,6 @@ LRESULT AeroControlBase::ProgressbarWindowProc(HWND hWnd, UINT uMsg, WPARAM wPar
                 BP_PAINTPARAMS params = { sizeof(BP_PAINTPARAMS) };
                 params.dwFlags        = 0L;
                 HDC hdcPaint = NULL;
-                params.dwFlags        = 0L;
                 HPAINTBUFFER hBufferedPaint = m_theme.BeginBufferedPaint(hdc, &rc, BPBF_TOPDOWNDIB, &params, &hdcPaint);
                 if (hdcPaint)
                 {
