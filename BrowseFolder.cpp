@@ -181,7 +181,7 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
         browseInfo.lpfn             = NULL;
         browseInfo.lParam           = (LPARAM)this;
 
-        if ((_tcslen(m_CheckText) > 0) || (m_sDefaultPath.size()))
+        if ((m_CheckText[0] != '\0') || (m_sDefaultPath.size()))
         {
             browseInfo.lpfn = BrowseCallBackProc;
         }
@@ -259,9 +259,9 @@ int CBrowseFolder::BrowseCallBackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARA
     //Initialization callback message
     if (uMsg == BFFM_INITIALIZED)
     {
-        if (_tcslen(m_CheckText) > 0)
+        if (m_CheckText[0] != '\0')
         {
-            bool bSecondCheckbox = (_tcslen(m_CheckText2) != 0);
+            bool bSecondCheckbox = (m_CheckText2[0] != '\0');
             //Rectangles for getting the positions
             checkbox = CreateWindowEx(  0,
                 _T("BUTTON"),
