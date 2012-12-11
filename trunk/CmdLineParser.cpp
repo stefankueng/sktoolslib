@@ -57,7 +57,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
     {
         //format is  -Key:"arg"
 
-        if (_tcslen(sCurrent) == 0)
+        if (sCurrent[0] == '\0')
             break;      // no more data, leave loop
 
         LPCTSTR sArg = _tcspbrk(sCurrent, m_sDelims);
@@ -65,7 +65,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
             break; // no (more) delimiters found
         sArg =  _tcsinc(sArg);
 
-        if (_tcslen(sArg) == 0)
+        if (sArg[0] == '\0')
             break; // ends with delim
 
         LPCTSTR sVal = _tcspbrk(sArg, m_sValueSep);
@@ -202,7 +202,7 @@ CCmdLineParser::ITERPOS CCmdLineParser::getNext(ITERPOS& pos, stdstring& sKey, s
     {
         sKey = pos->first;
         sValue = pos->second;
-        pos ++;
+        ++pos;
         return pos;
     }
 }
