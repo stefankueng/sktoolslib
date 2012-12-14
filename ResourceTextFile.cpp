@@ -267,7 +267,7 @@ size_t CResourceTextFile::ReadLine(TCHAR *buf, size_t nBufLen)
         {
             // there is not enough room, so replace last char
             nIndex = nBufLen - 1;
-            if (nIndex < 0)
+            if (nBufLen == 0)
                 nIndex = 0;
         }
         buf[nIndex] = _T('\0');
