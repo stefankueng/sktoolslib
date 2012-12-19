@@ -23,6 +23,10 @@
 #include "maxpath.h"
 
 
+#ifndef __IDataObjectAsyncCapability_FWD_DEFINED__
+#define IID_IDataObjectAsyncCapability IID_IAsyncOperation
+#endif
+
 CLIPFORMAT CF_FILECONTENTS = (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS);
 CLIPFORMAT CF_FILEDESCRIPTOR = (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR);
 CLIPFORMAT CF_PREFERREDDROPEFFECT = (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
