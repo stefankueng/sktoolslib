@@ -65,7 +65,7 @@ void CSysImageList::Cleanup()
 int CSysImageList::GetDirIconIndex() const
 {
     SHFILEINFO sfi;
-    ZeroMemory(&sfi, sizeof sfi);
+    SecureZeroMemory(&sfi, sizeof sfi);
 
     SHGetFileInfo(
         _T("Doesn't matter"),
@@ -79,7 +79,7 @@ int CSysImageList::GetDirIconIndex() const
 int CSysImageList::GetDirOpenIconIndex() const
 {
     SHFILEINFO sfi;
-    ZeroMemory(&sfi, sizeof sfi);
+    SecureZeroMemory(&sfi, sizeof sfi);
 
     SHGetFileInfo(
         _T("Doesn't matter"),
@@ -93,7 +93,7 @@ int CSysImageList::GetDirOpenIconIndex() const
 int CSysImageList::GetDefaultIconIndex() const
 {
     SHFILEINFO sfi;
-    ZeroMemory(&sfi, sizeof sfi);
+    SecureZeroMemory(&sfi, sizeof sfi);
 
     SHGetFileInfo(
         _T(""),
@@ -107,7 +107,7 @@ int CSysImageList::GetDefaultIconIndex() const
 int CSysImageList::GetFileIconIndex(const std::wstring& file) const
 {
     SHFILEINFO sfi;
-    ZeroMemory(&sfi, sizeof sfi);
+    SecureZeroMemory(&sfi, sizeof sfi);
 
     SHGetFileInfo(
         file.c_str(),
