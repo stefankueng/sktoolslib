@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -73,9 +73,35 @@ public:
 class CFileDropTarget : public CIDropTarget
 {
 public:
-    CFileDropTarget(HWND hTargetWnd):CIDropTarget(hTargetWnd){}
+    CFileDropTarget(HWND hTargetWnd)
+        : CIDropTarget(hTargetWnd)
+        , m_hParent(NULL)
+    {}
+    CFileDropTarget(HWND hTargetWnd, HWND hParent)
+        : CIDropTarget(hTargetWnd)
+        , m_hParent(hParent)
+    {
+        RegisterDragDrop(hTargetWnd, this);
+        // create the supported format:
+        FORMATETC ftetc={0};
+        ftetc.cfFormat = CF_HDROP;
+        ftetc.dwAspect = DVASPECT_CONTENT;
+        ftetc.lindex   = -1;
+        ftetc.tymed    = TYMED_HGLOBAL;
+        AddSuportedFormat(ftetc);
+    }
     virtual bool OnDrop(FORMATETC* pFmtEtc, STGMEDIUM& medium, DWORD * /*pdwEffect*/)
     {
+        if (m_hParent && (pFmtEtc->cfFormat == CF_HDROP) && (medium.tymed == TYMED_HGLOBAL))
+        {
+            HDROP hDrop = (HDROP)GlobalLock(medium.hGlobal);
+            if (hDrop != NULL)
+            {
+                SendMessage(m_hParent, WM_DROPFILES, (WPARAM)hDrop, 0);
+            }
+            GlobalUnlock(medium.hGlobal);
+            return true; //let base free the medium
+        }
         if (pFmtEtc->cfFormat == CF_TEXT && medium.tymed == TYMED_ISTREAM)
         {
             if (medium.pstm != NULL)
@@ -174,5 +200,6 @@ public:
         }
         return true; //let base free the medium
     }
-
+private:
+    HWND    m_hParent;
 };
