@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -403,4 +403,11 @@ std::unique_ptr<TCHAR[]> CDialog::GetDlgItemText( UINT nId )
     std::unique_ptr<TCHAR[]> buf(new TCHAR[len]);
     ::GetDlgItemText(*this, nId, buf.get(), len);
     return buf;
+}
+
+void CDialog::RefreshCursor()
+{
+    POINT pt;
+    GetCursorPos(&pt);
+    SetCursorPos(pt.x, pt.y);
 }

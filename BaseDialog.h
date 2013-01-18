@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -46,6 +46,7 @@ public:
     BOOL    EndDialog(HWND hDlg, INT_PTR nResult);
     void    AddToolTip(UINT ctrlID, LPTSTR text);
     bool    IsCursorOverWindowBorder();
+    void    RefreshCursor();
     /**
      * Wrapper around the CWnd::EnableWindow() method, but
      * makes sure that a control that has the focus is not disabled
