@@ -47,6 +47,8 @@ public:
     void    AddToolTip(UINT ctrlID, LPTSTR text);
     bool    IsCursorOverWindowBorder();
     void    RefreshCursor();
+    void    ShowEditBalloon(UINT nId, LPCWSTR title, LPCWSTR text, int icon = TTI_ERROR);
+
     /**
      * Wrapper around the CWnd::EnableWindow() method, but
      * makes sure that a control that has the focus is not disabled

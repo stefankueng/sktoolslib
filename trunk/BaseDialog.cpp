@@ -411,3 +411,35 @@ void CDialog::RefreshCursor()
     GetCursorPos(&pt);
     SetCursorPos(pt.x, pt.y);
 }
+
+void CDialog::ShowEditBalloon( UINT nId, LPCWSTR title, LPCWSTR text, int icon /*= TTI_ERROR*/ )
+{
+    EDITBALLOONTIP ebt = {0};
+    ebt.cbStruct = sizeof(EDITBALLOONTIP);
+    ebt.pszTitle = title;
+    ebt.pszText  = text;
+    ebt.ttiIcon  = icon;
+    if (!::SendMessage(GetDlgItem(*this, nId), EM_SHOWBALLOONTIP, 0, (LPARAM)&ebt))
+    {
+        UINT uType = MB_ICONERROR;
+        switch (icon)
+        {
+        case TTI_ERROR:
+        case TTI_ERROR_LARGE:
+            uType = MB_ICONERROR;
+            break;
+        case TTI_WARNING:
+        case TTI_WARNING_LARGE:
+            uType = MB_ICONWARNING;
+            break;
+        case TTI_INFO:
+        case TTI_INFO_LARGE:
+            uType = MB_ICONINFORMATION;
+            break;
+        case TTI_NONE:
+            uType = 0;
+            break;
+        }
+        ::MessageBox(*this, text, title, uType);
+    }
+}
