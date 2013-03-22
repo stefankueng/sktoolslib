@@ -81,7 +81,7 @@ private:
     {
         // Format the output buffer
         char szBuffer[1024];
-        _vsnprintf_s(szBuffer, 1024, _countof(szBuffer), pszFormat, args);
+        _vsnprintf_s(szBuffer, _countof(szBuffer), pszFormat, args);
         OutputDebugStringA(szBuffer);
     }
 
@@ -89,7 +89,7 @@ private:
     void TraceV(PCWSTR pszFormat, va_list args)
     {
         wchar_t szBuffer[1024];
-        _vsnwprintf_s(szBuffer, 1024, _countof(szBuffer), pszFormat, args);
+        _vsnwprintf_s(szBuffer, _countof(szBuffer), pszFormat, args);
         OutputDebugStringW(szBuffer);
     }
 
