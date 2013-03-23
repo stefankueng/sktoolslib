@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -136,17 +136,18 @@ bool CWindow::Create(DWORD dwStyles, HWND hParent /* = NULL */, RECT* rect /* = 
     return CreateEx(0, dwStyles, hParent, rect);
 }
 
-bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = NULL */, RECT* rect /* = NULL */)
+bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = NULL */, RECT* rect /* = NULL */, LPCTSTR classname /* = NULL */)
 {
     // send the this pointer as the window creation parameter
     if (rect == NULL)
-        m_hwnd = CreateWindowEx(dwExStyles, sClassName.c_str(), sWindowTitle.c_str(), dwStyles, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hParent, NULL, hResource, (void *)this);
+        m_hwnd = CreateWindowEx(dwExStyles, classname ? classname : sClassName.c_str(), sWindowTitle.c_str(), dwStyles, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hParent, NULL, hResource, (void *)this);
     else
     {
-        m_hwnd = CreateWindowEx(dwExStyles, sClassName.c_str(), sWindowTitle.c_str(), dwStyles, rect->left, rect->top,
+        m_hwnd = CreateWindowEx(dwExStyles, classname ? classname : sClassName.c_str(), sWindowTitle.c_str(), dwStyles, rect->left, rect->top,
             rect->right - rect->left, rect->bottom - rect->top, hParent, NULL, hResource,
             (void *)this);
     }
+    m_hParent = hParent;
     return (m_hwnd != NULL);
 }
 
