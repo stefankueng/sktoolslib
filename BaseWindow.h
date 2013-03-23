@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -75,15 +75,17 @@ public:
 
     virtual bool Create();
     virtual bool Create(DWORD dwStyles, HWND hParent = NULL, RECT* rect = NULL);
-    virtual bool CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent = NULL, RECT* rect = NULL);
+    virtual bool CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent = NULL, RECT* rect = NULL, LPCTSTR classname = NULL);
 
     //void MsgLoop();
     bool IsWindowClosed() { return bWindowClosed; };
 
     operator HWND() {return m_hwnd;}
+    operator HWND() const {return m_hwnd;}
 protected:
     HINSTANCE hResource;
     HWND m_hwnd;
+    HWND m_hParent;
     bool bWindowClosed;
     std::wstring sClassName;
     std::wstring sWindowTitle;
@@ -92,8 +94,10 @@ protected:
     bool bWindowRestored;
 
     //constructor
-    CWindow(HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) : m_hwnd(NULL)
+    CWindow(HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL)
+        : m_hwnd(NULL)
         , hResource(NULL)
+        , m_hParent(NULL)
         , bWindowClosed(FALSE)
         , bWindowRestored(false)
     {
