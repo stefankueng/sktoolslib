@@ -19,17 +19,10 @@
 
 #include "stdafx.h"
 #include "BaseWindow.h"
+#include <memory>
 #include <Shlwapi.h>
 
 #pragma comment(lib, "shlwapi.lib")
-
-ResString::ResString (HINSTANCE hInst, int resId)
-{
-    if (!::LoadString (hInst, resId, _buf, MAX_RESSTRING + 1))
-    {
-        SecureZeroMemory(_buf, sizeof(_buf));
-    }
-}
 
 
 bool CWindow::RegisterWindow(UINT style, HICON hIcon, HCURSOR hCursor, HBRUSH hbrBackground,
