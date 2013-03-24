@@ -1,0 +1,300 @@
+﻿// sktoolslib - common files for SK tools
+
+// Copyright (C) 2013 - Stefan Kueng
+
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+//
+#include "stdafx.h"
+#include "Language.h"
+#include "codecvt.h"
+#include "StringUtils.h"
+
+#include <Shlwapi.h>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+#include <cctype>
+#include <memory>
+#include <functional>
+
+#define MAX_STRING_LENGTH   (64*1024)
+
+
+bool CLanguage::LoadFile( const std::wstring& path )
+{
+    // revert to original language
+    std::map<std::wstring, std::wstring> langmap2;
+    for (auto it = langmap.cbegin(); it != langmap.cend(); ++it)
+    {
+        langmap2[it->second] = it->first;
+    }
+    langmap = langmap2;
+
+    if (!PathFileExists(path.c_str()))
+        return false;
+
+    // since stream classes still expect the filepath in char and not wchar_t
+    // we need to convert the filepath to multibyte first
+    char filepath[MAX_PATH+1];
+    SecureZeroMemory(filepath, sizeof(filepath));
+    WideCharToMultiByte(CP_ACP, NULL, path.c_str(), -1, filepath, _countof(filepath)-1, NULL, NULL);
+
+    std::wifstream File;
+    File.imbue(std::locale(std::locale(), new utf8_conversion()));
+    File.open(filepath);
+    if (!File.good())
+    {
+        return false;
+    }
+    std::unique_ptr<TCHAR[]> line(new TCHAR[2*MAX_STRING_LENGTH]);
+    std::vector<std::wstring> entry;
+    do
+    {
+        File.getline(line.get(), 2*MAX_STRING_LENGTH);
+        if (line.get()[0]==0)
+        {
+            //empty line means end of entry!
+            std::wstring msgid;
+            std::wstring msgstr;
+            int type = 0;
+            for (auto I = entry.begin(); I != entry.end(); ++I)
+            {
+                if (wcsncmp(I->c_str(), L"# ", 2)==0)
+                {
+                    //user comment
+                    type = 0;
+                }
+                if (wcsncmp(I->c_str(), L"#.", 2)==0)
+                {
+                    //automatic comments
+                    type = 0;
+                }
+                if (wcsncmp(I->c_str(), L"#,", 2)==0)
+                {
+                    //flag
+                    type = 0;
+                }
+                if (wcsncmp(I->c_str(), L"msgid", 5)==0)
+                {
+                    //message id
+                    msgid = I->c_str();
+                    msgid = std::wstring(msgid.substr(7, msgid.size() - 8));
+
+                    std::wstring s = msgid;
+                    s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+                    type = 1;
+                }
+                if (wcsncmp(I->c_str(), L"msgstr", 6)==0)
+                {
+                    //message string
+                    msgstr = I->c_str();
+                    msgstr = msgstr.substr(8, msgstr.length() - 9);
+                    type = 2;
+                }
+                if (wcsncmp(I->c_str(), L"\"", 1)==0)
+                {
+                    if (type == 1)
+                    {
+                        std::wstring temp = I->c_str();
+                        temp = temp.substr(1, temp.length()-2);
+                        msgid += temp;
+                    }
+                    if (type == 2)
+                    {
+                        std::wstring temp = I->c_str();
+                        temp = temp.substr(1, temp.length()-2);
+                        msgstr += temp;
+                    }
+                }
+            }
+            entry.clear();
+            SearchReplace(msgid, L"\\\"", L"\"");
+            SearchReplace(msgid, L"\\n", L"\n");
+            SearchReplace(msgid, L"\\r", L"\r");
+            SearchReplace(msgstr, L"\\\"", L"\"");
+            SearchReplace(msgstr, L"\\n", L"\n");
+            SearchReplace(msgstr, L"\\r", L"\r");
+            langmap[msgid] = msgstr;
+            msgid.clear();
+            msgstr.clear();
+        }
+        else
+        {
+            entry.push_back(line.get());
+        }
+    } while (File.gcount() > 0);
+    File.close();
+
+    return true;
+}
+
+void CLanguage::AdjustEOLs(std::wstring& str)
+{
+    std::wstring result;
+    std::wstring::size_type pos = 0;
+    for ( ; ; ) // while (true)
+    {
+        std::wstring::size_type next = str.find(L"\\r\\n", pos);
+        result.append(str, pos, next-pos);
+        if( next != std::string::npos )
+        {
+            result.append(L"\\n");
+            pos = next + 4; // 4 = sizeof("\\r\\n")
+        }
+        else
+        {
+            break;  // exit loop
+        }
+    }
+    str.swap(result);
+    result.clear();
+    pos = 0;
+
+    for ( ; ; ) // while (true)
+    {
+        std::wstring::size_type next = str.find(L"\\n", pos);
+        result.append(str, pos, next-pos);
+        if( next != std::string::npos )
+        {
+            result.append(L"\\r\\n");
+            pos = next + 2; // 2 = sizeof("\\n")
+        }
+        else
+        {
+            break;  // exit loop
+        }
+    }
+    str.swap(result);
+}
+
+std::wstring CLanguage::GetTranslatedString( const std::wstring& s )
+{
+    return GetTranslatedString(s, &langmap);
+}
+
+std::wstring CLanguage::GetTranslatedString( const std::wstring& s, std::map<std::wstring, std::wstring>* pLangMap )
+{
+    auto foundIt = pLangMap->find(s);
+    if ((foundIt != pLangMap->end()) && (!foundIt->second.empty()))
+        return foundIt->second;
+    return s;
+}
+
+void CLanguage::TranslateWindow( HWND hWnd )
+{
+    // iterate over all windows and replace their
+    // texts with the translation
+    EnumChildWindows(hWnd, TranslateWindowProc, (LPARAM)&langmap);
+}
+
+BOOL CALLBACK CLanguage::TranslateWindowProc( HWND hwnd, LPARAM lParam )
+{
+    std::map<std::wstring,std::wstring> * pLangMap = (std::map<std::wstring,std::wstring> *)lParam;
+    int length = GetWindowTextLength(hwnd);
+    std::unique_ptr<wchar_t[]> text(new wchar_t[length+1]);
+    std::wstring translatedString;
+    if (GetWindowText(hwnd, text.get(), length+1))
+    {
+        translatedString = GetTranslatedString(text.get(), pLangMap);
+        SetWindowText(hwnd, translatedString.c_str());
+    }
+
+    wchar_t classname[1024] = {0};
+    if (GetClassName(hwnd, classname, _countof(classname)))
+    {
+        if (wcscmp(classname, L"ComboBox")==0)
+        {
+            // translate the items in the combobox
+            int nSel = (int)SendMessage(hwnd, CB_GETCURSEL, 0, 0);
+            int nCount = (int)SendMessage(hwnd, CB_GETCOUNT, 0, 0);
+            for (int i = 0; i < nCount; ++i)
+            {
+                length = (int)SendMessage(hwnd, CB_GETLBTEXTLEN, i, 0);
+                std::unique_ptr<wchar_t[]> buf(new wchar_t[length+1]);
+                SendMessage(hwnd, CB_GETLBTEXT, i, (LPARAM)buf.get());
+                std::wstring sTranslated = GetTranslatedString(buf.get(), pLangMap);
+                SendMessage(hwnd, CB_INSERTSTRING, i, (LPARAM)sTranslated.c_str());
+                SendMessage(hwnd, CB_DELETESTRING, i+1, 0);
+            }
+            SendMessage(hwnd, CB_SETCURSEL, nSel, 0);
+        }
+        else if (wcscmp(classname, L"Button")==0)
+        {
+            LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
+            if (((style & BS_GROUPBOX)==0) &&
+                ((style & BS_CHECKBOX) || (style & BS_AUTORADIOBUTTON) || (style & BS_RADIOBUTTON)))
+            {
+                // adjust the width of checkbox and radio buttons
+                HDC hDC = GetWindowDC(hwnd);
+                RECT controlrect;
+                RECT controlrectorig;
+                GetWindowRect(hwnd, &controlrect);
+                ::MapWindowPoints(NULL, GetParent(hwnd), (LPPOINT)&controlrect, 2);
+                controlrectorig = controlrect;
+                if (hDC)
+                {
+                    HFONT hFont = GetWindowFont(hwnd);
+                    HGDIOBJ hOldFont = ::SelectObject(hDC, hFont);
+                    if (DrawText(hDC, translatedString.c_str(), -1, &controlrect, DT_WORDBREAK | DT_EDITCONTROL | DT_EXPANDTABS | DT_LEFT | DT_CALCRECT))
+                    {
+                        // now we have the rectangle the control really needs
+                        if ((controlrectorig.right - controlrectorig.left) > (controlrect.right - controlrect.left))
+                        {
+                            // we're dealing with radio buttons and check boxes,
+                            // which means we have to add a little space for the checkbox
+                            // the value of 3 pixels added here is necessary in case certain visual styles have
+                            // been disabled. Without this, the width is calculated too short.
+                            const int checkWidth = GetSystemMetrics(SM_CXMENUCHECK) + 2*GetSystemMetrics(SM_CXEDGE) + 3;
+                            controlrectorig.right = controlrectorig.left + (controlrect.right - controlrect.left) + checkWidth;
+                            MoveWindow(hwnd, controlrectorig.left, controlrectorig.top, controlrectorig.right-controlrectorig.left, controlrectorig.bottom-controlrectorig.top, TRUE);
+                        }
+                    }
+                    SelectObject(hDC, hOldFont);
+                    ReleaseDC(hwnd, hDC);
+                }
+            }
+        }
+        else if (wcscmp(classname, L"SysHeader32")==0)
+        {
+            // translate column headers in list and other controls
+            int nCount = Header_GetItemCount(hwnd);
+            std::unique_ptr<wchar_t[]> buf(new wchar_t[270]);
+            for (int i = 0; i < nCount; ++i)
+            {
+                HDITEM hdi = {0};
+                hdi.mask = HDI_TEXT;
+                hdi.pszText = buf.get();
+                hdi.cchTextMax = 270;
+                Header_GetItem(hwnd, i, &hdi);
+                std::wstring sTranslated = GetTranslatedString(buf.get(), pLangMap);
+                hdi.pszText = const_cast<LPWSTR>(sTranslated.c_str());
+                Header_SetItem(hwnd, i, &hdi);
+            }
+        }
+        else
+        {
+            OutputDebugString(classname);
+            OutputDebugString(L"\n");
+        }
+    }
+
+    return TRUE;
+}
+
+CLanguage& CLanguage::Instance()
+{
+    static CLanguage instance;
+    return instance;
+}
