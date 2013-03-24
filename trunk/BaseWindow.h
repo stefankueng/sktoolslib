@@ -18,22 +18,10 @@
 //
 
 #pragma once
+#include "ResString.h"
 
 #include <string>
 
-
-/**
- * Loads a string from the application resources.
- */
-class ResString
-{
-    enum { MAX_RESSTRING = 1024 };
-public:
-    ResString (HINSTANCE hInst, int resId);
-    operator TCHAR const * () const { return _buf; }
-private:
-    TCHAR _buf [MAX_RESSTRING + 1];
-};
 
 /**
  * \ingroup Utils
