@@ -129,14 +129,14 @@ void CDialog::InitDialog(HWND hwndDlg, UINT iconID)
     m_margins.cyTopHeight = 0;
 }
 
-void CDialog::AddToolTip(UINT ctrlID, LPTSTR text)
+void CDialog::AddToolTip(UINT ctrlID, LPCWSTR text)
 {
     TOOLINFO tt;
     tt.cbSize = sizeof(TOOLINFO);
     tt.uFlags = TTF_IDISHWND|TTF_SUBCLASS;
     tt.hwnd = GetDlgItem(*this, ctrlID);
     tt.uId = (UINT)GetDlgItem(*this, ctrlID);
-    tt.lpszText = text;
+    tt.lpszText = const_cast<LPTSTR>(text);
 
     SendMessage (m_hToolTips, TTM_ADDTOOL, 0, (LPARAM) &tt);
 }

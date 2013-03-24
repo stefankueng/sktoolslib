@@ -19,8 +19,9 @@
 
 #pragma once
 
-#include <string>
 #include "AeroGlass.h"
+#include "ResString.h"
+#include <string>
 #include <memory>
 
 /**
@@ -44,7 +45,7 @@ public:
     INT_PTR DoModal(HINSTANCE hInstance, int resID, HWND hWndParent, UINT idAccel);
     HWND    Create(HINSTANCE hInstance, int resID, HWND hWndParent);
     BOOL    EndDialog(HWND hDlg, INT_PTR nResult);
-    void    AddToolTip(UINT ctrlID, LPTSTR text);
+    void    AddToolTip(UINT ctrlID, LPCWSTR text);
     bool    IsCursorOverWindowBorder();
     void    RefreshCursor();
     void    ShowEditBalloon(UINT nId, LPCWSTR title, LPCWSTR text, int icon = TTI_ERROR);
