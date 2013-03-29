@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -189,4 +189,113 @@ int LoadStringEx(HINSTANCE hInstance, UINT uID, LPTSTR lpBuffer, int nBufferMax,
     lpBuffer[ret] = 0;
 #endif
     return ret;
+}
+
+int GetCodepageFromBuf( LPVOID pBuffer, int cb, bool& hasBOM )
+{
+    hasBOM = false;
+    if (cb < 2)
+        return CP_ACP;
+    const UINT32 * const pVal32 = (UINT32 *)pBuffer;
+    const UINT16 * const pVal16 = (UINT16 *)pBuffer;
+    const UINT8 * const pVal8 = (UINT8 *)pBuffer;
+    // scan the whole buffer for a 0x00000000 sequence
+    // if found, we assume a binary file
+    int nDwords = cb/4;
+    for (int i=0; i<nDwords; ++i)
+    {
+        if (0x00000000 == pVal32[i])
+            return -1;
+    }
+    if (cb >=4 )
+    {
+        if (*pVal32 == 0x0000FEFF)
+        {
+            hasBOM = true;
+            return 12000; // UTF32_LE
+        }
+        if (*pVal32 == 0xFFFE0000)
+        {
+            hasBOM = true;
+            return 12001; // UTF32_BE
+        }
+    }
+    if (*pVal16 == 0xFEFF)
+    {
+        hasBOM = true;
+        return 1200; // UTF16_LE
+    }
+    if (*pVal16 == 0xFFFE)
+    {
+        hasBOM = true;
+        return 1201; // UTF16_BE
+    }
+    if (cb < 3)
+        return CP_ACP;
+    if (*pVal16 == 0xBBEF)
+    {
+        if (pVal8[2] == 0xBF)
+        {
+            hasBOM = true;
+            return CP_UTF8;
+        }
+    }
+    // check for illegal UTF8 sequences
+    bool bNonANSI = false;
+    int nNeedData = 0;
+    int i=0;
+    // run fast for ASCII
+    for (; i<cb; i+=8)
+    {
+        if ((*(UINT64 *)&pVal8[i] & 0x8080808080808080)!=0) // all ASCII?
+        {
+            bNonANSI = true;
+            break;
+        }
+    }
+    // continue slow
+    for (; i<cb; ++i)
+    {
+        UINT8 zChar = pVal8[i];
+        if ((zChar & 0x80)==0) // ASCII
+        {
+            if (nNeedData)
+            {
+                return CP_ACP;
+            }
+            continue;
+        }
+        if ((zChar & 0x40)==0) // top bit
+        {
+            if (!nNeedData)
+                return CP_ACP;
+            --nNeedData;
+        }
+        else if (nNeedData)
+        {
+            return CP_ACP;
+        }
+        else if ((zChar & 0x20)==0) // top two bits
+        {
+            if (zChar<=0xC1)
+                return CP_ACP;
+            nNeedData = 1;
+        }
+        else if ((zChar & 0x10)==0) // top three bits
+        {
+            nNeedData = 2;
+        }
+        else if ((zChar & 0x08)==0) // top four bits
+        {
+            if (zChar>=0xf5)
+                return CP_ACP;
+            nNeedData = 3;
+        }
+        else
+            return CP_ACP;
+    }
+    if (bNonANSI && nNeedData==0)
+        return CP_UTF8;
+
+    return CP_ACP;
 }
