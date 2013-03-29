@@ -193,7 +193,7 @@ std::wstring CStringUtils::Format( const wchar_t* frmt, ... )
 
         // Create a char vector to hold the formatted string.
         std::vector<wchar_t> buffer(len, L'\0');
-        int written = _vsnwprintf_s(&buffer[0], buffer.size(), len, frmt, marker);    
+        _vsnwprintf_s(&buffer[0], buffer.size(), len, frmt, marker);    
 
         // Reset variable arguments
         va_end(marker);
