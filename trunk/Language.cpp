@@ -21,6 +21,7 @@
 #include "codecvt.h"
 #include "StringUtils.h"
 
+#include <Commctrl.h>
 #include <Shlwapi.h>
 #include <fstream>
 #include <vector>
