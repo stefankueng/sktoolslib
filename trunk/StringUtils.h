@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -149,4 +149,6 @@ public:
     static std::wstring ToHexWString( BYTE* pSrc, int nSrcLen );
 
     static bool FromHexString( const std::wstring& src, BYTE* pDest );
+
+    static std::wstring Format(const wchar_t* frmt, ...);
 };
