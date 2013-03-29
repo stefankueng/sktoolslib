@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 #include "StringUtils.h"
+#include <vector>
 
 int strwildcmp(const char *wild, const char *string)
 {
@@ -176,6 +177,31 @@ bool CStringUtils::FromHexString( const std::wstring& src, BYTE* pDest )
 {
     std::string s = std::string(src.begin(), src.end());
     return FromHexString(s, pDest);
+}
+
+std::wstring CStringUtils::Format( const wchar_t* frmt, ... )
+{
+    if (frmt != NULL)
+    {
+        va_list marker;
+
+        // Initialize variable arguments
+        va_start(marker, frmt);
+
+        // Get formatted string length adding one for the NULL
+        size_t len = _vscwprintf(frmt, marker) + 1;
+
+        // Create a char vector to hold the formatted string.
+        std::vector<wchar_t> buffer(len, L'\0');
+        int written = _vsnwprintf_s(&buffer[0], buffer.size(), len, frmt, marker);    
+
+        // Reset variable arguments
+        va_end(marker);
+
+        return &buffer[0];
+    }
+
+    return L"";
 }
 
 
