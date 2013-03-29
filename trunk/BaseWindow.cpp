@@ -53,7 +53,7 @@ bool CWindow::RegisterWindow(CONST WNDCLASSEX* wcx)
 {
     // Register the window class.
     sClassName = std::wstring(wcx->lpszClassName);
-
+    bRegisterWindowCalled = true;
     if (RegisterClassEx(wcx) == 0)
     {
         if (GetLastError() == ERROR_CLASS_ALREADY_EXISTS)
@@ -141,6 +141,14 @@ bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = NULL 
             (void *)this);
     }
     m_hParent = hParent;
+
+    if (!bRegisterWindowCalled)
+    {
+        ::SetWindowLongPtr(m_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+        prevWndProc = (WNDPROC)GetWindowLongPtr(m_hwnd, GWLP_WNDPROC);
+        ::SetWindowLongPtr(m_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(stWinMsgHandler));
+    }
+
     return (m_hwnd != NULL);
 }
 

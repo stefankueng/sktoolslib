@@ -80,6 +80,8 @@ protected:
     std::wstring sRegistryPath;
     std::wstring sRegistryValue;
     bool bWindowRestored;
+    bool bRegisterWindowCalled;
+    WNDPROC prevWndProc;
 
     //constructor
     CWindow(HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL)
@@ -88,6 +90,8 @@ protected:
         , m_hParent(NULL)
         , bWindowClosed(FALSE)
         , bWindowRestored(false)
+        , bRegisterWindowCalled(false)
+        , prevWndProc(nullptr)
     {
         hResource = hInst;
         if (wcx != NULL)
