@@ -22,6 +22,8 @@
 #include <CommCtrl.h>
 #include <WindowsX.h>
 
+static HWND g_hDlgCurrent = NULL;
+
 INT_PTR CDialog::DoModal(HINSTANCE hInstance, int resID, HWND hWndParent)
 {
     m_bPseudoModal = false;
@@ -60,7 +62,7 @@ INT_PTR CDialog::DoModal(HINSTANCE hInstance, int resID, HWND hWndParent, UINT i
             if (!PreTranslateMessage(&msg))
             {
                 if (!TranslateAccelerator(m_hwnd, hAccelTable, &msg) &&
-                    !IsDialogMessage(m_hwnd, &msg)
+                    !::IsDialogMessage(m_hwnd, &msg)
                     )
                 {
                     TranslateMessage(&msg);
@@ -96,6 +98,17 @@ HWND CDialog::Create(HINSTANCE hInstance, int resID, HWND hWndParent)
     hResource = hInstance;
     m_hwnd = CreateDialogParam(hInstance, MAKEINTRESOURCE(resID), hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
     return m_hwnd;
+}
+
+
+void CDialog::ShowModeless( HINSTANCE hInstance, int resID, HWND hWndParent )
+{
+    if (m_hwnd == NULL)
+    {
+        hResource = hInstance;
+        m_hwnd = CreateDialogParam(hInstance, MAKEINTRESOURCE(resID), hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
+    }
+    ShowWindow(m_hwnd, SW_SHOW);
 }
 
 void CDialog::InitDialog(HWND hwndDlg, UINT iconID)
@@ -262,6 +275,12 @@ INT_PTR CALLBACK CDialog::stDlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                     }
                 }
             }
+            break;
+        case WM_ACTIVATE:
+            if (0 == wParam)             // becoming inactive
+                g_hDlgCurrent = NULL;
+            else                         // becoming active
+                g_hDlgCurrent = hwndDlg;
             break;
         default:
             break;
@@ -442,4 +461,41 @@ void CDialog::ShowEditBalloon( UINT nId, LPCWSTR title, LPCWSTR text, int icon /
         }
         ::MessageBox(*this, text, title, uType);
     }
+}
+
+void CDialog::SetTransparency( BYTE alpha, COLORREF color /*= 0xFF000000*/ )
+{
+    if (alpha == 255)
+    {
+        LONG_PTR exstyle = GetWindowLongPtr(*this, GWL_EXSTYLE);
+        exstyle &= ~WS_EX_LAYERED;
+        SetWindowLongPtr(*this, GWL_EXSTYLE, exstyle);
+    }
+    else
+    {
+        LONG_PTR exstyle = GetWindowLongPtr(*this, GWL_EXSTYLE);
+        exstyle |= WS_EX_LAYERED;
+        SetWindowLongPtr(*this, GWL_EXSTYLE, exstyle);
+    }
+    COLORREF col = color;
+    DWORD flags = LWA_ALPHA;
+    if (col & 0xFF000000)
+    {
+        col = RGB(255, 255, 255);
+        flags = LWA_ALPHA;
+    }
+    else
+    {
+        flags = LWA_COLORKEY;
+    }
+    SetLayeredWindowAttributes(*this, col, alpha, flags);
+}
+
+BOOL CDialog::IsDialogMessage( LPMSG lpMsg )
+{
+    if (g_hDlgCurrent)
+    {
+        return ::IsDialogMessage(g_hDlgCurrent, lpMsg);
+    }
+    return FALSE;
 }
