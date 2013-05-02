@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,7 +22,6 @@
 
 
 #define PROP_OBJECT_PTR         MAKEINTATOM(ga.atom)
-#define PROP_ORIGINAL_PROC      MAKEINTATOM(ga.atom)
 
 /*
  * typedefs
@@ -69,12 +68,12 @@ BOOL CEditDoubleClick::Subclass(HWND hwndParent, UINT uiCtlId)
 
     m_pfnOrigCtlProc = (WNDPROC) GetWindowLongPtr(hwndCtl, GWLP_WNDPROC);
     SetProp(hwndCtl, PROP_OBJECT_PTR, (HANDLE) this);
-    SetWindowLongPtr(hwndCtl, GWLP_WNDPROC, (LONG_PTR) (WNDPROC) _HyperlinkProc);
+    SetWindowLongPtr(hwndCtl, GWLP_WNDPROC, (LONG_PTR) EditCtrlWinProc);
 
     return TRUE;
 }
 
-LRESULT CALLBACK CEditDoubleClick::_HyperlinkProc(HWND hwnd, UINT message,
+LRESULT CALLBACK CEditDoubleClick::EditCtrlWinProc(HWND hwnd, UINT message,
                                            WPARAM wParam, LPARAM lParam)
 {
     CEditDoubleClick *pCtrl = (CEditDoubleClick *)GetProp(hwnd, PROP_OBJECT_PTR);
