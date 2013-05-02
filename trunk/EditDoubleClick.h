@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -37,6 +37,6 @@ private:
 
     static LRESULT CALLBACK _HyperlinkParentProc(HWND hwnd, UINT message,
                                                  WPARAM wParam, LPARAM lParam);
-    static LRESULT CALLBACK _HyperlinkProc(HWND hwnd, UINT message,
+    static LRESULT CALLBACK EditCtrlWinProc(HWND hwnd, UINT message,
                                            WPARAM wParam, LPARAM lParam);
 };
