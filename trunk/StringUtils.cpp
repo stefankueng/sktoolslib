@@ -204,6 +204,31 @@ std::wstring CStringUtils::Format( const wchar_t* frmt, ... )
     return L"";
 }
 
+std::string CStringUtils::Format( const char* frmt, ... )
+{
+    if (frmt != NULL)
+    {
+        va_list marker;
+
+        // Initialize variable arguments
+        va_start(marker, frmt);
+
+        // Get formatted string length adding one for the NULL
+        size_t len = _vscprintf(frmt, marker) + 1;
+
+        // Create a char vector to hold the formatted string.
+        std::vector<char> buffer(len, L'\0');
+        _vsnprintf_s(&buffer[0], buffer.size(), len, frmt, marker);
+
+        // Reset variable arguments
+        va_end(marker);
+
+        return &buffer[0];
+    }
+
+    return "";
+}
+
 
 bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd)
 {
@@ -258,6 +283,28 @@ void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::
     for (;;)    // while (true)
     {
         std::wstring::size_type next = str.find(toreplace, pos);
+        result.append(str, pos, next-pos);
+        if (next != std::string::npos)
+        {
+            result.append(replacewith);
+            pos = next + toreplace.size();
+        }
+        else
+        {
+            break;  // exit loop
+        }
+    }
+    str.swap(result);
+}
+
+
+void SearchReplace( std::string& str, const std::string& toreplace, const std::string& replacewith )
+{
+    std::string result;
+    std::string::size_type pos = 0;
+    for (;;)    // while (true)
+    {
+        std::string::size_type next = str.find(toreplace, pos);
         result.append(str, pos, next-pos);
         if (next != std::string::npos)
         {
