@@ -58,6 +58,7 @@ int wcswildcmp(const wchar_t * wild, const wchar_t * string);
 
 bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd);
 void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::wstring& replacewith);
+void SearchReplace(std::string& str, const std::string& toreplace, const std::string& replacewith);
 
 template <typename Container>
 void stringtok(Container &container, const std::wstring  &in, bool trim,
@@ -151,4 +152,5 @@ public:
     static bool FromHexString( const std::wstring& src, BYTE* pDest );
 
     static std::wstring Format(const wchar_t* frmt, ...);
+    static std::string Format(const char* frmt, ...);
 };
