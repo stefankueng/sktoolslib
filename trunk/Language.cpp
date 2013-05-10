@@ -197,6 +197,7 @@ void CLanguage::TranslateWindow( HWND hWnd )
 {
     // iterate over all windows and replace their
     // texts with the translation
+    TranslateWindowProc(hWnd, (LPARAM)&langmap);
     EnumChildWindows(hWnd, TranslateWindowProc, (LPARAM)&langmap);
 }
 
