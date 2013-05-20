@@ -285,11 +285,6 @@ BOOL CALLBACK CLanguage::TranslateWindowProc( HWND hwnd, LPARAM lParam )
                 Header_SetItem(hwnd, i, &hdi);
             }
         }
-        else
-        {
-            OutputDebugString(classname);
-            OutputDebugString(L"\n");
-        }
     }
 
     return TRUE;
