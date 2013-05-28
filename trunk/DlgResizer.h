@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -50,6 +50,7 @@ public:
     void    DoResize(int width, int height);
 
     RECT *  GetDlgRect() {return &m_dlgRect;}
+    RECT *  GetDlgRectScreen() {return &m_dlgRectScreen;}
     void    ShowSizeGrip(bool bShow = true) {::ShowWindow(m_wndGrip, bShow ? SW_SHOW : SW_HIDE);}
     void    UpdateGripPos();
 
@@ -57,6 +58,7 @@ private:
     HWND                        m_hDlg;
     std::vector<ResizeCtrls>    m_controls;
     RECT                        m_dlgRect;
+    RECT                        m_dlgRectScreen;
     SIZE                        m_sizeGrip;
     HWND                        m_wndGrip;
 

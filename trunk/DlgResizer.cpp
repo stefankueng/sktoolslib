@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -37,6 +37,8 @@ void CDlgResizer::Init(HWND hWndDlg)
 {
     m_hDlg = hWndDlg;
     GetClientRect(hWndDlg, &m_dlgRect);
+    GetWindowRect(hWndDlg, &m_dlgRectScreen);
+    OffsetRect(&m_dlgRectScreen, -m_dlgRectScreen.left, -m_dlgRectScreen.top);
 
     m_sizeGrip.cx = GetSystemMetrics(SM_CXVSCROLL);
     m_sizeGrip.cy = GetSystemMetrics(SM_CYHSCROLL);
@@ -136,6 +138,7 @@ void CDlgResizer::DoResize(int width, int height)
             SWP_NOZORDER);
     }
     EndDeferWindowPos(hdwp);
+    UpdateGripPos();
 }
 
 void CDlgResizer::UpdateGripPos()
@@ -160,6 +163,6 @@ void CDlgResizer::UpdateGripPos()
     else
     {
         ::EnableWindow(m_wndGrip, TRUE);
-        ShowSizeGrip(false);
+        ShowSizeGrip(true);
     }
 }
