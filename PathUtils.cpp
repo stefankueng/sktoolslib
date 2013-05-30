@@ -88,3 +88,35 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
         return path;
     return sRet;
 }
+
+
+std::wstring CPathUtils::GetParentDirectory( const std::wstring& path )
+{
+    auto pos = path.find_last_of('\\');
+    if (pos != std::wstring::npos)
+    {
+        std::wstring sPath = path.substr(0, pos);
+        return sPath;
+    }
+    return path;
+}
+
+std::wstring CPathUtils::GetModulePath( HMODULE hMod /*= NULL*/ )
+{
+    DWORD len = 0;
+    DWORD bufferlen = MAX_PATH;     // MAX_PATH is not the limit here!
+    std::unique_ptr<wchar_t[]> path(new wchar_t[bufferlen]);
+    do
+    {
+        bufferlen += MAX_PATH;      // MAX_PATH is not the limit here!
+        path = std::unique_ptr<wchar_t[]>(new wchar_t[bufferlen]);
+        len = GetModuleFileName(hMod, path.get(), bufferlen);
+    } while(len == bufferlen);
+    std::wstring sPath = path.get();
+    return sPath;
+}
+
+std::wstring CPathUtils::GetModuleDir( HMODULE hMod /*= NULL*/ )
+{
+    return GetParentDirectory(GetModulePath(hMod));
+}
