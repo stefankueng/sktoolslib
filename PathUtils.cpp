@@ -20,7 +20,9 @@
 #include "stdafx.h"
 #include "PathUtils.h"
 #include <vector>
+#include <Shlwapi.h>
 
+#pragma comment(lib, "Shlwapi.lib")
 
 std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
 {
@@ -119,4 +121,14 @@ std::wstring CPathUtils::GetModulePath( HMODULE hMod /*= NULL*/ )
 std::wstring CPathUtils::GetModuleDir( HMODULE hMod /*= NULL*/ )
 {
     return GetParentDirectory(GetModulePath(hMod));
+}
+
+std::wstring CPathUtils::Append( const std::wstring& path, const std::wstring& append )
+{
+    if (append.empty())
+        return path;
+    size_t pos = append.find_first_not_of('\\');
+    if (*path.rbegin() == '\\')
+        return path + &append[pos];
+    return path + L"\\" + &append[pos];
 }
