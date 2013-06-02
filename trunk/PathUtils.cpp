@@ -132,3 +132,19 @@ std::wstring CPathUtils::Append( const std::wstring& path, const std::wstring& a
         return path + &append[pos];
     return path + L"\\" + &append[pos];
 }
+
+std::wstring CPathUtils::GetTempFilePath()
+{
+    DWORD len = ::GetTempPath(0, NULL);
+    std::unique_ptr<TCHAR[]> temppath(new TCHAR[len+1]);
+    std::unique_ptr<TCHAR[]> tempF(new TCHAR[len+50]);
+    ::GetTempPath (len+1, temppath.get());
+    std::wstring tempfile;
+    ::GetTempFileName (temppath.get(), TEXT("cm_"), 0, tempF.get());
+    tempfile = std::wstring(tempF.get());
+    //now create the tempfile, so that subsequent calls to GetTempFile() return
+    //different filenames.
+    HANDLE hFile = CreateFile(tempfile.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
+    CloseHandle(hFile);
+    return tempfile;
+}
