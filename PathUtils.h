@@ -36,4 +36,5 @@ public:
     static std::wstring GetModulePath(HMODULE hMod = NULL);
     static std::wstring GetModuleDir(HMODULE hMod = NULL);
     static std::wstring Append(const std::wstring& path, const std::wstring& append);
+    static std::wstring GetTempFilePath();
 };
