@@ -109,6 +109,7 @@ void CDialog::ShowModeless( HINSTANCE hInstance, int resID, HWND hWndParent )
         m_hwnd = CreateDialogParam(hInstance, MAKEINTRESOURCE(resID), hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
     }
     ShowWindow(m_hwnd, SW_SHOW);
+    SetFocus(m_hwnd);
 }
 
 void CDialog::InitDialog(HWND hwndDlg, UINT iconID)
