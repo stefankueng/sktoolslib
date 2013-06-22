@@ -103,6 +103,17 @@ std::wstring CPathUtils::GetParentDirectory( const std::wstring& path )
     return path;
 }
 
+std::wstring CPathUtils::GetFileExtension( const std::wstring& path )
+{
+    auto pos = path.find_last_of('.');
+    if (pos != std::wstring::npos)
+    {
+        std::wstring sExt = path.substr(pos+1);
+        return sExt;
+    }
+    return L"";
+}
+
 std::wstring CPathUtils::GetModulePath( HMODULE hMod /*= NULL*/ )
 {
     DWORD len = 0;
@@ -148,3 +159,4 @@ std::wstring CPathUtils::GetTempFilePath()
     CloseHandle(hFile);
     return tempfile;
 }
+

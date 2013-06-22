@@ -32,6 +32,7 @@ public:
     static std::wstring GetLongPathname(const std::wstring& path);
 
     static std::wstring GetParentDirectory(const std::wstring& path);
+    static std::wstring GetFileExtension(const std::wstring& path);
     // module/app paths
     static std::wstring GetModulePath(HMODULE hMod = NULL);
     static std::wstring GetModuleDir(HMODULE hMod = NULL);
