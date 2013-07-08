@@ -38,6 +38,8 @@ public:
     bool            IsVistaOrLater() const {return (GetFullVersion() >= 0x0600);}
     bool            IsWin7() const {return (GetFullVersion() == 0x0601);}
     bool            IsWin7OrLater() const {return (GetFullVersion() >= 0x0601);}
+    bool            IsWin8() const {return (GetFullVersion() == 0x0602);}
+    bool            IsWin8OrLater() const {return (GetFullVersion() >= 0x0602);}
 private:
     OSVERSIONINFOEX inf;
 };
