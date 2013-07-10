@@ -19,10 +19,12 @@
 
 #include "stdafx.h"
 #include "PathUtils.h"
+#include "StringUtils.h"
 #include <vector>
 #include <Shlwapi.h>
 
 #pragma comment(lib, "Shlwapi.lib")
+#pragma comment(lib, "version.lib")
 
 std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
 {
@@ -160,3 +162,55 @@ std::wstring CPathUtils::GetTempFilePath()
     return tempfile;
 }
 
+std::wstring CPathUtils::GetVersionFromFile(const std::wstring& path)
+{
+    struct TRANSARRAY
+    {
+        WORD wLanguageID;
+        WORD wCharacterSet;
+    };
+
+    std::wstring strReturn;
+    DWORD dwReserved = 0;
+    DWORD dwBufferSize = GetFileVersionInfoSize((LPTSTR)(LPCTSTR)path.c_str(),&dwReserved);
+
+    if (dwBufferSize > 0)
+    {
+        LPVOID pBuffer = (void*) malloc(dwBufferSize);
+
+        if (pBuffer != (void*) NULL)
+        {
+            UINT            nInfoSize = 0,
+                            nFixedLength = 0;
+            LPSTR           lpVersion = NULL;
+            VOID*           lpFixedPointer;
+            TRANSARRAY*     lpTransArray;
+            std::wstring    strLangProduktVersion;
+
+            GetFileVersionInfo((LPTSTR)(LPCTSTR)path.c_str(),
+                dwReserved,
+                dwBufferSize,
+                pBuffer);
+
+            // Check the current language
+            VerQueryValue(  pBuffer,
+                L"\\VarFileInfo\\Translation",
+                &lpFixedPointer,
+                &nFixedLength);
+            lpTransArray = (TRANSARRAY*) lpFixedPointer;
+
+            strLangProduktVersion = CStringUtils::Format(L"\\StringFileInfo\\%04x%04x\\ProductVersion",
+                                                         lpTransArray[0].wLanguageID, lpTransArray[0].wCharacterSet);
+
+            VerQueryValue(pBuffer,
+                (LPTSTR)(LPCTSTR)strLangProduktVersion.c_str(),
+                (LPVOID *)&lpVersion,
+                &nInfoSize);
+            if (nInfoSize && lpVersion)
+                strReturn = (LPCTSTR)lpVersion;
+            free(pBuffer);
+        }
+    }
+
+    return strReturn;
+}
