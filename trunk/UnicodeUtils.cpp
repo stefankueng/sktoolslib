@@ -253,13 +253,33 @@ int GetCodepageFromBuf( LPVOID pBuffer, int cb, bool& hasBOM )
             break;
         }
     }
+    int nullcount = 0;
     // continue slow
     for (; i<cb; ++i)
     {
         UINT8 zChar = pVal8[i];
         if ((zChar & 0x80)==0) // ASCII
         {
-            if (nNeedData)
+            if (zChar == 0)
+            {
+                ++nullcount;
+                // count the null chars, we do not want to treat an ASCII/UTF8 file
+                // as UTF16 just because of some null chars that might be accidentally
+                // in the file.
+                // Use an arbitrary value of one fiftieth of the file length as
+                // the limit after which a file is considered UTF16.
+                if (nullcount > (cb / 50))
+                {
+                    // null-chars are not allowed for ASCII or UTF8, that means
+                    // this file is most likely UTF16 encoded
+                    if (i%2)
+                        return 1200; // UTF16_LE
+                    else
+                        return 1201; // UTF16_BE
+                }
+                nNeedData = 0;
+            }
+            else if (nNeedData)
             {
                 return CP_ACP;
             }
