@@ -214,3 +214,19 @@ std::wstring CPathUtils::GetVersionFromFile(const std::wstring& path)
 
     return strReturn;
 }
+
+std::wstring CPathUtils::GetAppDataPath(HMODULE hMod)
+{
+    DWORD len = 0;
+    DWORD bufferlen = MAX_PATH;     // MAX_PATH is not the limit here!
+    std::unique_ptr<wchar_t[]> path(new wchar_t[bufferlen]);
+    do
+    {
+        bufferlen += MAX_PATH;      // MAX_PATH is not the limit here!
+        path = std::unique_ptr<wchar_t[]>(new wchar_t[bufferlen]);
+        len = GetModuleFileName(hMod, path.get(), bufferlen);
+    } while(len == bufferlen);
+    std::wstring sPath = path.get();
+    sPath = sPath.substr(0, sPath.find_last_of('\\'));
+    return sPath;
+}
