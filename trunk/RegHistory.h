@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 
 #pragma once
-
+#include "SimpleIni.h"
 #include <string>
 #include <vector>
 
@@ -30,7 +30,7 @@
 class CRegHistory
 {
 public:
-    CRegHistory();
+    CRegHistory(CSimpleIni * pIni = NULL);
     virtual ~CRegHistory();
 
     /// Loads the history
@@ -58,4 +58,5 @@ protected:
     std::wstring m_sKeyPrefix;
     std::vector<std::wstring> m_arEntries;
     int m_nMaxHistoryItems;
+    CSimpleIni * m_pIniFile;
 };
