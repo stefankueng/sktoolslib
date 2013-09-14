@@ -127,3 +127,8 @@ void CIniSettings::SaveWindowPos( LPCWSTR windowname, HWND hWnd )
     SetInt64(L"windowpos", CStringUtils::Format(L"%s_rcNormalPositionRight", windowname).c_str(),   wpl.rcNormalPosition.right);
     SetInt64(L"windowpos", CStringUtils::Format(L"%s_rcNormalPositionBottom", windowname).c_str(),  wpl.rcNormalPosition.bottom);
 }
+
+void CIniSettings::Delete( LPCWSTR section, LPCWSTR key )
+{
+    m_IniFile.Delete(section, key, true);
+}
