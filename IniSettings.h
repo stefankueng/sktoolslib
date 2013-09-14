@@ -34,6 +34,7 @@ public:
     void                    SetString(LPCWSTR section, LPCWSTR key, LPCWSTR value);
     __int64                 GetInt64(LPCWSTR section, LPCWSTR key, __int64 default);
     void                    SetInt64(LPCWSTR section, LPCWSTR key, __int64 value);
+    void                    Delete(LPCWSTR section, LPCWSTR key);
     void                    RestoreWindowPos(LPCWSTR windowname, HWND hWnd, UINT showCmd);
     void                    SaveWindowPos(LPCWSTR windowname, HWND hWnd);
 
