@@ -199,6 +199,7 @@ BOOL CShellLink::Load(const std::wstring& sFilename)
         //Get the various link values
         TCHAR szBuf[MAX_PATH];
         WIN32_FIND_DATA fd;
+        SecureZeroMemory(&fd, sizeof(fd));
 
         hRes = m_psl->GetPath(szBuf, _countof(szBuf), &fd, SLGP_UNCPRIORITY);
         if (SUCCEEDED(hRes))
