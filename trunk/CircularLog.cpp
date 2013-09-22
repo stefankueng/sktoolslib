@@ -70,7 +70,7 @@ bool CCircularLog::AddLine( const std::wstring& line )
     _wstrdate_s(tmpbuf2, 128);
 
     m_lines.push_back(CStringUtils::Format(L"%s %s : %s", tmpbuf2, tmpbuf1, line.c_str()));
-    while (m_lines.size() > m_maxlines)
+    while ((int)m_lines.size() > m_maxlines)
         m_lines.pop_front();
     return true;
 }
