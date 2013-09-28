@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012-2013 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -40,6 +40,8 @@ public:
     bool            IsWin7OrLater() const {return (GetFullVersion() >= 0x0601);}
     bool            IsWin8() const {return (GetFullVersion() == 0x0602);}
     bool            IsWin8OrLater() const {return (GetFullVersion() >= 0x0602);}
+    bool            IsElevated() const {return isElevated;}
 private:
     OSVERSIONINFOEX inf;
+    bool            isElevated;
 };
