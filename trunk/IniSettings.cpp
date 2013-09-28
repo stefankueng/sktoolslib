@@ -105,7 +105,10 @@ void CIniSettings::RestoreWindowPos( LPCWSTR windowname, HWND hWnd, UINT showCmd
 
     if (wpl.showCmd)
     {
-        wpl.showCmd = showCmd;
+        if ((wpl.showCmd == SW_MINIMIZE) || (wpl.showCmd == SW_SHOWMINNOACTIVE))
+            wpl.showCmd = SW_RESTORE;
+        if (showCmd)
+            wpl.showCmd = showCmd;
         SetWindowPlacement(hWnd, &wpl);
     }
 }
