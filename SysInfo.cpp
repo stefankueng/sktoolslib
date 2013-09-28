@@ -22,6 +22,7 @@
 
 SysInfo::SysInfo(void)
     : isElevated(false)
+    , isUACEnabled(false)
 {
     SecureZeroMemory(&inf, sizeof(OSVERSIONINFOEX));
     inf.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
@@ -37,6 +38,11 @@ SysInfo::SysInfo(void)
             if (::GetTokenInformation(hToken, TokenElevation, &te, sizeof(te), &dwReturnLength))
             {
                 isElevated = (te.TokenIsElevated != 0);
+            }
+            TOKEN_ELEVATION_TYPE tet = TokenElevationTypeDefault;
+            if (::GetTokenInformation(hToken, TokenElevationType, &tet, sizeof(tet), &dwReturnLength))
+            {
+                isUACEnabled = tet != TokenElevationTypeDefault;
             }
             ::CloseHandle( hToken );
         }
