@@ -41,7 +41,9 @@ public:
     bool            IsWin8() const {return (GetFullVersion() == 0x0602);}
     bool            IsWin8OrLater() const {return (GetFullVersion() >= 0x0602);}
     bool            IsElevated() const {return isElevated;}
+    bool            IsUACEnabled() const {return isUACEnabled;}
 private:
     OSVERSIONINFOEX inf;
     bool            isElevated;
+    bool            isUACEnabled;
 };
