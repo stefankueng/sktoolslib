@@ -51,6 +51,9 @@ bool CCircularLog::Init( const std::wstring& path, int maxlines )
     File.open(m_path);
     if (!File.good())
     {
+        HANDLE hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hFile != INVALID_HANDLE_VALUE)
+            CloseHandle(hFile);
         return false;
     }
     std::wstring line;
