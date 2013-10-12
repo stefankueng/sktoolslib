@@ -29,7 +29,7 @@ SysInfo::SysInfo(void)
     GetVersionEx((OSVERSIONINFO *)&inf);
     if (IsVistaOrLater())
     {
-        HANDLE hToken	= NULL;
+        HANDLE hToken = NULL;
         if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &hToken))
         {
             TOKEN_ELEVATION te = {0};
