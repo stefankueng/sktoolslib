@@ -145,6 +145,16 @@ void CAutoComplete::SetOptions( DWORD dwFlags )
     }
 }
 
+DWORD CAutoComplete::GetOptions() const
+{
+    DWORD dwFlags = 0;
+    if (m_pac)
+    {
+        m_pac->GetOptions(&dwFlags);
+    }
+    return dwFlags;
+}
+
 CAutoCompleteEnum::CAutoCompleteEnum(const std::vector<std::wstring>& vec)
     : m_cRefCount(0)
     , m_iCur(0)
