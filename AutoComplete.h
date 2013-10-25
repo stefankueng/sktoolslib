@@ -70,6 +70,7 @@ public:
 
     bool        RemoveSelected();
     void        SetOptions(DWORD dwFlags);
+    DWORD       GetOptions() const;
 private:
     CAutoCompleteEnum *         m_pcacs;
     IAutoComplete2 *            m_pac;
