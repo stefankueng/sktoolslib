@@ -173,7 +173,7 @@ std::wstring CPathUtils::GetVersionFromFile(const std::wstring& path)
     std::wstring strReturn;
     DWORD dwReserved = 0;
     DWORD dwBufferSize = GetFileVersionInfoSize((LPTSTR)(LPCTSTR)path.c_str(),&dwReserved);
-
+    dwReserved = 0;
     if (dwBufferSize > 0)
     {
         LPVOID pBuffer = (void*) malloc(dwBufferSize);
