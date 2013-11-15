@@ -24,10 +24,14 @@ SysInfo::SysInfo(void)
     : isElevated(false)
     , isUACEnabled(false)
 {
-    SecureZeroMemory(&inf, sizeof(OSVERSIONINFOEX));
+#ifndef NTDDI_WINBLUE
+	SecureZeroMemory(&inf, sizeof(OSVERSIONINFOEX));
     inf.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
     GetVersionEx((OSVERSIONINFO *)&inf);
-    if (IsVistaOrLater())
+	if (IsVistaOrLater())
+#else
+	if (IsWindowsVistaOrGreater())
+#endif
     {
         HANDLE hToken = NULL;
         if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &hToken))
