@@ -18,12 +18,30 @@
 //
 
 #pragma once
-
-
 /**
- * \ingroup Utils
- * This singleton class handles system information
- */
+* \ingroup Utils
+* This singleton class handles system information
+*/
+
+#ifdef NTDDI_WINBLUE
+#include <VersionHelpers.h>
+class SysInfo
+{
+private:
+	SysInfo(void);
+	~SysInfo(void);
+public:
+	static const SysInfo& Instance();
+
+	bool            IsElevated() const { return isElevated; }
+	bool            IsUACEnabled() const { return isUACEnabled; }
+private:
+	bool            isElevated;
+	bool            isUACEnabled;
+};
+
+#else
+
 class SysInfo
 {
 private:
@@ -47,3 +65,5 @@ private:
     bool            isElevated;
     bool            isUACEnabled;
 };
+
+#endif
