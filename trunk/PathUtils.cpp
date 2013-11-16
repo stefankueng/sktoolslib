@@ -93,6 +93,14 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
     return sRet;
 }
 
+std::wstring CPathUtils::AdjustForMaxPath(const std::wstring& path)
+{
+    if (path.size() < 248)  // 248 instead of MAX_PATH because 248 is the limit for directories
+        return path;
+    if (path.substr(0, 4).compare(L"\\\\?\\") == 0)
+        return path;
+    return L"\\\\?\\" + path;
+}
 
 std::wstring CPathUtils::GetParentDirectory( const std::wstring& path )
 {

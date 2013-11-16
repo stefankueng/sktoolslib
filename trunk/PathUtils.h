@@ -30,6 +30,7 @@ class CPathUtils
 public:
 
     static std::wstring GetLongPathname(const std::wstring& path);
+    static std::wstring AdjustForMaxPath(const std::wstring& path);
 
     static std::wstring GetParentDirectory(const std::wstring& path);
     static std::wstring GetFileExtension(const std::wstring& path);
