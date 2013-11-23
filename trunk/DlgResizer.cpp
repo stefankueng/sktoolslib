@@ -76,6 +76,12 @@ void CDlgResizer::Init(HWND hWndDlg)
     }
 }
 
+void CDlgResizer::AdjustMinMaxSize()
+{
+    GetWindowRect(m_hDlg, &m_dlgRectScreen);
+    OffsetRect(&m_dlgRectScreen, -m_dlgRectScreen.left, -m_dlgRectScreen.top);
+}
+
 void CDlgResizer::AddControl(HWND hWndDlg, UINT ctrlId, UINT resizeType)
 {
     ResizeCtrls ctrlInfo;
