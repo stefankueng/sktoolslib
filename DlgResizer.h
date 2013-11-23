@@ -46,6 +46,7 @@ public:
 
     void    Init(HWND hWndDlg);
     void    AddControl(HWND hWndDlg, UINT ctrlId, UINT resizeType);
+    void    AdjustMinMaxSize();
 
     void    DoResize(int width, int height);
 
