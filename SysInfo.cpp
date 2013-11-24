@@ -25,12 +25,12 @@ SysInfo::SysInfo(void)
     , isUACEnabled(false)
 {
 #ifndef NTDDI_WINBLUE
-	SecureZeroMemory(&inf, sizeof(OSVERSIONINFOEX));
+    SecureZeroMemory(&inf, sizeof(OSVERSIONINFOEX));
     inf.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
     GetVersionEx((OSVERSIONINFO *)&inf);
-	if (IsVistaOrLater())
+    if (IsVistaOrLater())
 #else
-	if (IsWindowsVistaOrGreater())
+    if (IsWindowsVistaOrGreater())
 #endif
     {
         HANDLE hToken = NULL;
