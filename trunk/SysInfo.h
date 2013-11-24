@@ -28,16 +28,16 @@
 class SysInfo
 {
 private:
-	SysInfo(void);
-	~SysInfo(void);
+    SysInfo(void);
+    ~SysInfo(void);
 public:
-	static const SysInfo& Instance();
+    static const SysInfo& Instance();
 
-	bool            IsElevated() const { return isElevated; }
-	bool            IsUACEnabled() const { return isUACEnabled; }
+    bool            IsElevated() const { return isElevated; }
+    bool            IsUACEnabled() const { return isUACEnabled; }
 private:
-	bool            isElevated;
-	bool            isUACEnabled;
+    bool            isElevated;
+    bool            isUACEnabled;
 };
 
 #else
