@@ -155,6 +155,17 @@ void CDialog::AddToolTip(UINT ctrlID, LPCWSTR text)
     SendMessage (m_hToolTips, TTM_ADDTOOL, 0, (LPARAM) &tt);
 }
 
+void CDialog::AddToolTip(HWND hWnd, LPCWSTR text)
+{
+    TOOLINFO tt;
+    tt.cbSize = sizeof(TOOLINFO);
+    tt.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+    tt.hwnd = hWnd;
+    tt.uId = (UINT)hWnd;
+    tt.lpszText = const_cast<LPTSTR>(text);
+
+    SendMessage(m_hToolTips, TTM_ADDTOOL, 0, (LPARAM)&tt);
+}
 
 INT_PTR CALLBACK CDialog::stDlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
