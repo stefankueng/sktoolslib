@@ -314,4 +314,11 @@ public:
        FILETIME ft = {0};
        return ft;
    }
+
+   DWORD GetError() const
+   {
+       if (m_seStack)
+           return m_seStack->GetError();
+       return 0;
+   }
 };
