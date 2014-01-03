@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2014 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -113,7 +113,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     // to do the encoding check. Then only load the full file in case
     // the encoding is UNICODE_LE since that's the only encoding we have
     // to convert first to do a proper search with.
-    if ((bytestoread < lint.LowPart) && ((memex.ullAvailPhys>>32UL) == 0))
+    if (bytestoread < lint.LowPart)
     {
         std::unique_ptr<BYTE[]> tempfilebuf(new BYTE[bytestoread+1]);
         if (!ReadFile(hFile, tempfilebuf.get(), bytestoread, &bytesread, NULL))
