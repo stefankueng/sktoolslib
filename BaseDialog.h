@@ -80,6 +80,14 @@ protected:
     MARGINS         m_margins;
 
     void            InitDialog(HWND hwndDlg, UINT iconID);
+    /**
+    * Adjusts the size of a checkbox or radio button control.
+    * Since we always make the size of those bigger than 'necessary'
+    * for making sure that translated strings can fit in those too,
+    * this method can reduce the size of those controls again to only
+    * fit the text.
+    */
+    RECT AdjustControlSize(UINT nID);
 
     // the real message handler
     static INT_PTR CALLBACK stDlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
