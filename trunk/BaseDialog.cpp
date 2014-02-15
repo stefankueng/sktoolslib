@@ -511,3 +511,38 @@ BOOL CDialog::IsDialogMessage( LPMSG lpMsg )
     }
     return FALSE;
 }
+
+RECT CDialog::AdjustControlSize(UINT nID)
+{
+    HWND hwndDlgItem = GetDlgItem(*this, nID);
+    // adjust the size of the control to fit its content
+    auto sControlText = GetDlgItemText(nID);
+    // next step: find the rectangle the control text needs to
+    // be displayed
+
+    HDC hDC = GetWindowDC(*this);
+    RECT controlrect;
+    RECT controlrectorig;
+    GetWindowRect(hwndDlgItem, &controlrect);
+    ::MapWindowPoints(NULL, *this, (LPPOINT)&controlrect, 2);
+    controlrectorig = controlrect;
+    if (hDC)
+    {
+        HFONT hFont = GetWindowFont(hwndDlgItem);
+        HFONT hOldFont = (HFONT)SelectObject(hDC, hFont);
+        if (DrawText(hDC, sControlText.get(), -1, &controlrect, DT_WORDBREAK | DT_EDITCONTROL | DT_EXPANDTABS | DT_LEFT | DT_CALCRECT))
+        {
+            // now we have the rectangle the control really needs
+            if ((controlrectorig.right - controlrectorig.left) > (controlrect.right - controlrect.left))
+            {
+                // we're dealing with radio buttons and check boxes,
+                // which means we have to add a little space for the checkbox
+                controlrectorig.right = controlrectorig.left + (controlrect.right - controlrect.left) + 20;
+                MoveWindow(hwndDlgItem, controlrectorig.left, controlrectorig.top, controlrectorig.right - controlrectorig.left, controlrectorig.bottom - controlrectorig.top, TRUE);
+            }
+        }
+        SelectObject(hDC, hOldFont);
+        ReleaseDC(*this, hDC);
+    }
+    return controlrectorig;
+}
