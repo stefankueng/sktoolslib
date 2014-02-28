@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -120,6 +120,23 @@ std::wstring CPathUtils::GetFileExtension( const std::wstring& path )
     {
         std::wstring sExt = path.substr(pos+1);
         return sExt;
+    }
+    return L"";
+}
+
+std::wstring CPathUtils::GetFileName(const std::wstring& path)
+{
+    auto pos = path.find_last_of('\\');
+    if (pos != std::wstring::npos)
+    {
+        std::wstring sName = path.substr(pos + 1);
+        return sName;
+    }
+    else
+    {
+        pos = path.find_last_of('/');
+        std::wstring sName = path.substr(pos + 1);
+        return sName;
     }
     return L"";
 }
