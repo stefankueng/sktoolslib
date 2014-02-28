@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -34,6 +34,7 @@ public:
 
     static std::wstring GetParentDirectory(const std::wstring& path);
     static std::wstring GetFileExtension(const std::wstring& path);
+    static std::wstring GetFileName(const std::wstring& path);
     // module/app paths
     static std::wstring GetModulePath(HMODULE hMod = NULL);
     static std::wstring GetModuleDir(HMODULE hMod = NULL);
