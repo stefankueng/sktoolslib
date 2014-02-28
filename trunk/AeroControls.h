@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2014 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -39,15 +39,15 @@ private:
     LRESULT ProgressbarWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     void DrawFocusRect(LPRECT prcFocus, HDC hdcPaint);
-    void DrawRect(LPRECT prc, HDC hdcPaint, Gdiplus::DashStyle dashStyle, Gdiplus::Color clr, Gdiplus::REAL width);
-    void FillRect(LPRECT prc, HDC hdcPaint, Gdiplus::Color clr);
-    int GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwCheckState, int iPartId, BOOL bHasMouseCapture);
+    void DrawRect(LPRECT prc, HDC hdcPaint, Gdiplus::DashStyle dashStyle, Gdiplus::Color clr, Gdiplus::REAL width) const;
+    void FillRect(LPRECT prc, HDC hdcPaint, Gdiplus::Color clr) const;
+    int GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwCheckState, int iPartId, BOOL bHasMouseCapture) const;
     void PaintControl(HWND hWnd, HDC hdc, RECT* prc, bool bDrawBorder);
     void ScreenToClient(HWND hWnd, LPRECT lprc);
     void DrawSolidWndRectOnParent(HWND hWnd,Gdiplus:: Color clr);
     void DrawEditBorder(HWND hWnd);
     BOOL GetEditBorderColor(HWND hWnd, COLORREF *pClr);
-    void GetRoundRectPath(Gdiplus::GraphicsPath *pPath, Gdiplus::Rect r, int dia);
+    void GetRoundRectPath(Gdiplus::GraphicsPath *pPath, Gdiplus::Rect r, int dia) const;
 
     CDwmApiImpl                 m_dwm;
     CUxThemeAeroImpl            m_theme;
