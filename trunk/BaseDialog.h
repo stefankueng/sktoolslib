@@ -79,7 +79,7 @@ protected:
     CDwmApiImpl     m_Dwm;
     MARGINS         m_margins;
 
-    void            InitDialog(HWND hwndDlg, UINT iconID);
+    void            InitDialog(HWND hwndDlg, UINT iconID, bool bPosition = true);
     /**
     * Adjusts the size of a checkbox or radio button control.
     * Since we always make the size of those bigger than 'necessary'
