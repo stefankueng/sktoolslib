@@ -112,7 +112,7 @@ void CDialog::ShowModeless( HINSTANCE hInstance, int resID, HWND hWndParent )
     SetFocus(m_hwnd);
 }
 
-void CDialog::InitDialog(HWND hwndDlg, UINT iconID)
+void CDialog::InitDialog(HWND hwndDlg, UINT iconID, bool bPosition/* = true*/)
 {
     HWND hwndOwner;
     RECT rc, rcDlg, rcOwner;
@@ -132,7 +132,8 @@ void CDialog::InitDialog(HWND hwndDlg, UINT iconID)
     OffsetRect(&rc, -rc.left, -rc.top);
     OffsetRect(&rc, -rcDlg.right, -rcDlg.bottom);
 
-    SetWindowPos(hwndDlg, HWND_TOP, rcOwner.left + (rc.right / 2), rcOwner.top + (rc.bottom / 2), 0, 0, SWP_NOSIZE|SWP_SHOWWINDOW);
+    if (bPosition)
+        SetWindowPos(hwndDlg, HWND_TOP, rcOwner.left + (rc.right / 2), rcOwner.top + (rc.bottom / 2), 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW);
     HICON hIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE|LR_SHARED);
     ::SendMessage(hwndDlg, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
     ::SendMessage(hwndDlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
