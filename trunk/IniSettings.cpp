@@ -93,7 +93,7 @@ void CIniSettings::RestoreWindowPos( LPCWSTR windowname, HWND hWnd, UINT showCmd
     wpl.length = sizeof(WINDOWPLACEMENT);
 
     wpl.flags                   = (UINT)GetInt64(L"windowpos", CStringUtils::Format(L"%s_flags", windowname).c_str(), 0);
-    wpl.showCmd                 = (UINT)GetInt64(L"windowpos", CStringUtils::Format(L"%s_showCmd", windowname).c_str(), 0);
+    wpl.showCmd                 = (UINT)GetInt64(L"windowpos", CStringUtils::Format(L"%s_showCmd", windowname).c_str(), -1);
     wpl.ptMinPosition.x         = (LONG)GetInt64(L"windowpos", CStringUtils::Format(L"%s_ptMinPositionX", windowname).c_str(), 0);
     wpl.ptMinPosition.y         = (LONG)GetInt64(L"windowpos", CStringUtils::Format(L"%s_ptMinPositionY", windowname).c_str(), 0);
     wpl.ptMaxPosition.x         = (LONG)GetInt64(L"windowpos", CStringUtils::Format(L"%s_ptMaxPositionX", windowname).c_str(), 0);
@@ -103,7 +103,7 @@ void CIniSettings::RestoreWindowPos( LPCWSTR windowname, HWND hWnd, UINT showCmd
     wpl.rcNormalPosition.right  = (LONG)GetInt64(L"windowpos", CStringUtils::Format(L"%s_rcNormalPositionRight", windowname).c_str(), 0);
     wpl.rcNormalPosition.bottom = (LONG)GetInt64(L"windowpos", CStringUtils::Format(L"%s_rcNormalPositionBottom", windowname).c_str(), 0);
 
-    if (wpl.showCmd)
+    if (wpl.showCmd != UINT(-1))
     {
         if ((wpl.showCmd == SW_MINIMIZE) || (wpl.showCmd == SW_SHOWMINNOACTIVE))
             wpl.showCmd = SW_RESTORE;
@@ -111,6 +111,8 @@ void CIniSettings::RestoreWindowPos( LPCWSTR windowname, HWND hWnd, UINT showCmd
             wpl.showCmd = showCmd;
         SetWindowPlacement(hWnd, &wpl);
     }
+    else
+        ShowWindow(hWnd, SW_SHOW);
 }
 
 void CIniSettings::SaveWindowPos( LPCWSTR windowname, HWND hWnd )
