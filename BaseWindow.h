@@ -82,6 +82,7 @@ protected:
     bool bWindowRestored;
     bool bRegisterWindowCalled;
     WNDPROC prevWndProc;
+    float m_dpiScale;
 
     //constructor
     CWindow(HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL)
@@ -92,6 +93,7 @@ protected:
         , bWindowRestored(false)
         , bRegisterWindowCalled(false)
         , prevWndProc(nullptr)
+        , m_dpiScale(1.0)
     {
         hResource = hInst;
         if (wcx != NULL)
