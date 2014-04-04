@@ -149,6 +149,10 @@ bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = NULL 
         ::SetWindowLongPtr(m_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(stWinMsgHandler));
     }
 
+    HDC hdc = GetDC(*this);
+    m_dpiScale = GetDeviceCaps(hdc, LOGPIXELSX) / 96.0f;
+    ReleaseDC(*this, hdc);
+    
     return (m_hwnd != NULL);
 }
 
