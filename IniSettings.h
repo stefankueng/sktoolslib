@@ -28,7 +28,9 @@ public:
     static CIniSettings&    Instance();
 
     void                    SetIniPath(const std::wstring& p);
+    std::wstring            GetIniPath() const { return m_iniPath; }
     void                    Save();
+    void                    Reload();
 
     LPCWSTR                 GetString(LPCWSTR section, LPCWSTR key, LPCWSTR default = nullptr);
     void                    SetString(LPCWSTR section, LPCWSTR key, LPCWSTR value);

@@ -137,3 +137,8 @@ void CIniSettings::Delete( LPCWSTR section, LPCWSTR key )
 {
     m_IniFile.Delete(section, key, true);
 }
+
+void CIniSettings::Reload()
+{
+    m_IniFile.LoadFile(m_iniPath.c_str());
+}
