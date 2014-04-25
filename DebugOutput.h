@@ -21,6 +21,10 @@
 
 #include "Registry.h"
 
+// A little like a release build assert. Always evaluate expr.
+// Does not abort in this variant.
+#define APPVERIFY(expr) CTraceToOutputDebugString::Instance().Verify(expr, __FUNCTION__, __LINE__, (const char*)NULL)
+#define APPVERIFYM(expr,msg,...) CTraceToOutputDebugString::Instance().Verify(expr, __FUNCTION__, __LINE__, msg, ...)
 
 class CTraceToOutputDebugString
 {
@@ -58,6 +62,50 @@ public:
             va_start(ptr, pszFormat);
             TraceV(pszFormat,ptr);
             va_end(ptr);
+        }
+    }
+
+    void Verify(bool expr, const char* function, int line, const char * msg, ...)
+    {
+        if (!expr)
+        {
+            OutputDebugStringA(function);
+            OutputDebugStringA(", line ");
+            OutputDebugStringA(std::to_string(line).c_str());
+            OutputDebugStringA(" : ");
+
+            if (msg)
+            {
+                va_list ptr;
+                va_start(ptr, msg);
+                TraceV(msg, ptr);
+                va_end(ptr);
+            }
+            else
+                OutputDebugStringA("An unexpected error occurred");
+            OutputDebugStringA("\n");
+        }
+    }
+
+    void Verify(bool expr, const char* function, int line, const wchar_t * msg, ...)
+    {
+        if (!expr)
+        {
+            OutputDebugStringA(function);
+            OutputDebugStringA(", line ");
+            OutputDebugStringA(std::to_string(line).c_str());
+            OutputDebugStringA(" : ");
+
+            if (msg)
+            {
+                va_list ptr;
+                va_start(ptr, msg);
+                TraceV(msg, ptr);
+                va_end(ptr);
+            }
+            else
+                OutputDebugStringA("An unexpected error occurred");
+            OutputDebugStringA("\n");
         }
     }
 
