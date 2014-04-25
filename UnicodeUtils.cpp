@@ -244,17 +244,7 @@ int GetCodepageFromBuf( LPVOID pBuffer, int cb, bool& hasBOM )
     bool bNonANSI = false;
     int nNeedData = 0;
     int i=0;
-    // run fast for ASCII
-    for (; i<cb; i+=8)
-    {
-        if ((*(UINT64 *)&pVal8[i] & 0x8080808080808080)!=0) // all ASCII?
-        {
-            bNonANSI = true;
-            break;
-        }
-    }
     int nullcount = 0;
-    // continue slow
     for (; i<cb; ++i)
     {
         UINT8 zChar = pVal8[i];
