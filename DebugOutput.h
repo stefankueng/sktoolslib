@@ -24,7 +24,7 @@
 // A little like a release build assert. Always evaluate expr.
 // Does not abort in this variant.
 #define APPVERIFY(expr) CTraceToOutputDebugString::Instance().Verify(expr, __FUNCTION__, __LINE__, (const char*)NULL)
-#define APPVERIFYM(expr,msg,...) CTraceToOutputDebugString::Instance().Verify(expr, __FUNCTION__, __LINE__, msg, ...)
+#define APPVERIFYM(expr,msg,...) CTraceToOutputDebugString::Instance().Verify(expr, __FUNCTION__, __LINE__, msg, ##__VA_ARGS__)
 
 class CTraceToOutputDebugString
 {
