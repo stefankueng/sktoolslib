@@ -275,6 +275,8 @@ int GetCodepageFromBuf( LPVOID pBuffer, int cb, bool& hasBOM )
             }
             continue;
         }
+        else
+            bNonANSI = true;
         if ((zChar & 0x40)==0) // top bit
         {
             if (!nNeedData)
