@@ -160,6 +160,11 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
             if (downloadedSum > contentLength)
                 downloadedSum = contentLength - 1;
             m_pProgress->SetProgress(downloadedSum, contentLength + 1);
+            if (m_pProgress->HasUserCancelled())
+            {
+                downloadedSum = 0;
+                break;
+            }
         }
     }
     while (true);
@@ -168,7 +173,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
     InternetCloseHandle(hConnectHandle);
     if (downloadedSum == 0)
     {
-        CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download size of %s was zero.\n", url);
+        CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download size of %s was zero or user canceled.\n", url);
         return false;// INET_E_DOWNLOAD_FAILURE;
     }
     return true;
