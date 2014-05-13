@@ -124,6 +124,55 @@ void stringtok(Container &container, const std::string  &in, bool trim,
     }
 }
 
+template<typename T> std::wstring to_bit_wstring(T number, bool trim_significant_clear_bits)
+{
+    // Unsigned version of type given.
+    typedef typename std::make_unsigned<T>::type UT;
+    UT one = 1;
+    UT zero = 0;
+    UT unumber;
+    unumber = UT(number);
+    const int nbits = std::numeric_limits<UT>::digits;
+    std::wstring bs;
+    bool seen_set_bit = false;
+    for (int bn = nbits - 1; bn >= 0; --bn)
+    {
+        UT mask = one << bn;
+        bool is_set = (unumber & mask) != zero;
+        if (trim_significant_clear_bits && !seen_set_bit && !is_set)
+            continue;
+        bs += is_set ? '1' : '0';
+        if (is_set)
+            seen_set_bit = true;
+    }
+    return bs;
+}
+
+template<typename T> std::string to_bit_string(T number, bool trim_significant_clear_bits)
+{
+    // Unsigned version of type given.
+    typedef typename std::make_unsigned<T>::type UT;
+    UT one = 1;
+    UT zero = 0;
+    UT unumber;
+    unumber = UT(number);
+    const int nbits = std::numeric_limits<UT>::digits;
+    std::string bs;
+    bool seen_set_bit = false;
+    for (int bn = nbits - 1; bn >= 0; --bn)
+    {
+        UT mask = one << bn;
+        bool is_set = (unumber & mask) != zero;
+        if (trim_significant_clear_bits && !seen_set_bit && !is_set)
+            continue;
+        bs += is_set ? '1' : '0';
+        if (is_set)
+            seen_set_bit = true;
+    }
+    return bs;
+}
+
+
 class CStringUtils
 {
 public:
