@@ -30,16 +30,18 @@ public:
     ResString (HINSTANCE hInst, int resId)
     {
         int bufsize = 1024;
-        str.clear();
-        do
+        for ( ;; )
         {
             std::unique_ptr<wchar_t[]> buf(new wchar_t[bufsize]);
             int ret = ::LoadString(hInst, resId, buf.get(), bufsize);
             if (ret == (bufsize-1))
                 bufsize *= 2;
             else
+            {
                 str = buf.get();
-        } while (str.empty());
+                break;
+            }
+        }
     }
     operator TCHAR const * () const { return str.c_str(); }
     operator std::wstring () const { return str; }
