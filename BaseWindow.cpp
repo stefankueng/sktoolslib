@@ -152,7 +152,7 @@ bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = NULL 
     HDC hdc = GetDC(*this);
     m_dpiScale = GetDeviceCaps(hdc, LOGPIXELSX) / 96.0f;
     ReleaseDC(*this, hdc);
-    
+
     return (m_hwnd != NULL);
 }
 
