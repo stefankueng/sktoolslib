@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Registry.h"
+#include <cassert>
 
 // A little like a release build assert. Always evaluate expr.
 // Does not abort in this variant.
@@ -106,6 +107,8 @@ public:
             else
                 OutputDebugStringA("An unexpected error occurred");
             OutputDebugStringA("\n");
+            // Verification failures are bugs so draw attention to them while debugging.
+            assert(false);
         }
     }
 
