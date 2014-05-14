@@ -68,7 +68,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
     {
         DWORD dwError = 0;
         bool httpsendrequest = false;
-        do 
+        do
         {
             httpsendrequest = !!HttpSendRequest(hResourceHandle, nullptr, 0, nullptr, 0);
             dwError = InternetErrorDlg(NULL, hResourceHandle, ERROR_SUCCESS, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA, nullptr);
