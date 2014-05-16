@@ -27,6 +27,12 @@
 class ResString
 {
 public:
+    // Easier to use. TODO: Remove the reverse one if opportunity allows.
+    ResString (int resId, HINSTANCE hInst = NULL) 
+        : ResString(hInst, resId)
+    {
+    }
+
     ResString (HINSTANCE hInst, int resId)
     {
         int bufsize = 1024;
