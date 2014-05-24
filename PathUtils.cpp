@@ -255,3 +255,30 @@ std::wstring CPathUtils::GetAppDataPath(HMODULE hMod)
     sPath = sPath.substr(0, sPath.find_last_of('\\'));
     return sPath;
 }
+
+std::wstring CPathUtils::GetCWD()
+{
+    // Getting the CWD is a little more complicated than it seems.
+    // The directory can change between asking for the name size
+    // and obtaining the name value. So we need to handle that.
+    // We also need to handle any eror the first or second time we ask.
+
+    for (;;)
+    {
+        // Returned length already includes + 1 fo null.
+        auto estimatedLen = GetCurrentDirectory(0, NULL);
+        if (estimatedLen <= 0) // Error, can't recover.
+            break;
+        std::unique_ptr<TCHAR[]> cwd(new TCHAR[estimatedLen]);
+        auto actualLen = GetCurrentDirectory(estimatedLen, cwd.get());
+        if (actualLen <= 0) // Error Can't recover
+            break;
+        // Directory changed in mean time and got larger..
+        if (actualLen <= estimatedLen)
+            return std::wstring(cwd.get(), actualLen);
+        // If we reach here, the directory has changed between us
+        // asking for it's size and obtaining the value and the
+        // the size has increased, so loop around to try again.
+    }
+    return L"";
+}

@@ -19,35 +19,20 @@
 
 #include "stdafx.h"
 #include "PreserveChdir.h"
+#include "PathUtils.h"
 
-PreserveChdir::PreserveChdir() :
-    size(GetCurrentDirectory(0, NULL)),
-    originalCurrentDirectory(new TCHAR[size])
+PreserveChdir::PreserveChdir() : m_originalDir(CPathUtils::GetCWD())
 {
-    if (size > 0)
-        if (GetCurrentDirectory((DWORD)size, originalCurrentDirectory.get()) !=0)
-            return; // succeeded
-
-    // GetCurrentDirectory failed
-    originalCurrentDirectory.reset();
 }
 
 PreserveChdir::~PreserveChdir()
 {
-    if (!originalCurrentDirectory)
-        return; // nothing to do
-
-    // _tchdir is an expensive function - don't call it unless we really have to
-    const DWORD len = GetCurrentDirectory(0, NULL);
-    if(len == size) {
-        // same size, must check contents
-        std::unique_ptr<TCHAR[]> currentDirectory(new TCHAR[len]);
-        if(GetCurrentDirectory(len, currentDirectory.get()) != 0)
-            if(_tcscmp(currentDirectory.get(), originalCurrentDirectory.get()) == 0)
-                return; // no change required, reset of no use as dtor is called exactly once
-    }
-
-    // must reset directory
-    if(SetCurrentDirectory(originalCurrentDirectory.get()))
-        originalCurrentDirectory.reset();
+    if (m_originalDir.empty()) // Nothing to do if failed to get the original dir.
+        return;    
+    // _tchdir is an expensive function - don't call it unless we really have to.
+    std::wstring currentDir = CPathUtils::GetCWD();
+    // Restore the current directory if it doesn't match the original directory
+    // or if we failed to get the current directory.
+    if (currentDir.empty() || _tcsicmp(m_originalDir.c_str(), currentDir.c_str()) != 0)
+        SetCurrentDirectory(m_originalDir.c_str());
 }
