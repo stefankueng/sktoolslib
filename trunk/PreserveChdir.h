@@ -31,7 +31,6 @@ private:
     PreserveChdir(const PreserveChdir&);            ///< non-copyable
     PreserveChdir& operator=(const PreserveChdir&); ///< non-assignable
 
-    const size_t size;                              ///< size of originalCurrentDirectory
-    std::unique_ptr<TCHAR[]> originalCurrentDirectory;    ///< %CD% at ctor time
+    std::wstring m_originalDir;
 };
 

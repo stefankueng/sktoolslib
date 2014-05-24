@@ -42,4 +42,5 @@ public:
     static std::wstring GetTempFilePath();
     static std::wstring GetVersionFromFile(const std::wstring& path);
     static std::wstring GetAppDataPath(HMODULE hMod = NULL);
+    static std::wstring GetCWD();
 };
