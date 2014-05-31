@@ -153,17 +153,21 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
 
         if (contentLength == 0) // got no content-length from web server
         {
-            m_pProgress->SetProgress(0, 0);
+            if (m_pProgress)
+                m_pProgress->SetProgress(0, 0);
         }
         else
         {
             if (downloadedSum > contentLength)
                 downloadedSum = contentLength - 1;
-            m_pProgress->SetProgress(downloadedSum, contentLength + 1);
-            if (m_pProgress->HasUserCancelled())
+            if (m_pProgress)
             {
-                downloadedSum = 0;
-                break;
+                m_pProgress->SetProgress(downloadedSum, contentLength + 1);
+                if (m_pProgress->HasUserCancelled())
+                {
+                    downloadedSum = 0;
+                    break;
+                }
             }
         }
     }
