@@ -43,4 +43,5 @@ public:
     static std::wstring GetVersionFromFile(const std::wstring& path);
     static std::wstring GetAppDataPath(HMODULE hMod = NULL);
     static std::wstring GetCWD();
+    static bool         Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder);
 };
