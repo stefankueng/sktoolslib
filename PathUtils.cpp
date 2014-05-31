@@ -282,3 +282,86 @@ std::wstring CPathUtils::GetCWD()
     }
     return L"";
 }
+
+
+bool CPathUtils::Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder)
+{
+    IShellDispatch *pISD;
+
+    Folder  *pZippedFile = 0L;
+    Folder  *pDestination = 0L;
+
+    long FilesCount = 0;
+    IDispatch* pItem = 0L;
+    FolderItems *pFilesInside = 0L;
+
+    VARIANT Options, OutFolder, InZipFile, Item;
+    HRESULT hr = S_OK;
+    CoInitialize(NULL);
+    __try
+    {
+        if (CoCreateInstance(CLSID_Shell, NULL, CLSCTX_INPROC_SERVER, IID_IShellDispatch, (void **)&pISD) != S_OK)
+            return false;
+
+        InZipFile.vt = VT_BSTR;
+        InZipFile.bstrVal = const_cast<BSTR>(lpZipFile);
+        hr = pISD->NameSpace(InZipFile, &pZippedFile);
+        if (FAILED(hr) || !pZippedFile)
+        {
+            pISD->Release();
+            return false;
+        }
+
+        OutFolder.vt = VT_BSTR;
+        OutFolder.bstrVal = const_cast<BSTR>(lpFolder);
+        pISD->NameSpace(OutFolder, &pDestination);
+        if (!pDestination)
+        {
+            pZippedFile->Release();
+            pISD->Release();
+            return false;
+        }
+
+        pZippedFile->Items(&pFilesInside);
+        if (!pFilesInside)
+        {
+            pDestination->Release();
+            pZippedFile->Release();
+            pISD->Release();
+            return false;
+        }
+
+        pFilesInside->get_Count(&FilesCount);
+        if (FilesCount < 1)
+        {
+            pFilesInside->Release();
+            pDestination->Release();
+            pZippedFile->Release();
+            pISD->Release();
+            return true;
+        }
+
+        pFilesInside->QueryInterface(IID_IDispatch, (void**)&pItem);
+
+        Item.vt = VT_DISPATCH;
+        Item.pdispVal = pItem;
+
+        Options.vt = VT_I4;
+        Options.lVal = 1024 | 512 | 16 | 4;//http://msdn.microsoft.com/en-us/library/bb787866(VS.85).aspx
+
+        bool retval = pDestination->CopyHere(Item, Options) == S_OK;
+
+        pItem->Release(); pItem = 0L;
+        pFilesInside->Release(); pFilesInside = 0L;
+        pDestination->Release(); pDestination = 0L;
+        pZippedFile->Release(); pZippedFile = 0L;
+        pISD->Release(); pISD = 0L;
+
+        return retval;
+
+    }
+    __finally
+    {
+        CoUninitialize();
+    }
+}
