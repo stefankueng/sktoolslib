@@ -64,7 +64,7 @@ std::wstring CTempFiles::ConstructTempPath(const std::wstring& path) const
             std::wstring sExt = CPathUtils::GetFileExtension(path);
             do
             {
-                possibletempfile = CStringUtils::Format(L"%s%s.svn%3.3x.tmp%s", temppath.get(), (LPCTSTR)filename.c_str(), i, (LPCTSTR)sExt.c_str());
+                possibletempfile = CStringUtils::Format(L"%s%s.svn%3.3x.tmp.%s", temppath.get(), (LPCTSTR)filename.c_str(), i, (LPCTSTR)sExt.c_str());
                 tempfile = possibletempfile;
                 filename = filename.substr(0, filename.size()-1);
             } while (   (filename.size() > 4)
