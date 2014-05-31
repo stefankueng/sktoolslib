@@ -28,7 +28,7 @@ PreserveChdir::PreserveChdir() : m_originalDir(CPathUtils::GetCWD())
 PreserveChdir::~PreserveChdir()
 {
     if (m_originalDir.empty()) // Nothing to do if failed to get the original dir.
-        return;    
+        return;
     // _tchdir is an expensive function - don't call it unless we really have to.
     std::wstring currentDir = CPathUtils::GetCWD();
     // Restore the current directory if it doesn't match the original directory
