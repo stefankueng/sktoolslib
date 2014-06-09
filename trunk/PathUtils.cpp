@@ -22,6 +22,7 @@
 #include "StringUtils.h"
 #include <vector>
 #include <Shlwapi.h>
+#include <Shldisp.h>
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "version.lib")
@@ -138,7 +139,7 @@ std::wstring CPathUtils::GetFileName(const std::wstring& path)
         std::wstring sName = path.substr(pos + 1);
         return sName;
     }
-    return L"";
+    //return L"";
 }
 
 std::wstring CPathUtils::GetModulePath( HMODULE hMod /*= NULL*/ )
