@@ -54,7 +54,7 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, LPTSTR path, size_t pathl
     std::wstring temp;
     temp = path;
     std::wstring sDefault;
-    if (szDefaultPath)
+    if (szDefaultPath && PathFileExists(szDefaultPath))
         sDefault = szDefaultPath;
     CBrowseFolder::retVal ret = Show(parent, temp, sDefault);
     _tcscpy_s(path, pathlen, temp.c_str());
