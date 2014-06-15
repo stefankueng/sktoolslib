@@ -386,10 +386,9 @@ LRESULT AeroControlBase::ButtonWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
                             PatBlt(hdcPaint, 0, 0, RECTWIDTH(rcClient), RECTHEIGHT(rcClient), BLACKNESS);
 
                             m_theme.BufferedPaintSetAlpha(hBufferedPaint, &ps.rcPaint, 0x00);
-                            int iState = GBS_NORMAL;
-                            int iPartId = BP_GROUPBOX;
 
-                            iState = GetStateFromBtnState(dwStyle, FALSE, FALSE, 0L, iPartId, FALSE);
+                            int iPartId = BP_GROUPBOX;
+                            int iState = GetStateFromBtnState(dwStyle, FALSE, FALSE, 0L, iPartId, FALSE);
 
                             DTTOPTS DttOpts = {sizeof(DTTOPTS)};
                             DttOpts.dwFlags = DTT_COMPOSITED | DTT_GLOWSIZE;
