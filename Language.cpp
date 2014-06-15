@@ -57,7 +57,7 @@ bool CLanguage::LoadFile( const std::wstring& path )
     try
     {
     }
-    catch (std::ios_base::failure e)
+    catch (std::ios_base::failure &)
     {
         return false;
     }
