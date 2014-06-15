@@ -245,7 +245,7 @@ void CBrowseFolder::SetFont(HWND hwnd,LPTSTR FontName,int FontSize)
     GetObject(GetWindowFont(hwnd),sizeof(lf),&lf);
     lf.lfWeight = FW_REGULAR;
     lf.lfHeight = (LONG)FontSize;
-    lstrcpy( lf.lfFaceName, FontName );
+    lstrcpyn( lf.lfFaceName, FontName, _countof(lf.lfFaceName) );
     hf=CreateFontIndirect(&lf);
     SetBkMode(hdc,OPAQUE);
     SendMessage(hwnd,WM_SETFONT,(WPARAM)hf,TRUE);

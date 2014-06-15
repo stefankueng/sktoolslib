@@ -405,8 +405,8 @@ HRESULT STDMETHODCALLTYPE FileDataObject::SetDropDescription(DROPIMAGETYPE image
         return E_OUTOFMEMORY;
 
     DROPDESCRIPTION* pDropDescription = (DROPDESCRIPTION*)GlobalLock(medium.hGlobal);
-    lstrcpyW(pDropDescription->szInsert, insert);
-    lstrcpyW(pDropDescription->szMessage, format);
+    lstrcpynW(pDropDescription->szInsert, insert, _countof(pDropDescription->szInsert));
+    lstrcpynW(pDropDescription->szMessage, format, _countof(pDropDescription->szMessage));
     pDropDescription->type = image;
     GlobalUnlock(medium.hGlobal);
     return SetData(&fetc, &medium, TRUE);

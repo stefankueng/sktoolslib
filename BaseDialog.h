@@ -40,6 +40,7 @@ public:
         , m_iPseudoRet(0)
         , m_hToolTips(nullptr)
     {
+        m_margins = {};
     }
     INT_PTR         DoModal(HINSTANCE hInstance, int resID, HWND hWndParent);
     INT_PTR         DoModal(HINSTANCE hInstance, int resID, HWND hWndParent, UINT idAccel);
