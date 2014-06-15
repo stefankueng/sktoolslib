@@ -28,6 +28,7 @@ CSimpleFileFind::CSimpleFileFind(const std::wstring &sPath, LPCTSTR pPattern)
     , m_bFirst(true)
     , m_sPathPrefix(sPath)
 {
+    m_FindFileData = {};
     if (PathIsDirectory(sPath.c_str()))
     {
         // Add a trailing \ to m_sPathPrefix if it is missing.

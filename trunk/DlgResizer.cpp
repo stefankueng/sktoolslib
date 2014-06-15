@@ -25,6 +25,9 @@ CDlgResizer::CDlgResizer(void)
     , m_wndGrip(NULL)
 {
     m_controls.clear();
+    m_dlgRect = {};
+    m_dlgRectScreen = {};
+    m_sizeGrip = {};
 }
 
 CDlgResizer::~CDlgResizer(void)

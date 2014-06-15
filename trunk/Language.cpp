@@ -54,6 +54,13 @@ bool CLanguage::LoadFile( const std::wstring& path )
 
     std::wifstream File;
     File.imbue(std::locale(std::locale(), new utf8_conversion()));
+    try
+    {
+    }
+    catch (std::ios_base::failure e)
+    {
+        return false;
+    }
     File.open(filepath);
     if (!File.good())
     {
