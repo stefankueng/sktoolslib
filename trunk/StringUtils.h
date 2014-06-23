@@ -233,4 +233,17 @@ public:
 
     static std::wstring Format(const wchar_t* frmt, ...);
     static std::string Format(const char* frmt, ...);
+
+    static inline void emplace_to_lower(std::wstring& s)
+    {
+        std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    }
+    
+    static inline std::wstring to_lower(const std::wstring& s)
+    {
+        std::wstring ls(s);
+        std::transform(ls.begin(), ls.end(), ls.begin(), ::tolower);
+        return ls;
+    }
+
 };
