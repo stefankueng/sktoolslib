@@ -43,5 +43,10 @@ public:
     static std::wstring GetVersionFromFile(const std::wstring& path);
     static std::wstring GetAppDataPath(HMODULE hMod = NULL);
     static std::wstring GetCWD();
+    static void         NormalizeFolderSeparators( std::wstring& path);
+    static int          PathCompare(const std::wstring& path1, const std::wstring& path2);
+    static int          PathCompareN(const std::wstring& path1, const std::wstring& path2, size_t limit);
+    static std::wstring GetFileNameWithoutExtension( const std::wstring& path );
+    static std::wstring RemoveExtension( const std::wstring& path );
     static bool         Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder);
 };
