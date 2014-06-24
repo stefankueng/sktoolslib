@@ -26,6 +26,7 @@
 #include <vector>
 #include <memory>
 #include <Shlwapi.h>
+#include <Shldisp.h>
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "version.lib")
@@ -428,7 +429,7 @@ std::wstring CPathUtils::GetCWD()
 // Change the path separators to ones appropriate for this OS.
 void CPathUtils::NormalizeFolderSeparators( std::wstring& path )
 {
-	for (auto& c : path ) // Non const desired.
+    for (auto& c : path ) // Non const desired.
         if (c == OtherOSPathSeparator)
             c = ThisOSPathSeparator;
 }
