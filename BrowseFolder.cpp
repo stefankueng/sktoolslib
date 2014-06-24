@@ -21,6 +21,7 @@
 #include <WindowsX.h>
 #include <Shobjidl.h>
 #include <Shlobj.h>
+#include <Shlwapi.h>
 #include "BrowseFolder.h"
 
 BOOL CBrowseFolder::m_bCheck = FALSE;
