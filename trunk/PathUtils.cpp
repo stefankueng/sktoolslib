@@ -385,6 +385,15 @@ std::wstring CPathUtils::GetVersionFromFile(const std::wstring& path)
 
 std::wstring CPathUtils::GetAppDataPath(HMODULE hMod)
 {
+    PWSTR path = NULL;
+    if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path) == S_OK)
+    {
+        std::wstring sPath = path;
+        sPath += L"\\";
+        sPath += CPathUtils::GetFileNameWithoutExtension(CPathUtils::GetModulePath(hMod));
+        CreateDirectory(sPath.c_str(), NULL);
+        return sPath;
+    }
     return CPathUtils::GetModuleDir(hMod);
 }
 
