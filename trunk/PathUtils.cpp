@@ -254,7 +254,7 @@ std::wstring CPathUtils::GetFileNameWithoutExtension( const std::wstring& path )
 // everything before it.
 // Does not include the dot. Handles leading folders with dots.
 // Example, if given: "c:\product version 1.0\test.txt"
-// returnns:          "c:\product version 1.0\test"
+// returns:           "c:\product version 1.0\test"
 std::wstring CPathUtils::RemoveExtension( const std::wstring& path )
 {
     for (size_t i = path.length(); i > 0;)
@@ -525,4 +525,28 @@ bool CPathUtils::Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder)
     {
         CoUninitialize();
     }
+}
+
+bool CPathUtils::IsKnownExtension(const std::wstring& ext)
+{
+    // an extension is considered as 'known' if it's registered
+    // in the registry with an associated application.
+    if (ext.empty())
+        return false;    // no extension, assume 'not known'
+
+    LPCWSTR sExt = ext.c_str();
+    std::wstring sDotExt;
+    if (ext[0] != '.')
+    {
+        sDotExt = L"." + ext;
+        sExt = sDotExt.c_str();
+    }
+    HKEY hKey = 0;
+    if (RegOpenKeyEx(HKEY_CLASSES_ROOT, sExt, 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS)
+    {
+        // key exists
+        RegCloseKey(hKey);
+        return true;
+    }
+    return false;
 }

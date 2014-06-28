@@ -49,4 +49,5 @@ public:
     static std::wstring GetFileNameWithoutExtension( const std::wstring& path );
     static std::wstring RemoveExtension( const std::wstring& path );
     static bool         Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder);
+    static bool         IsKnownExtension(const std::wstring& ext);
 };
