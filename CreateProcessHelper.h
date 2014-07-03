@@ -57,7 +57,7 @@ inline bool CCreateProcessHelper::CreateProcess(LPCTSTR applicationName,
     DWORD dwCreationFlags)
 {
     STARTUPINFO startupInfo;
-    memset(&startupInfo, 0, sizeof(STARTUPINFO));
+    SecureZeroMemory(&startupInfo, sizeof(startupInfo));
     startupInfo.cb = sizeof(STARTUPINFO);
     if (hidden)
     {
@@ -65,7 +65,7 @@ inline bool CCreateProcessHelper::CreateProcess(LPCTSTR applicationName,
         startupInfo.wShowWindow = SW_HIDE;
     }
 
-    memset(processInfo, 0, sizeof(PROCESS_INFORMATION));
+    SecureZeroMemory(&processInfo, sizeof(processInfo));
     const BOOL result = ::CreateProcess( applicationName,
                     commandLine, NULL, NULL, FALSE, dwCreationFlags, 0, currentDirectory,
                     &startupInfo, processInfo );

@@ -238,7 +238,7 @@ public:
     {
         std::transform(s.begin(), s.end(), s.begin(), ::tolower);
     }
-    
+
     static inline std::wstring to_lower(const std::wstring& s)
     {
         std::wstring ls(s);
