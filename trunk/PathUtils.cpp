@@ -27,6 +27,7 @@
 #include <memory>
 #include <Shlwapi.h>
 #include <Shldisp.h>
+#include <Shlobj.h>
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "version.lib")
