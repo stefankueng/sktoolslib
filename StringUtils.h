@@ -60,12 +60,16 @@ bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd);
 void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::wstring& replacewith);
 void SearchReplace(std::string& str, const std::string& toreplace, const std::string& replacewith);
 
+// append = true is a bad default, but added for compatibility.
+// if compatibility isn't needed, append should default to false.
 template <typename Container>
 void stringtok(Container &container, const std::wstring  &in, bool trim,
-    const wchar_t * const delimiters = L"|")
+    const wchar_t * const delimiters = L"|", bool append = true)
 {
     const std::string::size_type len = in.length();
     std::string::size_type i = 0;
+    if (!append)
+        container.clear();
 
     while ( i < len )
     {
@@ -92,12 +96,16 @@ void stringtok(Container &container, const std::wstring  &in, bool trim,
     }
 }
 
+// append = true is a bad default, but added for compatibility.
+// if compatibility isn't needed, append should default to false.
 template <typename Container>
 void stringtok(Container &container, const std::string  &in, bool trim,
-               const char * const delimiters = "|")
+               const char * const delimiters = "|", bool append = true)
 {
     const std::string::size_type len = in.length();
     std::string::size_type i = 0;
+    if (!append)
+        container.clear();
 
     while ( i < len )
     {

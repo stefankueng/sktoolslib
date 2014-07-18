@@ -198,7 +198,7 @@ std::wstring CPathUtils::GetParentDirectory( const std::wstring& path )
 // everything after it, NOT including the ".".
 // Handles leading folders with dots.
 // Example, if given: "c:\product version 1.0\test.txt"
-// returnns:          "txt"
+// returns:          "txt"
 std::wstring CPathUtils::GetFileExtension( const std::wstring& path )
 {
     // Find the last dot after the first path separator as
@@ -216,6 +216,39 @@ std::wstring CPathUtils::GetFileExtension( const std::wstring& path )
             std::wstring ext = path.substr(i+1);
             return ext;
         }
+    }
+    return std::wstring();
+}
+
+// Finds the first "." after the last path separator and returns
+// everything after it, NOT including the ".".
+// Handles leading folders with dots.
+// Example, if given: "c:\product version 1.0\test.aspx.cs"
+// returns:          "aspx.cs"
+std::wstring CPathUtils::GetLongFileExtension( const std::wstring& path )
+{
+    // Find the last dot after the first path separator as
+    // folders can have dots in them too.
+    // Start at the last character and work back stopping at the
+    // first . or path separator. If we find a dot take the rest
+    // after it as the extension.
+    size_t foundPos = size_t(-1);
+    bool found = false;
+    for (size_t i = path.length(); i > 0;)
+    {
+        --i;
+        if (IsFolderSeparator(path[i]))
+            break;
+        if (path[i] == L'.')
+        {
+            foundPos = i;
+            found = true;
+        }
+    }
+    if (found && foundPos > 0)
+    {
+        std::wstring ext = path.substr(foundPos+1);
+        return ext;
     }
     return std::wstring();
 }
@@ -251,6 +284,12 @@ std::wstring CPathUtils::GetFileNameWithoutExtension( const std::wstring& path )
     return RemoveExtension(GetFileName(path));
 }
 
+// Returns only the filename without extension, i.e. will not include a path.
+std::wstring CPathUtils::GetFileNameWithoutLongExtension( const std::wstring& path )
+{
+    return RemoveLongExtension(GetFileName(path));
+}
+
 // Finds the last "." after the last path separator and returns
 // everything before it.
 // Does not include the dot. Handles leading folders with dots.
@@ -265,6 +304,39 @@ std::wstring CPathUtils::RemoveExtension( const std::wstring& path )
             break;
         if (path[i] == L'.')
             return path.substr(0, i);
+    }
+    return path;
+}
+
+// Finds the first "." after the last path separator and returns
+// everything before it, NOT including the ".".
+// Handles leading folders with dots.
+// Example, if given: "c:\product version 1.0\test.aspx.cs"
+// returns:          "aspx.cs"
+std::wstring CPathUtils::RemoveLongExtension( const std::wstring& path )
+{
+    // Find the last dot after the first path separator as
+    // folders can have dots in them too.
+    // Start at the last character and work back stopping at the
+    // first . or path separator. If we find a dot take the rest
+    // after it as the extension.
+    size_t foundPos = size_t(-1);
+    bool found = false;
+    for (size_t i = path.length(); i > 0;)
+    {
+        --i;
+        if (IsFolderSeparator(path[i]))
+            break;
+        if (path[i] == L'.')
+        {
+            foundPos = i;
+            found = true;
+        }
+    }
+    if (found && foundPos > 0)
+    {
+        std::wstring pathWithoutExt = path.substr(0, foundPos);
+        return pathWithoutExt;
     }
     return path;
 }

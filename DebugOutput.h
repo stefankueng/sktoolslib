@@ -85,6 +85,8 @@ public:
             else
                 OutputDebugStringA("An unexpected error occurred");
             OutputDebugStringA("\n");
+            // Verification failures are bugs so draw attention to them while debugging.
+            assert(false);
         }
     }
 
