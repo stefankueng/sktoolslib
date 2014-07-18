@@ -34,6 +34,7 @@ public:
 
     static std::wstring GetParentDirectory(const std::wstring& path);
     static std::wstring GetFileExtension(const std::wstring& path);
+    static std::wstring GetLongFileExtension(const std::wstring& path);
     static std::wstring GetFileName(const std::wstring& path);
     // module/app paths
     static std::wstring GetModulePath(HMODULE hMod = NULL);
@@ -47,7 +48,9 @@ public:
     static int          PathCompare(const std::wstring& path1, const std::wstring& path2);
     static int          PathCompareN(const std::wstring& path1, const std::wstring& path2, size_t limit);
     static std::wstring GetFileNameWithoutExtension( const std::wstring& path );
+    static std::wstring GetFileNameWithoutLongExtension( const std::wstring& path );
     static std::wstring RemoveExtension( const std::wstring& path );
+    static std::wstring RemoveLongExtension( const std::wstring& path );
     static bool         Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder);
     static bool         IsKnownExtension(const std::wstring& ext);
 };
