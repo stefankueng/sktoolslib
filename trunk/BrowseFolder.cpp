@@ -65,7 +65,7 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
 {
     retVal ret = OK;        //assume OK
     m_sDefaultPath = sDefaultPath;
-    if ((m_sDefaultPath.size() == 0) && path.size())
+    if (m_sDefaultPath.empty() && !path.empty())
     {
         // if the result path already contains a path, use that as the default path
         m_sDefaultPath = path;
