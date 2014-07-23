@@ -42,8 +42,8 @@ CTempFiles& CTempFiles::Instance()
 std::wstring CTempFiles::ConstructTempPath(const std::wstring& path) const
 {
     DWORD len = ::GetTempPath(0, NULL);
-    std::unique_ptr<TCHAR[]> temppath (new TCHAR[len+1]);
-    std::unique_ptr<TCHAR[]> tempF (new TCHAR[len+50]);
+    auto temppath = std::make_unique<TCHAR[]>(len+1);
+    auto tempF = std::make_unique<TCHAR[]>(len+50);
     ::GetTempPath (len+1, temppath.get());
     std::wstring tempfile;
     std::wstring possibletempfile;
