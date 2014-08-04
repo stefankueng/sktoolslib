@@ -241,7 +241,7 @@ std::wstring CEscapeUtils::EscapeString( const std::wstring& str )
 
 std::string CEscapeUtils::StringUnescape( const std::string& str )
 {
-    std::unique_ptr<char[]> urlabuf (new char[str.size()+1]);
+    auto urlabuf = std::make_unique<char[]>(str.size()+1);
 
     strcpy_s(urlabuf.get(), str.size()+1, str.c_str());
     Unescape(urlabuf.get());

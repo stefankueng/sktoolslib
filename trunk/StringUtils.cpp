@@ -140,7 +140,7 @@ BYTE DecLookup[] = {
 std::string CStringUtils::ToHexString( BYTE* pSrc, int nSrcLen )
 {
     WORD * pwHex=  (WORD*)HexLookup;
-    std::unique_ptr<char[]> dest(new char[(nSrcLen*2)+1]);
+    auto dest = std::make_unique<char[]>((nSrcLen*2)+1);
     WORD * pwDest = (WORD*)dest.get();
     for (int j=0; j<nSrcLen; j++ )
     {

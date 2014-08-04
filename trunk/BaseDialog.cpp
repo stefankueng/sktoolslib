@@ -432,7 +432,7 @@ std::unique_ptr<TCHAR[]> CDialog::GetDlgItemText( UINT nId )
 {
     int len = GetDlgItemTextLength(nId);
     len++;
-    std::unique_ptr<TCHAR[]> buf(new TCHAR[len]);
+    auto buf = std::make_unique<TCHAR[]>(len);
     ::GetDlgItemText(*this, nId, buf.get(), len);
     return buf;
 }

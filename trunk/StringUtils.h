@@ -224,7 +224,7 @@ public:
         if (len == 0)
             return s;
 
-        std::unique_ptr<TCHAR[]> buf(new TCHAR[len+1]);
+        auto buf = std::make_unique<TCHAR[]>(len+1);
         if (::ExpandEnvironmentStrings (s.c_str(), buf.get(), len) == 0)
             return s;
 
