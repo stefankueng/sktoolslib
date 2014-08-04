@@ -36,7 +36,7 @@ std::string CUnicodeUtils::StdGetUTF8(const std::wstring& wide)
     if (len == 0)
         return std::string();
     int size = len*4;
-    std::unique_ptr<char[]> narrow(new char[size]);
+    auto narrow = std::make_unique<char[]>(size);
     int ret = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), len, narrow.get(), size-1, NULL, NULL);
     narrow[ret] = 0;
     std::string sRet = std::string(narrow.get());
@@ -49,7 +49,7 @@ std::string CUnicodeUtils::StdGetANSI(const std::wstring& wide)
     if (len == 0)
         return std::string();
     int size = len*4;
-    std::unique_ptr<char[]> narrow(new char[size]);
+    auto narrow = std::make_unique<char[]>(size);
     int ret = WideCharToMultiByte(CP_ACP, 0, wide.c_str(), len, narrow.get(), size-1, NULL, NULL);
     narrow[ret] = 0;
     std::string sRet = std::string(narrow.get());
@@ -62,7 +62,7 @@ std::wstring CUnicodeUtils::StdGetUnicode(const std::string& multibyte)
     if (len == 0)
         return std::wstring();
     int size = len*4;
-    std::unique_ptr<wchar_t[]> wide(new wchar_t[size]);
+    auto wide = std::make_unique<wchar_t[]>(size);
     int ret = MultiByteToWideChar(CP_UTF8, 0, multibyte.c_str(), len, wide.get(), size - 1);
     wide[ret] = 0;
     std::wstring sRet = std::wstring(wide.get());
@@ -72,7 +72,7 @@ std::wstring CUnicodeUtils::StdGetUnicode(const std::string& multibyte)
 
 std::string WideToMultibyte(const std::wstring& wide)
 {
-    std::unique_ptr<char[]> narrow(new char[wide.length()*3+2]);
+    auto narrow = std::make_unique<char[]>(wide.length()*3+2);
     BOOL defaultCharUsed;
     int ret = (int)WideCharToMultiByte(CP_ACP, 0, wide.c_str(), (int)wide.size(), narrow.get(), (int)wide.length()*3 - 1, ".", &defaultCharUsed);
     narrow[ret] = 0;
@@ -82,7 +82,7 @@ std::string WideToMultibyte(const std::wstring& wide)
 
 std::string WideToUTF8(const std::wstring& wide)
 {
-    std::unique_ptr<char[]> narrow(new char[wide.length()*3+2]);
+    auto narrow = std::make_unique<char[]>(wide.length()*3+2);
     int ret = (int)WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), (int)wide.size(), narrow.get(), (int)wide.length()*3 - 1, NULL, NULL);
     narrow[ret] = 0;
     std::string str = narrow.get();
@@ -95,7 +95,7 @@ std::wstring MultibyteToWide(const std::string& multibyte)
     if (length == 0)
         return std::wstring();
 
-    std::unique_ptr<wchar_t[]> wide(new wchar_t[multibyte.length()*2+2]);
+    auto wide = std::make_unique<wchar_t[]>(multibyte.length()*2+2);
     if (wide == NULL)
         return std::wstring();
     int ret = (int)MultiByteToWideChar(CP_ACP, 0, multibyte.c_str(), (int)multibyte.size(), wide.get(), (int)length*2 - 1);
@@ -110,7 +110,7 @@ std::wstring UTF8ToWide(const std::string& multibyte)
     if (length == 0)
         return std::wstring();
 
-    std::unique_ptr<wchar_t[]> wide(new wchar_t[length*2+2]);
+    auto wide = std::make_unique<wchar_t[]>(length*2+2);
     if (wide == NULL)
         return std::wstring();
     int ret = (int)MultiByteToWideChar(CP_UTF8, 0, multibyte.c_str(), (int)multibyte.size(), wide.get(), (int)length*2 - 1);
