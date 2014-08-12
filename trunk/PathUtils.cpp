@@ -500,9 +500,7 @@ std::wstring CPathUtils::GetCWD()
 // Change the path separators to ones appropriate for this OS.
 void CPathUtils::NormalizeFolderSeparators( std::wstring& path )
 {
-    for (auto& c : path ) // Non const desired.
-        if (c == OtherOSPathSeparator)
-            c = ThisOSPathSeparator;
+    std::replace(path.begin(), path.end(), OtherOSPathSeparator, ThisOSPathSeparator);
 }
 
 // Path names are case insensitive, using this function is clearer
