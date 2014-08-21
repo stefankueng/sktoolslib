@@ -62,11 +62,11 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
     std::wstring sRet = path;
     if (!PathIsURL(path.c_str()) && PathIsRelative(path.c_str()))
     {
-        ret = GetFullPathName(path.c_str(), 0, NULL, NULL);
+        ret = GetFullPathName(path.c_str(), 0, nullptr, nullptr);
         if (ret)
         {
             auto pathbuf = std::make_unique<TCHAR[]>(ret+1);
-            if ((ret = GetFullPathName(path.c_str(), ret, pathbuf.get(), NULL))!=0)
+            if ((ret = GetFullPathName(path.c_str(), ret, pathbuf.get(), nullptr))!=0)
             {
                 sRet = std::wstring(pathbuf.get(), ret);
             }
@@ -74,7 +74,7 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
     }
     else if (PathCanonicalize(pathbufcanonicalized, path.c_str()))
     {
-        ret = ::GetLongPathName(pathbufcanonicalized, NULL, 0);
+        ret = ::GetLongPathName(pathbufcanonicalized, nullptr, 0);
         // TODO REIVEW: Why + 2 and not + 1? A few other instances of this exist too.
         auto pathbuf = std::make_unique<TCHAR[]>(ret+2);
         ret = ::GetLongPathName(pathbufcanonicalized, pathbuf.get(), ret+1);
@@ -85,7 +85,7 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
         // To fix the casing of the path, we use a trick:
         // convert the path to its short form, then back to its long form.
         // That will fix the wrong casing of the path.
-        int shortret = ::GetShortPathName(pathbuf.get(), NULL, 0);
+        int shortret = ::GetShortPathName(pathbuf.get(), nullptr, 0);
         if (shortret)
         {
             auto shortpath = std::make_unique<TCHAR[]>(shortret+2);
@@ -99,12 +99,12 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
     }
     else
     {
-        ret = ::GetLongPathName(path.c_str(), NULL, 0);
+        ret = ::GetLongPathName(path.c_str(), nullptr, 0);
         auto pathbuf = std::make_unique<TCHAR[]>(ret+2);
         ret = ::GetLongPathName(path.c_str(), pathbuf.get(), ret+1);
         sRet = std::wstring(pathbuf.get(), ret);
         // fix the wrong casing of the path. See above for details.
-        int shortret = ::GetShortPathName(pathbuf.get(), NULL, 0);
+        int shortret = ::GetShortPathName(pathbuf.get(), nullptr, 0);
         if (shortret)
         {
             auto shortpath = std::make_unique<TCHAR[]>(shortret+2);
@@ -341,7 +341,7 @@ std::wstring CPathUtils::RemoveLongExtension( const std::wstring& path )
     return path;
 }
 
-std::wstring CPathUtils::GetModulePath( HMODULE hMod /*= NULL*/ )
+std::wstring CPathUtils::GetModulePath( HMODULE hMod /*= nullptr*/ )
 {
     DWORD len = 0;
     DWORD bufferlen = MAX_PATH;     // MAX_PATH is not the limit here!
@@ -356,7 +356,7 @@ std::wstring CPathUtils::GetModulePath( HMODULE hMod /*= NULL*/ )
     return sPath;
 }
 
-std::wstring CPathUtils::GetModuleDir( HMODULE hMod /*= NULL*/ )
+std::wstring CPathUtils::GetModuleDir( HMODULE hMod /*= nullptr*/ )
 {
     return GetParentDirectory(GetModulePath(hMod));
 }
@@ -389,7 +389,7 @@ std::wstring CPathUtils::Append( const std::wstring& path, const std::wstring& a
 
 std::wstring CPathUtils::GetTempFilePath()
 {
-    DWORD len = ::GetTempPath(0, NULL);
+    DWORD len = ::GetTempPath(0, nullptr);
     auto temppath = std::make_unique<TCHAR[]>(len+1);
     auto tempF = std::make_unique<TCHAR[]>(len+50);
     ::GetTempPath (len+1, temppath.get());
@@ -398,7 +398,7 @@ std::wstring CPathUtils::GetTempFilePath()
     tempfile = std::wstring(tempF.get());
     //now create the tempfile, so that subsequent calls to GetTempFile() return
     //different filenames.
-    HANDLE hFile = CreateFile(tempfile.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
+    HANDLE hFile = CreateFile(tempfile.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, nullptr);
     CloseHandle(hFile);
     return tempfile;
 }
@@ -417,24 +417,23 @@ std::wstring CPathUtils::GetVersionFromFile(const std::wstring& path)
     dwReserved = 0;
     if (dwBufferSize > 0)
     {
-        LPVOID pBuffer = (void*) malloc(dwBufferSize);
-
-        if (pBuffer != (void*) NULL)
+        auto pBuffer = std::make_unique<char[]>(dwBufferSize);
+        if (pBuffer)
         {
             UINT            nInfoSize = 0,
                             nFixedLength = 0;
-            LPSTR           lpVersion = NULL;
+            LPSTR           lpVersion = nullptr;
             VOID*           lpFixedPointer;
             TRANSARRAY*     lpTransArray;
             std::wstring    strLangProduktVersion;
 
-            GetFileVersionInfo((LPTSTR)(LPCTSTR)path.c_str(),
+            GetFileVersionInfo(path.c_str(),
                 dwReserved,
                 dwBufferSize,
-                pBuffer);
+                pBuffer.get());
 
             // Check the current language
-            VerQueryValue(  pBuffer,
+            VerQueryValue(pBuffer.get(),
                 L"\\VarFileInfo\\Translation",
                 &lpFixedPointer,
                 &nFixedLength);
@@ -443,13 +442,12 @@ std::wstring CPathUtils::GetVersionFromFile(const std::wstring& path)
             strLangProduktVersion = CStringUtils::Format(L"\\StringFileInfo\\%04x%04x\\ProductVersion",
                                                          lpTransArray[0].wLanguageID, lpTransArray[0].wCharacterSet);
 
-            VerQueryValue(pBuffer,
+            VerQueryValue(pBuffer.get(),
                 (LPTSTR)(LPCTSTR)strLangProduktVersion.c_str(),
                 (LPVOID *)&lpVersion,
                 &nInfoSize);
             if (nInfoSize && lpVersion)
                 strReturn = (LPCTSTR)lpVersion;
-            free(pBuffer);
         }
     }
 
@@ -458,13 +456,13 @@ std::wstring CPathUtils::GetVersionFromFile(const std::wstring& path)
 
 std::wstring CPathUtils::GetAppDataPath(HMODULE hMod)
 {
-    PWSTR path = NULL;
-    if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path) == S_OK)
+    PWSTR path = nullptr;
+    if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, nullptr, &path) == S_OK)
     {
         std::wstring sPath = path;
         sPath += L"\\";
         sPath += CPathUtils::GetFileNameWithoutExtension(CPathUtils::GetModulePath(hMod));
-        CreateDirectory(sPath.c_str(), NULL);
+        CreateDirectory(sPath.c_str(), nullptr);
         return sPath;
     }
     return CPathUtils::GetModuleDir(hMod);
@@ -480,7 +478,7 @@ std::wstring CPathUtils::GetCWD()
     for (;;)
     {
         // Returned length already includes + 1 fo null.
-        auto estimatedLen = GetCurrentDirectory(0, NULL);
+        auto estimatedLen = GetCurrentDirectory(0, nullptr);
         if (estimatedLen <= 0) // Error, can't recover.
             break;
         auto cwd = std::make_unique<TCHAR[]>(estimatedLen);
@@ -529,10 +527,10 @@ bool CPathUtils::Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder)
 
     VARIANT Options, OutFolder, InZipFile, Item;
     HRESULT hr = S_OK;
-    CoInitialize(NULL);
+    CoInitialize(nullptr);
     __try
     {
-        if (CoCreateInstance(CLSID_Shell, NULL, CLSCTX_INPROC_SERVER, IID_IShellDispatch, (void **)&pISD) != S_OK)
+        if (CoCreateInstance(CLSID_Shell, nullptr, CLSCTX_INPROC_SERVER, IID_IShellDispatch, (void **)&pISD) != S_OK)
             return false;
 
         InZipFile.vt = VT_BSTR;
