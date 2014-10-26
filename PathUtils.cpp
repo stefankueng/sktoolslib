@@ -503,7 +503,7 @@ void CPathUtils::NormalizeFolderSeparators( std::wstring& path )
 
 // Path names are case insensitive, using this function is clearer
 // that the string involved is a path.
-// In theory it can be canse insensitive or not as needed for the OS too.
+// In theory it can be case insensitive or not as needed for the OS too.
 int CPathUtils::PathCompare(const std::wstring& path1, const std::wstring& path2)
 {
     return _wcsicmp(path1.c_str(), path2.c_str());
