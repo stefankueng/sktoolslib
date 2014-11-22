@@ -47,6 +47,7 @@ public:
     static void         NormalizeFolderSeparators( std::wstring& path);
     static int          PathCompare(const std::wstring& path1, const std::wstring& path2);
     static int          PathCompareN(const std::wstring& path1, const std::wstring& path2, size_t limit);
+    static bool         PathIsChild(const std::wstring& parent, const std::wstring& child);
     static std::wstring GetFileNameWithoutExtension( const std::wstring& path );
     static std::wstring GetFileNameWithoutLongExtension( const std::wstring& path );
     static std::wstring RemoveExtension( const std::wstring& path );

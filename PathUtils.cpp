@@ -619,3 +619,57 @@ bool CPathUtils::IsKnownExtension(const std::wstring& ext)
     }
     return false;
 }
+
+bool CPathUtils::PathIsChild(const std::wstring& parent, const std::wstring& child)
+{
+    std::wstring sParent = GetLongPathname(parent);
+    std::wstring sChild = GetLongPathname(child);
+    if (sParent.size() >= sChild.size())
+        return false;
+    NormalizeFolderSeparators(sParent);
+    NormalizeFolderSeparators(sChild);
+
+    std::wstring sChildAsParent = sChild.substr(0, sParent.size());
+    if (sChildAsParent.empty())
+        return false;
+    if (PathCompare(sParent, sChildAsParent) != 0)
+        return false;
+
+    if (IsFolderSeparator(*sParent.rbegin()))
+    {
+        if (!IsFolderSeparator(*sChildAsParent.rbegin()))
+            return false;
+    }
+    else
+    {
+        if (!IsFolderSeparator(sChild[sParent.size()]))
+            return false;
+    }
+    return true;
+}
+
+
+// poor mans code tests
+#ifdef _DEBUG
+static class CPathTests
+{
+public:
+    CPathTests()
+    {
+        assert(CPathUtils::AdjustForMaxPath(L"c:\\") == L"c:\\");
+        assert(CPathUtils::AdjustForMaxPath(L"c:\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz") == L"\\\\?\\c:\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz\\abcdefghijklmnopqrstuvwxyz");
+        assert(CPathUtils::GetParentDirectory(L"c:\\windows\\system32") == L"c:\\windows");
+        assert(CPathUtils::GetParentDirectory(L"c:\\") == L"");
+        assert(CPathUtils::GetParentDirectory(L"\\myserver") == L"");
+        assert(CPathUtils::GetFileExtension(L"d:\\test.file.ext1.ext2") == L"ext2");
+        assert(CPathUtils::GetLongFileExtension(L"d:\\test.file.ext1.ext2") == L"file.ext1.ext2");
+        assert(!CPathUtils::PathIsChild(L"c:\\windows\\", L"c:\\windows"));
+        assert(!CPathUtils::PathIsChild(L"c:\\windows\\", L"c:\\windows\\"));
+        assert(CPathUtils::PathIsChild(L"c:\\windows\\", L"c:\\windows\\child\\"));
+        assert(CPathUtils::PathIsChild(L"c:\\windows\\", L"c:\\windows\\child"));
+        assert(CPathUtils::PathIsChild(L"c:\\windows", L"c:\\windows\\child"));
+        assert(!CPathUtils::PathIsChild(L"c:\\windows", L"c:\\windowsnotachild"));
+        assert(!CPathUtils::PathIsChild(L"c:\\windows\\", L"c:\\windowsnotachild"));
+    }
+} CPathTests;
+#endif
