@@ -46,23 +46,30 @@ bool CCircularLog::Init( const std::wstring& path, int maxlines )
     m_path = path;
     m_maxlines = maxlines;
 
-    std::wifstream File;
-    File.imbue(std::locale(std::locale(), new utf8_conversion()));
-    File.open(m_path);
-    if (!File.good())
+    try
     {
-        CreateDirectory(path.substr(0, path.find_last_of('\\')).c_str(), NULL);
-        HANDLE hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-        if (hFile != INVALID_HANDLE_VALUE)
-            CloseHandle(hFile);
+        std::wifstream File;
+        File.imbue(std::locale(std::locale(), new utf8_conversion()));
+        File.open(m_path);
+        if (!File.good())
+        {
+            CreateDirectory(path.substr(0, path.find_last_of('\\')).c_str(), NULL);
+            HANDLE hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (hFile != INVALID_HANDLE_VALUE)
+                CloseHandle(hFile);
+            return false;
+        }
+        std::wstring line;
+        while (std::getline(File, line))
+        {
+            m_lines.push_back(line);
+        };
+        File.close();
+    }
+    catch (std::exception&)
+    {
         return false;
     }
-    std::wstring line;
-    while (std::getline(File, line))
-    {
-        m_lines.push_back(line);
-    };
-    File.close();
     return true;
 }
 
@@ -83,18 +90,25 @@ bool CCircularLog::Save()
 {
     if (m_path.empty())
         return false;
-    std::wofstream File;
-    File.imbue(std::locale(std::locale(), new utf8_conversion()));
-    File.open(m_path);
-    if (!File.good())
+    try
+    {
+        std::wofstream File;
+        File.imbue(std::locale(std::locale(), new utf8_conversion()));
+        File.open(m_path);
+        if (!File.good())
+        {
+            return false;
+        }
+        for (const auto& line : m_lines)
+        {
+            File << line << std::endl;
+        }
+        File.close();
+    }
+    catch (std::exception&)
     {
         return false;
     }
-    for (const auto& line : m_lines)
-    {
-        File << line << std::endl;
-    }
-    File.close();
     return true;
 }
 
