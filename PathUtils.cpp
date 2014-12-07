@@ -25,6 +25,7 @@
 #include "StringUtils.h"
 #include <vector>
 #include <memory>
+#include <assert.h>
 #include <Shlwapi.h>
 #include <Shldisp.h>
 #include <Shlobj.h>
