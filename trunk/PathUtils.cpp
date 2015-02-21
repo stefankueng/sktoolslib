@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -139,7 +139,7 @@ std::wstring CPathUtils::AdjustForMaxPath(const std::wstring& path)
 
 std::wstring CPathUtils::GetParentDirectory( const std::wstring& path )
 {
-    std::wstring no_parent;
+    static std::wstring no_parent;
     size_t filenameLen;
     size_t pathLen = path.length();
     size_t pos;
