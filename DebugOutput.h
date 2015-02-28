@@ -154,7 +154,7 @@ private:
         if (GetTickCount() - m_LastTick > 10000)
         {
             m_LastTick = GetTickCount();
-            m_bActive = !!CRegStdDWORD(L"Software\\CryptSync\\DebugOutputString", FALSE);
+            m_bActive = !!CRegStdDWORD(DEBUGOUTPUTREGPATH, FALSE);
         }
         return m_bActive;
 #endif
