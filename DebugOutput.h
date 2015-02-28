@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2015 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -160,3 +160,31 @@ private:
 #endif
     }
 };
+
+
+class ProfileTimer
+{
+public:
+    ProfileTimer(LPCWSTR text)
+    {
+        info = text;
+        QueryPerformanceCounter(&startTime);
+    }
+    ~ProfileTimer()
+    {
+        LARGE_INTEGER endTime;
+        QueryPerformanceCounter(&endTime);
+        LARGE_INTEGER Frequency;
+        QueryPerformanceFrequency(&Frequency);
+        LARGE_INTEGER milliseconds;
+        milliseconds.QuadPart = endTime.QuadPart - startTime.QuadPart;
+        milliseconds.QuadPart *= 1000;
+        milliseconds.QuadPart /= Frequency.QuadPart;
+        CTraceToOutputDebugString::Instance()(L"%s : %lld ms\n", info.c_str(), milliseconds.QuadPart);
+    }
+
+private:
+    LARGE_INTEGER   startTime;
+    std::wstring    info;
+};
+
