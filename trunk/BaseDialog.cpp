@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013 - Stefan Kueng
+// Copyright (C) 2012-2013, 2015 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -150,7 +150,7 @@ void CDialog::AddToolTip(UINT ctrlID, LPCWSTR text)
     tt.cbSize = sizeof(TOOLINFO);
     tt.uFlags = TTF_IDISHWND|TTF_SUBCLASS;
     tt.hwnd = GetDlgItem(*this, ctrlID);
-    tt.uId = (UINT)GetDlgItem(*this, ctrlID);
+    tt.uId = (UINT_PTR)GetDlgItem(*this, ctrlID);
     tt.lpszText = const_cast<LPTSTR>(text);
 
     SendMessage (m_hToolTips, TTM_ADDTOOL, 0, (LPARAM) &tt);
@@ -162,7 +162,7 @@ void CDialog::AddToolTip(HWND hWnd, LPCWSTR text)
     tt.cbSize = sizeof(TOOLINFO);
     tt.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
     tt.hwnd = hWnd;
-    tt.uId = (UINT)hWnd;
+    tt.uId = (UINT_PTR)hWnd;
     tt.lpszText = const_cast<LPTSTR>(text);
 
     SendMessage(m_hToolTips, TTM_ADDTOOL, 0, (LPARAM)&tt);
