@@ -41,6 +41,8 @@ public:
     std::wstring GetTranslatedString(const std::wstring& s);
     /// Translates a whole window/dialog and all its controls
     void TranslateWindow(HWND hWnd);
+    /// Translates a menu and all submenus
+    void TranslateMenu(HMENU hMenu);
 
 private:
     void AdjustEOLs(std::wstring& str);
