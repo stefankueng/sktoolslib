@@ -211,6 +211,36 @@ void CLanguage::TranslateWindow( HWND hWnd )
     EnumChildWindows(hWnd, TranslateWindowProc, (LPARAM)&langmap);
 }
 
+void CLanguage::TranslateMenu(HMENU hMenu)
+{
+    auto count = GetMenuItemCount(hMenu);
+    for (int i = 0; i < count; ++i)
+    {
+        MENUITEMINFO mii = { 0 };
+        mii.cbSize = sizeof(MENUITEMINFO);
+        mii.fMask = MIIM_STRING | MIIM_SUBMENU;
+        mii.dwTypeData = NULL;
+        if (GetMenuItemInfo(hMenu, i, MF_BYPOSITION, &mii))
+        {
+            if (mii.hSubMenu)
+                TranslateMenu(mii.hSubMenu);
+            if (mii.cch)
+            {
+                ++mii.cch;
+                auto textbuf = std::make_unique<wchar_t[]>(mii.cch + 1);
+                mii.dwTypeData = textbuf.get();
+                if (GetMenuItemInfo(hMenu, i, MF_BYPOSITION, &mii))
+                {
+                    auto translated = GetTranslatedString(textbuf.get());
+                    mii.fMask = MIIM_STRING;
+                    mii.dwTypeData = const_cast<wchar_t*>(translated.c_str());
+                    SetMenuItemInfo(hMenu, i, MF_BYPOSITION, &mii);
+                }
+            }
+        }
+    }
+}
+
 BOOL CALLBACK CLanguage::TranslateWindowProc( HWND hwnd, LPARAM lParam )
 {
     std::map<std::wstring,std::wstring> * pLangMap = (std::map<std::wstring,std::wstring> *)lParam;
