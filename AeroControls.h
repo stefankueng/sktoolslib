@@ -22,7 +22,10 @@
 #include "AeroGlass.h"
 #include "Registry.h"
 #include <map>
+#pragma warning(push)
+#pragma warning(disable: 4458) // declaration of 'xxx' hides class member
 #include <gdiplus.h>
+#pragma warning(pop)
 
 class AeroControlBase
 {
