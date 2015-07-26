@@ -165,7 +165,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
 
     if (encoding == UNICODE_LE)
     {
-        if (*(char*)pFileBuf == 0xFF)
+        if ((bytesread > 1) && (*(char*)pFileBuf == 0xFF))
         {
             // remove the BOM
             textcontent = std::wstring(((wchar_t*)pFileBuf+1), (bytesread/sizeof(wchar_t))-1);
@@ -183,7 +183,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
         int ret2 = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pFileBuf, bytesread, pWideBuf, ret+1);
         if (ret2 == ret)
         {
-            if (*pWideBuf == 0xFEFF)
+            if ((ret > 1) && (*pWideBuf == 0xFEFF))
             {
                 // remove the BOM
                 textcontent = std::wstring(pWideBuf+1, ret-1);
