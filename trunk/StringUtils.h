@@ -252,6 +252,47 @@ template<typename T> std::string to_bit_string(T number, bool trim_significant_c
     return bs;
 }
 
+/// helper struct for case-insensitive containers.
+/// use it as the second/third argument when creating a container, e.g.:
+/// std::map< std::string, std::vector<std::string>, ci_less > myMap;
+/// std::vector<std::string, ci_less> myVector;
+struct ci_less : std::binary_function<std::string, std::string, bool>
+{
+    // case-independent (ci) compare_less binary function
+    struct nocase_compare : public std::binary_function<unsigned char, unsigned char, bool>
+    {
+        bool operator() (const unsigned char& c1, const unsigned char& c2) const
+        {
+            return tolower(c1) < tolower(c2);
+        }
+    };
+    bool operator() (const std::string & s1, const std::string & s2) const
+    {
+        return std::lexicographical_compare
+            (s1.begin(), s1.end(),   // source range
+             s2.begin(), s2.end(),   // dest range
+             nocase_compare());  // comparison
+    }
+};
+
+struct ci_lessW : std::binary_function<std::wstring, std::wstring, bool>
+{
+    // case-independent (ci) compare_less binary function
+    struct nocase_compare : public std::binary_function<wchar_t, wchar_t, bool>
+    {
+        bool operator() (const wchar_t& c1, const wchar_t& c2) const
+        {
+            return tolower(c1) < tolower(c2);
+        }
+    };
+    bool operator() (const std::wstring & s1, const std::wstring & s2) const
+    {
+        return std::lexicographical_compare
+            (s1.begin(), s1.end(),   // source range
+             s2.begin(), s2.end(),   // dest range
+             nocase_compare());  // comparison
+    }
+};
 
 class CStringUtils
 {
