@@ -179,6 +179,106 @@ bool CStringUtils::FromHexString( const std::wstring& src, BYTE* pDest )
     return FromHexString(s, pDest);
 }
 
+std::unique_ptr<char[]> CStringUtils::Decrypt(const char * text)
+{
+    DWORD dwLen = 0;
+    if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, NULL, &dwLen, NULL, NULL) == FALSE)
+        return NULL;
+
+    std::unique_ptr<BYTE[]> strIn(new BYTE[dwLen + 1]);
+    if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, NULL, NULL) == FALSE)
+        return NULL;
+
+    DATA_BLOB blobin;
+    blobin.cbData = dwLen;
+    blobin.pbData = strIn.get();
+    LPWSTR descr = nullptr;
+    DATA_BLOB blobout = { 0 };
+    if (CryptUnprotectData(&blobin, &descr, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
+        return NULL;
+    SecureZeroMemory(blobin.pbData, blobin.cbData);
+
+    std::unique_ptr<char[]> result(new char[blobout.cbData + 1]);
+    strncpy_s(result.get(), blobout.cbData + 1, (const char*)blobout.pbData, blobout.cbData);
+    SecureZeroMemory(blobout.pbData, blobout.cbData);
+    LocalFree(blobout.pbData);
+    LocalFree(descr);
+    return result;
+}
+
+std::unique_ptr<wchar_t[]> CStringUtils::Decrypt(const wchar_t * text)
+{
+    DWORD dwLen = 0;
+    if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, NULL, &dwLen, NULL, NULL) == FALSE)
+        return NULL;
+
+    std::unique_ptr<BYTE[]> strIn(new BYTE[dwLen + 1]);
+    if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, NULL, NULL) == FALSE)
+        return NULL;
+
+    DATA_BLOB blobin;
+    blobin.cbData = dwLen;
+    blobin.pbData = strIn.get();
+    LPWSTR descr = nullptr;
+    DATA_BLOB blobout = { 0 };
+    if (CryptUnprotectData(&blobin, &descr, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
+        return NULL;
+    SecureZeroMemory(blobin.pbData, blobin.cbData);
+
+    std::unique_ptr<wchar_t[]> result(new wchar_t[(blobout.cbData) / sizeof(wchar_t) + 1]);
+    wcsncpy_s(result.get(), (blobout.cbData) / sizeof(wchar_t) + 1, (const wchar_t*)blobout.pbData, blobout.cbData / sizeof(wchar_t));
+    SecureZeroMemory(blobout.pbData, blobout.cbData);
+    LocalFree(blobout.pbData);
+    LocalFree(descr);
+    return result;
+}
+
+std::string CStringUtils::Encrypt(const char * text)
+{
+    DATA_BLOB blobin = { 0 };
+    DATA_BLOB blobout = { 0 };
+    std::string result;
+
+    blobin.cbData = (DWORD)strlen(text);
+    blobin.pbData = (BYTE*)(LPCSTR)text;
+    if (CryptProtectData(&blobin, L"TSVNAuth", NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
+        return result;
+    DWORD dwLen = 0;
+    if (CryptBinaryToStringA(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, NULL, &dwLen) == FALSE)
+        return result;
+    std::unique_ptr<char[]> strOut(new char[dwLen + 1]);
+    if (CryptBinaryToStringA(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, strOut.get(), &dwLen) == FALSE)
+        return result;
+    LocalFree(blobout.pbData);
+
+    result = strOut.get();
+
+    return result;
+}
+
+std::wstring CStringUtils::Encrypt(const wchar_t * text)
+{
+    DATA_BLOB blobin = { 0 };
+    DATA_BLOB blobout = { 0 };
+    std::wstring result;
+
+    blobin.cbData = (DWORD)wcslen(text)*sizeof(wchar_t);
+    blobin.pbData = (BYTE*)(LPCWSTR)text;
+    if (CryptProtectData(&blobin, L"TSVNAuth", NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
+        return result;
+    DWORD dwLen = 0;
+    if (CryptBinaryToStringW(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, NULL, &dwLen) == FALSE)
+        return result;
+    std::unique_ptr<wchar_t[]> strOut(new wchar_t[dwLen + 1]);
+    if (CryptBinaryToStringW(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, strOut.get(), &dwLen) == FALSE)
+        return result;
+    LocalFree(blobout.pbData);
+
+    result = strOut.get();
+
+    return result;
+}
+
 std::wstring CStringUtils::Format( const wchar_t* frmt, ... )
 {
     if (frmt != NULL)
