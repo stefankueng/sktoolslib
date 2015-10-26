@@ -352,6 +352,11 @@ public:
 
     static bool FromHexString( const std::wstring& src, BYTE* pDest );
 
+    static std::unique_ptr<char[]>      Decrypt(const char * text);
+    static std::unique_ptr<wchar_t[]>   Decrypt(const wchar_t * text);
+    static std::string                  Encrypt(const char * text);
+    static std::wstring                 Encrypt(const wchar_t * text);
+
     static std::wstring Format(const wchar_t* frmt, ...);
     static std::string Format(const char* frmt, ...);
 
