@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "StringUtils.h"
 #include <vector>
+#include <Wincrypt.h>
+
+#pragma comment(lib, "Crypt32.lib")
+
 
 int strwildcmp(const char *wild, const char *string)
 {
