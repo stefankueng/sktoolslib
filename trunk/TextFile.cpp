@@ -315,17 +315,20 @@ CTextFile::UnicodeType CTextFile::CheckUnicodeType(BYTE * pBuffer, int cb)
     UINT8 * pVal8 = (UINT8 *)(pVal16+1);
     // scan the whole buffer for a 0x0000 sequence
     // if found, we assume a binary file
-    bool bNull = false;
+    int nNull = 0;
+    int nDblNull = 0;
     for (int i=0; i<(cb-2); i=i+2)
     {
         if (0x0000 == *pVal16++)
-            return BINARY;
+            ++nDblNull;
         if (0x00 == *pVal8++)
-            bNull = true;
+            ++nNull;
         if (0x00 == *pVal8++)
-            bNull = true;
+            ++nNull;
     }
-    if ((bNull) && ((cb % 2) == 0))
+    if (nDblNull > 2)   // arbitrary value: allow two double null chars to account for 'broken' text files
+        return BINARY;
+    if ((nNull > 3) && ((cb % 2) == 0)) // arbitrary value: allow three null chars to account for 'broken' text files
         return UNICODE_LE;
     pVal16 = (UINT16 *)pBuffer;
     pVal8 = (UINT8 *)(pVal16+1);
