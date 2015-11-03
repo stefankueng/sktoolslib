@@ -18,9 +18,10 @@
 //
 
 #include "stdafx.h"
-#include <memory>
 #include "TextFile.h"
+#include "PathUtils.h"
 #include "maxpath.h"
+#include <memory>
 
 CTextFile::CTextFile(void) : pFileBuf(NULL)
     , filelen(0)
@@ -466,16 +467,10 @@ std::wstring CTextFile::GetLineString(long lineNumber) const
 
 std::wstring CTextFile::GetFileNameWithoutExtension()
 {
-    size_t pos = filename.find_last_of('.');
-    if (pos != std::string::npos)
-        return filename.substr(0, pos);
-    return filename;
+    return CPathUtils::GetFileNameWithoutExtension(filename);
 }
 
 std::wstring CTextFile::GetFileNameExtension()
 {
-    size_t pos = filename.find_last_of('.');
-    if (pos != std::string::npos)
-        return filename.substr(pos);
-    return L"";
+    return CPathUtils::GetFileExtension(filename);
 }
