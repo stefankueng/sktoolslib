@@ -61,6 +61,8 @@ AeroControlBase::~AeroControlBase()
 bool AeroControlBase::SubclassControl(HWND hControl)
 {
     bool bRet = false;
+    if (!m_dwm.IsDwmCompositionEnabled())
+        return bRet;
     TCHAR szWndClassName[MAX_PATH];
     if (GetClassName(hControl, szWndClassName, _countof(szWndClassName)))
     {

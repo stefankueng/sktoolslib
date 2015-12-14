@@ -352,6 +352,8 @@ void CDialog::OnCompositionChanged()
 
 void CDialog::ExtendFrameIntoClientArea(UINT leftControl, UINT topControl, UINT rightControl, UINT botomControl)
 {
+    if (!m_Dwm.IsDwmCompositionEnabled())
+        return;
     RECT rc, rc2;
     GetWindowRect(*this, &rc);
     GetClientRect(*this, &rc2);
