@@ -20,6 +20,15 @@
 #include "stdafx.h"
 #include "AeroGlass.h"
 
+#include <VersionHelpers.h>
+// SDKs prior to Win10 don't have the IsWindows10OrGreater API in the versionhelpers header, so
+// we define it here just in case:
+#ifndef _WIN32_WINNT_WIN10
+#define _WIN32_WINNT_WIN10 0x0A00
+#define _WIN32_WINNT_WINTHRESHOLD 0x0A00
+#define  IsWindows10OrGreater() (IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 0))
+#endif
+
 
 typedef HRESULT (__stdcall *DWM_EXTEND_FRAME_INTO_CLIENT_AREA)(HWND ,const MARGINS* );
 typedef HRESULT (__stdcall *DWM_IS_COMPOSITION_ENABLED)(BOOL *pfEnabled);
@@ -62,6 +71,8 @@ HRESULT CDwmApiImpl::DwmExtendFrameIntoClientArea(HWND hWnd,const MARGINS* pMarI
     {
         return OLE_E_BLANK;
     }
+    if (!IsDwmCompositionEnabled())
+        return OLE_E_BLANK;
     DWM_EXTEND_FRAME_INTO_CLIENT_AREA pfnDwmExtendFrameIntoClientArea = (DWM_EXTEND_FRAME_INTO_CLIENT_AREA)GetProcAddress(m_hDwmApiLib, "DwmExtendFrameIntoClientArea");
     if(!pfnDwmExtendFrameIntoClientArea)
         return HRESULT_FROM_WIN32(GetLastError());
@@ -76,12 +87,18 @@ BOOL CDwmApiImpl::IsDwmCompositionEnabled(void)
         SetLastError((DWORD)OLE_E_BLANK);
         return FALSE;
     }
+    // disable aero dialogs in high contrast mode and on Windows 10:
+    // in high contrast mode, while DWM is still active, the aero effect is not
+    // in Win 10, the dialog title bar is not rendered transparent, so the dialogs would
+    // look really ugly and not symmetric.
+    HIGHCONTRAST hc = { sizeof(HIGHCONTRAST) };
+    SystemParametersInfo(SPI_GETHIGHCONTRAST, sizeof(HIGHCONTRAST), &hc, FALSE);
     DWM_IS_COMPOSITION_ENABLED pfnDwmIsCompositionEnabled = (DWM_IS_COMPOSITION_ENABLED)GetProcAddress(m_hDwmApiLib, "DwmIsCompositionEnabled");
     if(!pfnDwmIsCompositionEnabled)
         return FALSE;
     BOOL bEnabled = FALSE;
     HRESULT hRes = pfnDwmIsCompositionEnabled(&bEnabled);
-    return SUCCEEDED(hRes) && bEnabled;
+    return SUCCEEDED(hRes) && bEnabled && ((hc.dwFlags & HCF_HIGHCONTRASTON) == 0) && !IsWindows10OrGreater();
 }
 
 HRESULT CDwmApiImpl::DwmEnableComposition(UINT uCompositionAction)
