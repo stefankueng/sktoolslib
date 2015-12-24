@@ -364,7 +364,8 @@ std::wstring CPathUtils::GetModuleDir( HMODULE hMod /*= nullptr*/ )
 
 // Append one path onto another such that "path" + "append" = "path\append"
 // Aims to conform to C++ <filesystem> semantics.
-// e.g: "c:" + "append" = "c:append" not "c:\append"
+// e.g: "c:" + "append" = "c:\append" not "c:append"
+// note: "c:append" breaks many Windows APIs
 std::wstring CPathUtils::Append( const std::wstring& path, const std::wstring& append )
 {
     std::wstring newPath(path);
@@ -373,7 +374,7 @@ std::wstring CPathUtils::Append( const std::wstring& path, const std::wstring& a
 
     if (pathLen == 0)
         newPath += append;
-    else if (IsFolderSeparator(path[pathLen - 1]) || path[pathLen - 1] == DeviceSeparator)
+    else if (IsFolderSeparator(path[pathLen - 1]))
         newPath += append;
     else if (appendLen > 0)
     {
