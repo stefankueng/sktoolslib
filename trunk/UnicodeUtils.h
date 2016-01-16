@@ -29,29 +29,29 @@ public:
     CUnicodeUtils(void);
     ~CUnicodeUtils(void);
 #ifdef UNICODE
-    static std::string StdGetUTF8(const std::wstring& wide);
-    static std::wstring StdGetUnicode(const std::string& multibyte);
-    static std::string StdGetANSI(const std::wstring& wide);
+    static std::string StdGetUTF8(const std::wstring& wide, bool stopAtNull = true);
+    static std::wstring StdGetUnicode(const std::string& multibyte, bool stopAtNull = true);
+    static std::string StdGetANSI(const std::wstring& wide, bool stopAtNull = true);
 #else
-    static std::string StdGetUTF8(std::string str) {return str;}
-    static std::string StdGetUnicode(std::string multibyte) {return multibyte;}
+    static std::string StdGetUTF8(std::string str, bool stopAtNull = true) {return str;}
+    static std::string StdGetUnicode(std::string multibyte, bool stopAtNull = true) {return multibyte;}
 #endif
 };
 
-std::string WideToMultibyte(const std::wstring& wide);
-std::string WideToUTF8(const std::wstring& wide);
-std::wstring MultibyteToWide(const std::string& multibyte);
-std::wstring UTF8ToWide(const std::string& multibyte);
+std::string WideToMultibyte(const std::wstring& wide, bool stopAtNull = true);
+std::string WideToUTF8(const std::wstring& wide, bool stopAtNull = true);
+std::wstring MultibyteToWide(const std::string& multibyte, bool stopAtNull = true);
+std::wstring UTF8ToWide(const std::string& multibyte, bool stopAtNull = true);
 
 /// determines the codepage from a text buffer. Returns -1 for binary
 int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM);
 
 #ifdef UNICODE
-    tstring UTF8ToString(const std::string& string);
-    std::string StringToUTF8(const tstring& string);
+    tstring UTF8ToString(const std::string& string, bool stopAtNull = true);
+    std::string StringToUTF8(const tstring& string, bool stopAtNull = true);
 #else
-    tstring UTF8ToString(const std::string& string);
-    std::string StringToUTF8(const tstring& string);
+    tstring UTF8ToString(const std::string& string, bool stopAtNull = true);
+    std::string StringToUTF8(const tstring& string, bool stopAtNull = true);
 #endif
 
 class UTF8Helper
@@ -93,6 +93,56 @@ public:
             )
             ++charContinuationBytes;
         return startingIndex-charContinuationBytes;
+    }
+
+    inline static void Advance(const char * str, int& pos)
+    {
+        if ((str[pos] & 0xE0) == 0xC0)
+        {
+            // utf8 2-byte sequence
+            pos += 2;
+        }
+        else if ((str[pos] & 0xF0) == 0xE0)
+        {
+            // utf8 3-byte sequence
+            pos += 3;
+        }
+        else if ((str[pos] & 0xF8) == 0xF0)
+        {
+            // utf8 4-byte sequence
+            pos += 4;
+        }
+        else
+            pos++;
+    }
+
+    inline static int UTF16PosFromUTF8Pos(const char * utf8string, int utf8pos)
+    {
+        int utf16pos = 0;
+        const char * pCurrentPos = utf8string;
+        const char * pFinalPos = pCurrentPos + utf8pos;
+        while (pCurrentPos < pFinalPos)
+        {
+            if (((*pCurrentPos) & 0xE0) == 0xC0)
+            {
+                // utf8 2-byte sequence
+                pCurrentPos += 2;
+            }
+            else if (((*pCurrentPos) & 0xF0) == 0xE0)
+            {
+                // utf8 3-byte sequence
+                pCurrentPos += 3;
+            }
+            else if (((*pCurrentPos) & 0xF8) == 0xF0)
+            {
+                // utf8 4-byte sequence
+                pCurrentPos += 4;
+            }
+            else
+                pCurrentPos++;
+            ++utf16pos;
+        }
+        return utf16pos;
     }
 };
 
