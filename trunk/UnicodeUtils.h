@@ -95,7 +95,7 @@ public:
         return startingIndex-charContinuationBytes;
     }
 
-    inline static void Advance(const char * str, int& pos)
+    inline static void Advance(const char * str, size_t& pos)
     {
         if ((str[pos] & 0xE0) == 0xC0)
         {
@@ -116,9 +116,9 @@ public:
             pos++;
     }
 
-    inline static int UTF16PosFromUTF8Pos(const char * utf8string, int utf8pos)
+    inline static size_t UTF16PosFromUTF8Pos(const char * utf8string, size_t utf8pos)
     {
-        int utf16pos = 0;
+        size_t utf16pos = 0;
         const char * pCurrentPos = utf8string;
         const char * pFinalPos = pCurrentPos + utf8pos;
         while (pCurrentPos < pFinalPos)
