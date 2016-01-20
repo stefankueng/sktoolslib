@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013 - Stefan Kueng
+// Copyright (C) 2012-2013, 2016 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -73,7 +73,8 @@ public:
     virtual LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
     virtual bool    PreTranslateMessage(MSG* pMsg);
 
-    operator HWND() {return m_hwnd;}
+    operator HWND() { return m_hwnd; }
+    operator HWND() const { return m_hwnd; }
 protected:
     HINSTANCE       hResource;
     HWND            m_hwnd;
