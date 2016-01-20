@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013 - Stefan Kueng
+// Copyright (C) 2012-2013, 2016 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,10 +19,11 @@
 
 #include "stdafx.h"
 #include "DlgResizer.h"
+#include <type_traits>
 
 CDlgResizer::CDlgResizer(void)
-    : m_hDlg(NULL)
-    , m_wndGrip(NULL)
+    : m_hDlg(nullptr)
+    , m_wndGrip(nullptr)
 {
     m_controls.clear();
     m_dlgRect = {};
@@ -49,15 +50,15 @@ void CDlgResizer::Init(HWND hWndDlg)
     RECT rect = { 0 , 0, m_sizeGrip.cx, m_sizeGrip.cy };
 
     m_wndGrip = ::CreateWindowEx(0, _T("SCROLLBAR"),
-        (LPCTSTR)NULL,
+        (LPCTSTR)nullptr,
         WS_CHILD | WS_CLIPSIBLINGS | SBS_SIZEGRIP,
         rect.left, rect.top,
         rect.right-rect.left,
         rect.bottom-rect.top,
         m_hDlg,
         (HMENU)0,
-        NULL,
-        NULL);
+        nullptr,
+        nullptr);
 
     if (m_wndGrip)
     {
@@ -90,6 +91,11 @@ void CDlgResizer::AddControl(HWND hWndDlg, UINT ctrlId, UINT resizeType)
     ResizeCtrls ctrlInfo;
 
     ctrlInfo.hWnd = GetDlgItem(hWndDlg, ctrlId);
+    if (!ctrlInfo.hWnd)
+    {
+        assert(false);
+        return;
+    }
     ctrlInfo.resizeType = resizeType;
 
     GetWindowRect(ctrlInfo.hWnd, &ctrlInfo.origSize);
@@ -105,13 +111,29 @@ void CDlgResizer::DoResize(int width, int height)
     if (m_controls.empty())
         return;
 
-    InvalidateRect(m_hDlg, NULL, true);
-
+    InvalidateRect(m_hDlg, nullptr, true);
     HDWP hdwp = BeginDeferWindowPos((int)m_controls.size());
+
+    TCHAR className[257]; // WNDCLASS docs say 256 is the longest class name possible.
+    std::vector<std::pair<size_t, DWORD>> savedSelections;
     for (size_t i=0; i<m_controls.size(); ++i)
     {
-        RECT newpos = m_controls[i].origSize;
-        switch (m_controls[i].resizeType)
+        const auto& ctrlInfo = m_controls[i];
+        // Work around a bug in the standard combo box control that causes it to
+        // incorrectly change the selection status after resizing. Without this
+        // fix sometimes the combo box will show selected text after a WM_SIZE
+        // resize type event even if there was no text selected before the size event.
+        // The workaround is to save the current selection state before the resize and
+        // to restore that state after the resize.
+        int status = GetClassName(ctrlInfo.hWnd, className, (int)std::size(className));
+        bool isComboBox = status > 0 &&_tcsicmp(className, _T("COMBOBOX")) == 0;
+        if (isComboBox)
+        {
+            DWORD sel = ComboBox_GetEditSel(ctrlInfo.hWnd);
+            savedSelections.push_back({ i, sel });
+        }
+        RECT newpos = ctrlInfo.origSize;
+        switch (ctrlInfo.resizeType)
         {
         case RESIZER_TOPLEFT:
             break;  // do nothing - the original position is fine
@@ -142,11 +164,19 @@ void CDlgResizer::DoResize(int width, int height)
             newpos.right += (width - m_dlgRect.right);
             break;
         }
-        hdwp = DeferWindowPos(hdwp, m_controls[i].hWnd, NULL, newpos.left, newpos.top,
+        hdwp = DeferWindowPos(hdwp, ctrlInfo.hWnd, nullptr, newpos.left, newpos.top,
             newpos.right-newpos.left, newpos.bottom-newpos.top,
-            SWP_NOZORDER);
+            SWP_NOZORDER | SWP_NOACTIVATE);
     }
     EndDeferWindowPos(hdwp);
+    for (const auto& selInfo : savedSelections)
+    {
+        size_t index = selInfo.first;
+        DWORD sel = selInfo.second;
+        int startSel = LOWORD(sel);
+        int endSel = HIWORD(sel);
+        ComboBox_SetEditSel(m_controls[index].hWnd, startSel, endSel);
+    }
     UpdateGripPos();
 }
 
