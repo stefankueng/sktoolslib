@@ -376,7 +376,7 @@ void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::
             break;  // exit loop
         }
     }
-    str.swap(result);
+    str = std::move(result);
 }
 
 
@@ -398,5 +398,5 @@ void SearchReplace( std::string& str, const std::string& toreplace, const std::s
             break;  // exit loop
         }
     }
-    str.swap(result);
+    str = std::move(result);
 }
