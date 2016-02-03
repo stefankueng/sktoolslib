@@ -25,10 +25,10 @@
 #pragma comment(lib, "Crypt32.lib")
 
 
-int strwildcmp(const char *wild, const char *string)
+int strwildcmp(const char *wild, const char *str)
 {
-    const char *cp = NULL;
-    const char *mp = NULL;
+    const char *cp = nullptr;
+    const char *mp = nullptr;
     while ((*string) && (*wild != '*'))
     {
         if ((*wild != *string) && (*wild != '?'))
@@ -70,8 +70,8 @@ int strwildcmp(const char *wild, const char *string)
 
 int wcswildcmp(const wchar_t *wild, const wchar_t *string)
 {
-    const wchar_t *cp = NULL;
-    const wchar_t *mp = NULL;
+    const wchar_t *cp = nullptr;
+    const wchar_t *mp = nullptr;
     while ((*string) && (*wild != '*'))
     {
         if ((*wild != *string) && (*wild != '?'))
@@ -163,7 +163,7 @@ bool CStringUtils::FromHexString( const std::string& src, BYTE* pDest )
     {
         if ((*it < '0') || (*it > 'f'))
             return false;
-        int d =  DecLookup[*it] << 4;
+        int d = DecLookup[*it] << 4;
         ++it;
         d |= DecLookup[*it];
         *pDest++ = (BYTE)d;
@@ -187,11 +187,11 @@ std::unique_ptr<char[]> CStringUtils::Decrypt(const char * text)
 {
     DWORD dwLen = 0;
     if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, NULL, &dwLen, NULL, NULL) == FALSE)
-        return NULL;
+        return nullptr;
 
     std::unique_ptr<BYTE[]> strIn(new BYTE[dwLen + 1]);
     if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, NULL, NULL) == FALSE)
-        return NULL;
+        return nullptr;
 
     DATA_BLOB blobin;
     blobin.cbData = dwLen;
@@ -199,7 +199,7 @@ std::unique_ptr<char[]> CStringUtils::Decrypt(const char * text)
     LPWSTR descr = nullptr;
     DATA_BLOB blobout = { 0 };
     if (CryptUnprotectData(&blobin, &descr, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
-        return NULL;
+        return nullptr;
     SecureZeroMemory(blobin.pbData, blobin.cbData);
 
     std::unique_ptr<char[]> result(new char[blobout.cbData + 1]);
@@ -214,11 +214,11 @@ std::unique_ptr<wchar_t[]> CStringUtils::Decrypt(const wchar_t * text)
 {
     DWORD dwLen = 0;
     if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, NULL, &dwLen, NULL, NULL) == FALSE)
-        return NULL;
+        return nullptr;
 
     std::unique_ptr<BYTE[]> strIn(new BYTE[dwLen + 1]);
     if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, NULL, NULL) == FALSE)
-        return NULL;
+        return nullptr;
 
     DATA_BLOB blobin;
     blobin.cbData = dwLen;
@@ -226,7 +226,7 @@ std::unique_ptr<wchar_t[]> CStringUtils::Decrypt(const wchar_t * text)
     LPWSTR descr = nullptr;
     DATA_BLOB blobout = { 0 };
     if (CryptUnprotectData(&blobin, &descr, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
-        return NULL;
+        return nullptr;
     SecureZeroMemory(blobin.pbData, blobin.cbData);
 
     std::unique_ptr<wchar_t[]> result(new wchar_t[(blobout.cbData) / sizeof(wchar_t) + 1]);
