@@ -29,16 +29,16 @@ int strwildcmp(const char *wild, const char *str)
 {
     const char *cp = nullptr;
     const char *mp = nullptr;
-    while ((*string) && (*wild != '*'))
+    while ((*str) && (*wild != '*'))
     {
-        if ((*wild != *string) && (*wild != '?'))
+        if ((*wild != *str) && (*wild != '?'))
         {
             return 0;
         }
         wild++;
-        string++;
+        str++;
     }
-    while (*string)
+    while (*str)
     {
         if (*wild == '*')
         {
@@ -47,17 +47,17 @@ int strwildcmp(const char *wild, const char *str)
                 return 1;
             }
             mp = wild;
-            cp = string+1;
+            cp = str +1;
         }
-        else if ((*wild == *string) || (*wild == '?'))
+        else if ((*wild == *str) || (*wild == '?'))
         {
             wild++;
-            string++;
+            str++;
         }
         else
         {
             wild = mp;
-            string = cp++;
+            str = cp++;
         }
     }
 
@@ -68,43 +68,43 @@ int strwildcmp(const char *wild, const char *str)
     return !*wild;
 }
 
-int wcswildcmp(const wchar_t *wild, const wchar_t *string)
+int wcswildcmp(const wchar_t *wild, const wchar_t *str)
 {
     const wchar_t *cp = nullptr;
     const wchar_t *mp = nullptr;
-    while ((*string) && (*wild != '*'))
+    while ((*str) && (*wild != L'*'))
     {
-        if ((*wild != *string) && (*wild != '?'))
+        if ((*wild != *str) && (*wild != L'?'))
         {
             return 0;
         }
         wild++;
-        string++;
+        str++;
     }
-    while (*string)
+    while (*str)
     {
-        if (*wild == '*')
+        if (*wild == L'*')
         {
             if (!*++wild)
             {
                 return 1;
             }
             mp = wild;
-            cp = string+1;
+            cp = str +1;
         }
-        else if ((*wild == *string) || (*wild == '?'))
+        else if ((*wild == *str) || (*wild == L'?'))
         {
             wild++;
-            string++;
+            str++;
         }
         else
         {
             wild = mp;
-            string = cp++;
+            str = cp++;
         }
     }
 
-    while (*wild == '*')
+    while (*wild == L'*')
     {
         wild++;
     }
