@@ -19,7 +19,8 @@
 
 #include "stdafx.h"
 #include "StringUtils.h"
-#include <vector>
+#include "OnOutOfScope.h"
+
 #include <Wincrypt.h>
 
 #pragma comment(lib, "Crypt32.lib")
@@ -338,44 +339,26 @@ bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd)
 {
     if (OpenClipboard(hOwningWnd))
     {
+        OnOutOfScope(
+            CloseClipboard();
+        );
         EmptyClipboard();
-        HGLOBAL hClipboardData;
+        HGLOBAL hClipboardData = nullptr;
         size_t sLen = _tcslen(sClipdata);
         hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen+1)*sizeof(wchar_t));
         if (hClipboardData)
         {
-            wchar_t * pchData;
-            pchData = (wchar_t*)GlobalLock(hClipboardData);
+            wchar_t* pchData = (wchar_t*)GlobalLock(hClipboardData);
             if (pchData)
             {
                 _tcscpy_s(pchData, sLen+1, sClipdata);
                 if (GlobalUnlock(hClipboardData))
                 {
-                    if (SetClipboardData(CF_UNICODETEXT, hClipboardData) == NULL)
-                    {
-                        CloseClipboard();
+                    if (SetClipboardData(CF_UNICODETEXT, hClipboardData) == nullptr)
                         return true;
-                    }
-                }
-                else
-                {
-                    CloseClipboard();
-                    return false;
                 }
             }
-            else
-            {
-                CloseClipboard();
-                return false;
-            }
         }
-        else
-        {
-            CloseClipboard();
-            return false;
-        }
-        CloseClipboard();
-        return false;
     }
     return false;
 }
