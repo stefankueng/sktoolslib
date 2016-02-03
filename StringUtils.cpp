@@ -286,54 +286,49 @@ std::wstring CStringUtils::Encrypt(const wchar_t * text)
 
 std::wstring CStringUtils::Format( const wchar_t* frmt, ... )
 {
-    if (frmt != NULL)
+    std::wstring buffer;
+    if (frmt != nullptr)
     {
         va_list marker;
 
-        // Initialize variable arguments
         va_start(marker, frmt);
 
-        // Get formatted string length adding one for the NULL
-        size_t len = _vscwprintf(frmt, marker) + 1;
+        // Get formatted string length adding one for the NUL
+        auto len = _vscwprintf(frmt, marker);
+        if (len > 0)
+        {
+            buffer.resize(len + 1);
+            _vsnwprintf_s(&buffer[0], buffer.size(), len, frmt, marker);
+            buffer.resize(len);
+        }
 
-        // Create a char vector to hold the formatted string.
-        std::vector<wchar_t> buffer(len, L'\0');
-        _vsnwprintf_s(&buffer[0], buffer.size(), len, frmt, marker);
-
-        // Reset variable arguments
         va_end(marker);
-
-        return &buffer[0];
     }
-
-    return L"";
+    return buffer;
 }
 
 std::string CStringUtils::Format( const char* frmt, ... )
 {
-    if (frmt != NULL)
+    std::string buffer;
+    if (frmt != nullptr)
     {
         va_list marker;
 
-        // Initialize variable arguments
         va_start(marker, frmt);
 
-        // Get formatted string length adding one for the NULL
-        size_t len = _vscprintf(frmt, marker) + 1;
+        // Get formatted string length adding one for the NUL
+        auto len = _vscprintf(frmt, marker);
+        if (len > 0)
+        {
+            buffer.resize(len + 1);
+            _vsnprintf_s(&buffer[0], buffer.size(), len, frmt, marker);
+            buffer.resize(len);
+        }
 
-        // Create a char vector to hold the formatted string.
-        std::vector<char> buffer(len, L'\0');
-        _vsnprintf_s(&buffer[0], buffer.size(), len, frmt, marker);
-
-        // Reset variable arguments
         va_end(marker);
-
-        return &buffer[0];
     }
-
-    return "";
+    return buffer;
 }
-
 
 bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd)
 {
