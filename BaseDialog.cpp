@@ -112,6 +112,46 @@ void CDialog::ShowModeless( HINSTANCE hInstance, int resID, HWND hWndParent )
     SetFocus(m_hwnd);
 }
 
+void CDialog::ShowModeless(HINSTANCE hInstance, int resID, HWND hWndParent, UINT idAccel)
+{
+    m_bPseudoModal = true;
+    m_bPseudoEnded = false;
+
+    if (m_hwnd == NULL)
+    {
+        hResource = hInstance;
+        m_hwnd = CreateDialogParam(hInstance, MAKEINTRESOURCE(resID), hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
+    }
+    ShowWindow(m_hwnd, SW_SHOW);
+    SetFocus(m_hwnd);
+
+    // Main message loop:
+    MSG msg = { 0 };
+    HACCEL hAccelTable = LoadAccelerators(hResource, MAKEINTRESOURCE(idAccel));
+    BOOL bRet = TRUE;
+    while (!m_bPseudoEnded && ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0))
+    {
+        if (bRet == -1)
+        {
+            // handle the error and possibly exit
+            break;
+        }
+        else
+        {
+            if (!PreTranslateMessage(&msg))
+            {
+                if (!TranslateAccelerator(m_hwnd, hAccelTable, &msg) &&
+                    !::IsDialogMessage(m_hwnd, &msg)
+                    )
+                {
+                    TranslateMessage(&msg);
+                    DispatchMessage(&msg);
+                }
+            }
+        }
+    }
+}
+
 void CDialog::InitDialog(HWND hwndDlg, UINT iconID, bool bPosition/* = true*/)
 {
     HWND hwndOwner;
