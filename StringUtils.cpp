@@ -112,7 +112,7 @@ int wcswildcmp(const wchar_t *wild, const wchar_t *str)
     return !*wild;
 }
 
-BYTE HexLookup[513] = {
+static const BYTE HexLookup[513] = {
     "000102030405060708090a0b0c0d0e0f"
     "101112131415161718191a1b1c1d1e1f"
     "202122232425262728292a2b2c2d2e2f"
@@ -130,7 +130,7 @@ BYTE HexLookup[513] = {
     "e0e1e2e3e4e5e6e7e8e9eaebecedeeef"
     "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"
 };
-BYTE DecLookup[] = {
+static const BYTE DecLookup[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // gap before first hex digit
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
