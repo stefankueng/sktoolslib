@@ -34,12 +34,13 @@ private:
     void obtainMessage(DWORD errorCode);
 
 public:
-    CFormatMessageWrapper() : buffer(0), result(0) { obtainMessage(); }
-    CFormatMessageWrapper(DWORD lastError) : buffer(0), result(0) { obtainMessage(lastError); }
+    CFormatMessageWrapper() : buffer(nullptr), result(0) { obtainMessage(); }
+    CFormatMessageWrapper(DWORD lastError) : buffer(nullptr), result(0) { obtainMessage(lastError); }
     ~CFormatMessageWrapper() { release(); }
-    operator LPCTSTR() { return buffer; }
-    operator bool() { return result != 0; }
-    bool operator!() { return result == 0; }
+    operator LPCTSTR() const { return buffer; }
+    operator bool() const { return result != 0; }
+    bool operator!() const { return result == 0; }
+    LPCTSTR c_str() const { return buffer; }
 };
 
 inline void CFormatMessageWrapper::obtainMessage(DWORD errorCode)
