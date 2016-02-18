@@ -52,7 +52,15 @@ inline bool IsFolderSeparator(wchar_t c)
     return (c == ThisOSPathSeparator || c == OtherOSPathSeparator);
 }
 
+struct task_mem_deleter
+{
+    void operator()(wchar_t buf[])
+    {
+        if (buf != nullptr)
+            CoTaskMemFree(buf);
+    }
 };
+}
 
 std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
 {
@@ -461,7 +469,8 @@ std::wstring CPathUtils::GetAppDataPath(HMODULE hMod)
     PWSTR path = nullptr;
     if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, nullptr, &path) == S_OK)
     {
-        std::wstring sPath = path;
+        std::unique_ptr<wchar_t[], task_mem_deleter> path_ptr(path);
+        std::wstring sPath = path_ptr.get();
         sPath += L"\\";
         sPath += CPathUtils::GetFileNameWithoutExtension(CPathUtils::GetModulePath(hMod));
         CreateDirectory(sPath.c_str(), nullptr);
@@ -475,7 +484,7 @@ std::wstring CPathUtils::GetCWD()
     // Getting the CWD is a little more complicated than it seems.
     // The directory can change between asking for the name size
     // and obtaining the name value. So we need to handle that.
-    // We also need to handle any eror the first or second time we ask.
+    // We also need to handle any error the first or second time we ask.
 
     for (;;)
     {
