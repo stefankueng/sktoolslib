@@ -19,7 +19,12 @@
 
 #include "stdafx.h"
 #include "DlgResizer.h"
+#include <cassert>
 #include <type_traits>
+
+#ifndef ComboBox_GetEditSel
+#include <windowsx.h>
+#endif
 
 CDlgResizer::CDlgResizer(void)
     : m_hDlg(nullptr)
