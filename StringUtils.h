@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013 - Stefan Kueng
+// Copyright (C) 2012-2016 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -59,6 +59,9 @@ int wcswildcmp(const wchar_t * wild, const wchar_t * string);
 bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd);
 void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::wstring& replacewith);
 void SearchReplace(std::string& str, const std::string& toreplace, const std::string& replacewith);
+
+void SearchRemoveAll(std::string& str, const std::string& toremove);
+void SearchRemoveAll(std::wstring& str, const std::wstring& toremove);
 
 // append = true is a bad default, but added for compatibility.
 // if compatibility isn't needed, append should default to false.
@@ -370,6 +373,48 @@ public:
         std::wstring ls(s);
         std::transform(ls.begin(), ls.end(), ls.begin(), ::tolower);
         return ls;
+    }
+
+    static inline std::string to_lower(const std::string& s)
+    {
+        std::string ls(s);
+        std::transform(ls.begin(), ls.end(), ls.begin(), ::tolower);
+        return ls;
+    }
+
+    template<typename T, typename T2> static void TrimLeading(T& s, const T2& vals)
+    {
+        auto it = s.begin();
+        while (it != s.end())
+        {
+            auto whereAt = std::find(vals.begin(), vals.end(), *it);
+            if (whereAt == vals.end())
+                break;
+            ++it;
+            if (it == s.end())
+                break;
+        }
+        s.erase(s.begin(), it);
+    }
+
+    template<typename T, typename T2> static void TrimTrailing(T& s, const T2& vals)
+    {
+        while (!s.empty())
+        {
+            auto whereAt = std::find(vals.begin(), vals.end(), s.back());
+            if (whereAt == vals.end())
+                break;
+            s.pop_back();
+        }
+    }
+
+    // Trim container T of values in T2.
+    // T1 can at least be a string, wstring, vector, 
+    // T2 can be simiar but initializer_list is the typical type used.
+    template<typename T, typename T2> static void TrimLeadingAndTrailing(T& s, const T2& vals)
+    {
+        TrimLeading(s, vals);
+        TrimTrailing(s, vals);
     }
 
 };
