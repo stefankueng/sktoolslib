@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013 - Stefan Kueng
+// Copyright (C) 2012-2016 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -362,7 +362,7 @@ void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::
 {
     std::wstring result;
     std::wstring::size_type pos = 0;
-    for (;;)    // while (true)
+    for (;;)
     {
         std::wstring::size_type next = str.find(toreplace, pos);
         result.append(str, pos, next-pos);
@@ -384,7 +384,7 @@ void SearchReplace( std::string& str, const std::string& toreplace, const std::s
 {
     std::string result;
     std::string::size_type pos = 0;
-    for (;;)    // while (true)
+    for (;;)
     {
         std::string::size_type next = str.find(toreplace, pos);
         result.append(str, pos, next-pos);
@@ -399,4 +399,30 @@ void SearchReplace( std::string& str, const std::string& toreplace, const std::s
         }
     }
     str = std::move(result);
+}
+
+void SearchRemoveAll(std::string& str, const std::string& toremove)
+{
+    std::string::size_type pos = 0;
+    for (;;)
+    {
+        auto nextpos = str.find(toremove, pos);
+        if (nextpos == std::string::npos)
+            break;
+        str.erase(nextpos, toremove.length());
+        pos = nextpos;
+    }
+}
+
+void SearchRemoveAll(std::wstring& str, const std::wstring& toremove)
+{
+    std::wstring::size_type pos = 0;
+    for (;;)
+    {
+        auto nextpos = str.find(toremove, pos);
+        if (nextpos == std::wstring::npos)
+            break;
+        str.erase(nextpos, toremove.length());
+        pos = nextpos;
+    }
 }
