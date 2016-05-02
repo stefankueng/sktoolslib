@@ -659,6 +659,10 @@ bool CPathUtils::PathIsChild(const std::wstring& parent, const std::wstring& chi
     return true;
 }
 
+bool CPathUtils::IsPathRelative(const std::wstring& path)
+{
+    return PathIsRelative(path.c_str()) ? true : false;
+}
 
 // poor mans code tests
 #ifdef _DEBUG

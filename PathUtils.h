@@ -54,4 +54,5 @@ public:
     static std::wstring RemoveLongExtension( const std::wstring& path );
     static bool         Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder);
     static bool         IsKnownExtension(const std::wstring& ext);
+    static bool         IsPathRelative(const std::wstring& path);
 };
