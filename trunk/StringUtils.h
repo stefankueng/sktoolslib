@@ -63,8 +63,7 @@ void SearchReplace(std::string& str, const std::string& toreplace, const std::st
 void SearchRemoveAll(std::string& str, const std::string& toremove);
 void SearchRemoveAll(std::wstring& str, const std::wstring& toremove);
 
-// append = true is a bad default, but added for compatibility.
-// if compatibility isn't needed, append should default to false.
+// append = true as the default: a default value should never lose data!
 template <typename Container>
 void stringtok(Container &container, const std::wstring  &in, bool trim,
     const wchar_t * const delimiters = L"|", bool append = true)
@@ -135,8 +134,7 @@ void stringtokset(Container &container, const std::wstring  &in, bool trim,
     }
 }
 
-// append = true is a bad default, but added for compatibility.
-// if compatibility isn't needed, append should default to false.
+// append = true as the default: a default value should never lose data!
 template <typename Container>
 void stringtok(Container &container, const std::string  &in, bool trim,
                const char * const delimiters = "|", bool append = true)
