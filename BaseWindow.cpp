@@ -129,15 +129,15 @@ bool CWindow::Create(DWORD dwStyles, HWND hParent /* = NULL */, RECT* rect /* = 
     return CreateEx(0, dwStyles, hParent, rect);
 }
 
-bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = NULL */, RECT* rect /* = NULL */, LPCTSTR classname /* = NULL */)
+bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = NULL */, RECT* rect /* = NULL */, LPCTSTR classname /* = NULL */, HMENU hMenu /* = NULL */)
 {
     // send the this pointer as the window creation parameter
     if (rect == NULL)
-        m_hwnd = CreateWindowEx(dwExStyles, classname ? classname : sClassName.c_str(), sWindowTitle.c_str(), dwStyles, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hParent, NULL, hResource, (void *)this);
+        m_hwnd = CreateWindowEx(dwExStyles, classname ? classname : sClassName.c_str(), sWindowTitle.c_str(), dwStyles, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hParent, hMenu, hResource, (void *)this);
     else
     {
         m_hwnd = CreateWindowEx(dwExStyles, classname ? classname : sClassName.c_str(), sWindowTitle.c_str(), dwStyles, rect->left, rect->top,
-            rect->right - rect->left, rect->bottom - rect->top, hParent, NULL, hResource,
+            rect->right - rect->left, rect->bottom - rect->top, hParent, hMenu, hResource,
             (void *)this);
     }
     m_hParent = hParent;
