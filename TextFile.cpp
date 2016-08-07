@@ -83,7 +83,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     {
         if (retrycounter)
             Sleep(20);
-        hFile = CreateFile(pathbuf.get(), GENERIC_READ, FILE_SHARE_READ,
+        hFile = CreateFile(pathbuf.get(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
             NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
         retrycounter++;
     } while (hFile == INVALID_HANDLE_VALUE && retrycounter < 5);
