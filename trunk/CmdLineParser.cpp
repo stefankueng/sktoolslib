@@ -27,6 +27,28 @@ const TCHAR CCmdLineParser::m_sQuotes[] = _T("\"");
 const TCHAR CCmdLineParser::m_sValueSep[] = _T(" :"); // don't forget space!!
 
 
+static void SearchReplace(stdstring& str, const stdstring& toreplace, const stdstring& replacewith)
+{
+    stdstring result;
+    stdstring::size_type pos = 0;
+    for (;;)
+    {
+        stdstring::size_type next = str.find(toreplace, pos);
+        result.append(str, pos, next - pos);
+        if (next != stdstring::npos)
+        {
+            result.append(replacewith);
+            pos = next + toreplace.size();
+        }
+        else
+        {
+            break;  // exit loop
+        }
+    }
+    str = std::move(result);
+}
+
+
 CCmdLineParser::CCmdLineParser(LPCTSTR sCmdLine)
 {
     if (sCmdLine)
@@ -97,22 +119,37 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
             sVal = _tcsinc(sVal);
 
             LPCTSTR sQuote = _tcspbrk(sVal, m_sQuotes), sEndQuote(NULL);
+            bool hasEscapedQuotes = false;
             if (sQuote == sVal)
             {
                 // string with quotes (defined in m_sQuotes, e.g. '")
                 sQuote = _tcsinc(sVal);
                 sEndQuote = _tcspbrk(sQuote, m_sQuotes);
+                while (sEndQuote && sEndQuote[-1] == '\\')
+                {
+                    hasEscapedQuotes = true;
+                    sEndQuote = _tcsinc(sEndQuote);
+                    sEndQuote = _tcspbrk(sEndQuote, m_sQuotes);
+                }
             }
             else
             {
                 sQuote = sVal;
                 sEndQuote = _tcschr(sQuote, _T(' '));
+                while (sEndQuote && sEndQuote[-1] == '\\')
+                {
+                    hasEscapedQuotes = true;
+                    sEndQuote = _tcsinc(sEndQuote);
+                    sEndQuote = _tcspbrk(sEndQuote, m_sQuotes);
+                }
             }
 
             if (sEndQuote == NULL)
             {
                 // no end quotes or terminating space, take the rest of the string to its end
                 stdstring csVal(sQuote);
+                if (hasEscapedQuotes)
+                    SearchReplace(csVal, _T("\\\""), _T("\""));
                 if (!Key.empty())
                 {
                     m_valueMap.insert(CValsMap::value_type(Key, csVal));
@@ -125,6 +162,8 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
                 if (!Key.empty())
                 {
                     stdstring csVal(sQuote, (int)(sEndQuote - sQuote));
+                    if (hasEscapedQuotes)
+                        SearchReplace(csVal, _T("\\\""), _T("\""));
                     m_valueMap.insert(CValsMap::value_type(Key, csVal));
                 }
                 sCurrent = _tcsinc(sEndQuote);
