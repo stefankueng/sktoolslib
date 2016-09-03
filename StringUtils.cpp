@@ -190,7 +190,7 @@ std::unique_ptr<char[]> CStringUtils::Decrypt(const char * text)
     if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, NULL, &dwLen, NULL, NULL) == FALSE)
         return nullptr;
 
-    std::unique_ptr<BYTE[]> strIn(new BYTE[dwLen + 1]);
+    auto strIn = std::make_unique<BYTE[]>(dwLen + 1);
     if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, NULL, NULL) == FALSE)
         return nullptr;
 
@@ -203,7 +203,7 @@ std::unique_ptr<char[]> CStringUtils::Decrypt(const char * text)
         return nullptr;
     SecureZeroMemory(blobin.pbData, blobin.cbData);
 
-    std::unique_ptr<char[]> result(new char[blobout.cbData + 1]);
+    auto result = std::make_unique<char[]>(blobout.cbData + 1);
     strncpy_s(result.get(), blobout.cbData + 1, (const char*)blobout.pbData, blobout.cbData);
     SecureZeroMemory(blobout.pbData, blobout.cbData);
     LocalFree(blobout.pbData);
@@ -217,7 +217,7 @@ std::unique_ptr<wchar_t[]> CStringUtils::Decrypt(const wchar_t * text)
     if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, NULL, &dwLen, NULL, NULL) == FALSE)
         return nullptr;
 
-    std::unique_ptr<BYTE[]> strIn(new BYTE[dwLen + 1]);
+    auto strIn = std::make_unique<BYTE[]>(dwLen + 1);
     if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, NULL, NULL) == FALSE)
         return nullptr;
 
@@ -230,7 +230,7 @@ std::unique_ptr<wchar_t[]> CStringUtils::Decrypt(const wchar_t * text)
         return nullptr;
     SecureZeroMemory(blobin.pbData, blobin.cbData);
 
-    std::unique_ptr<wchar_t[]> result(new wchar_t[(blobout.cbData) / sizeof(wchar_t) + 1]);
+    auto result = std::make_unique<wchar_t[]>((blobout.cbData) / sizeof(wchar_t) + 1);
     wcsncpy_s(result.get(), (blobout.cbData) / sizeof(wchar_t) + 1, (const wchar_t*)blobout.pbData, blobout.cbData / sizeof(wchar_t));
     SecureZeroMemory(blobout.pbData, blobout.cbData);
     LocalFree(blobout.pbData);
@@ -251,7 +251,7 @@ std::string CStringUtils::Encrypt(const char * text)
     DWORD dwLen = 0;
     if (CryptBinaryToStringA(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, NULL, &dwLen) == FALSE)
         return result;
-    std::unique_ptr<char[]> strOut(new char[dwLen + 1]);
+    auto strOut = std::make_unique<char[]>(dwLen + 1);
     if (CryptBinaryToStringA(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, strOut.get(), &dwLen) == FALSE)
         return result;
     LocalFree(blobout.pbData);
@@ -274,7 +274,7 @@ std::wstring CStringUtils::Encrypt(const wchar_t * text)
     DWORD dwLen = 0;
     if (CryptBinaryToStringW(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, NULL, &dwLen) == FALSE)
         return result;
-    std::unique_ptr<wchar_t[]> strOut(new wchar_t[dwLen + 1]);
+    auto strOut = std::make_unique<wchar_t[]>(dwLen + 1);
     if (CryptBinaryToStringW(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, strOut.get(), &dwLen) == FALSE)
         return result;
     LocalFree(blobout.pbData);

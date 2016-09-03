@@ -66,7 +66,7 @@ bool CLanguage::LoadFile( const std::wstring& path )
     {
         return false;
     }
-    std::unique_ptr<TCHAR[]> line(new TCHAR[2*MAX_STRING_LENGTH]);
+    auto line = std::make_unique<TCHAR[]>(2*MAX_STRING_LENGTH);
     std::vector<std::wstring> entry;
     do
     {
@@ -245,7 +245,7 @@ BOOL CALLBACK CLanguage::TranslateWindowProc( HWND hwnd, LPARAM lParam )
 {
     std::map<std::wstring,std::wstring> * pLangMap = (std::map<std::wstring,std::wstring> *)lParam;
     int length = GetWindowTextLength(hwnd);
-    std::unique_ptr<wchar_t[]> text(new wchar_t[length+1]);
+    auto text = std::make_unique<wchar_t[]>(length+1);
     std::wstring translatedString;
     if (GetWindowText(hwnd, text.get(), length+1))
     {
@@ -264,7 +264,7 @@ BOOL CALLBACK CLanguage::TranslateWindowProc( HWND hwnd, LPARAM lParam )
             for (int i = 0; i < nCount; ++i)
             {
                 length = (int)SendMessage(hwnd, CB_GETLBTEXTLEN, i, 0);
-                std::unique_ptr<wchar_t[]> buf(new wchar_t[length+1]);
+                auto buf = std::make_unique<wchar_t[]>(length+1);
                 SendMessage(hwnd, CB_GETLBTEXT, i, (LPARAM)buf.get());
                 std::wstring sTranslated = GetTranslatedString(buf.get(), pLangMap);
                 SendMessage(hwnd, CB_INSERTSTRING, i, (LPARAM)sTranslated.c_str());
@@ -312,7 +312,7 @@ BOOL CALLBACK CLanguage::TranslateWindowProc( HWND hwnd, LPARAM lParam )
         {
             // translate column headers in list and other controls
             int nCount = Header_GetItemCount(hwnd);
-            std::unique_ptr<wchar_t[]> buf(new wchar_t[270]);
+            auto buf = std::make_unique<wchar_t[]>(270);
             for (int i = 0; i < nCount; ++i)
             {
                 HDITEM hdi = {0};

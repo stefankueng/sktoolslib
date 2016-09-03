@@ -62,7 +62,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     if (pFileBuf)
         delete [] pFileBuf;
     pFileBuf = NULL;
-    std::unique_ptr<TCHAR[]> pathbuf(new TCHAR[MAX_PATH_NEW]);
+    auto pathbuf = std::make_unique<TCHAR[]>(MAX_PATH_NEW);
     HANDLE hFile = INVALID_HANDLE_VALUE;
     int retrycounter = 0;
 
@@ -116,7 +116,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     // to convert first to do a proper search with.
     if (bytestoread < lint.LowPart)
     {
-        std::unique_ptr<BYTE[]> tempfilebuf(new BYTE[bytestoread+1]);
+        auto tempfilebuf = std::make_unique<BYTE[]>(bytestoread+1);
         if (!ReadFile(hFile, tempfilebuf.get(), bytestoread, &bytesread, NULL))
         {
             CloseHandle(hFile);

@@ -829,19 +829,16 @@ LRESULT AeroControlBase::ProgressbarWindowProc(HWND hWnd, UINT uMsg, WPARAM wPar
 
 void AeroControlBase::FillRect(LPRECT prc, HDC hdcPaint, Color clr) const
 {
-    SolidBrush *pBrush = new SolidBrush(clr);
+    auto pBrush = std::make_unique<SolidBrush>(clr);
 
     if (pBrush)
     {
-        Graphics* myGraphics = new Graphics(hdcPaint);
+        auto myGraphics = std::make_unique<Graphics>(hdcPaint);
         if (myGraphics)
         {
-            myGraphics->FillRectangle(pBrush, prc->left, prc->top,
+            myGraphics->FillRectangle(pBrush.get(), prc->left, prc->top,
                 prc->right - 1 - prc->left, prc->bottom - 1 - prc->top);
-
-            delete myGraphics;
         }
-        delete pBrush;
     }
 }
 
@@ -940,9 +937,9 @@ int AeroControlBase::GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFoc
 
 void AeroControlBase::DrawRect(LPRECT prc, HDC hdcPaint, DashStyle dashStyle, Color clr, REAL width) const
 {
-    std::unique_ptr<Pen> myPen(new Pen(clr, width));
+    auto myPen = std::make_unique<Pen>(clr, width);
     myPen->SetDashStyle(dashStyle);
-    std::unique_ptr<Graphics> myGraphics(new Graphics(hdcPaint));
+    auto myGraphics = std::make_unique<Graphics>(hdcPaint);
 
     myGraphics->DrawRectangle(myPen.get(), prc->left, prc->top,
         prc->right - 1 - prc->left, prc->bottom - 1 - prc->top);
