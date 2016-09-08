@@ -207,14 +207,6 @@ int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM, bool& inconclusive)
     const UINT32 * const pVal32 = (UINT32 *)pBuffer;
     const UINT16 * const pVal16 = (UINT16 *)pBuffer;
     const UINT8 * const pVal8 = (UINT8 *)pBuffer;
-    // scan the whole buffer for a 0x00000000 sequence
-    // if found, we assume a binary file
-    int nDwords = cb / 4;
-    for (int i = 0; i < nDwords; ++i)
-    {
-        if (0x00000000 == pVal32[i])
-            return -1;
-    }
     if (cb >= 4)
     {
         if (*pVal32 == 0x0000FEFF)
@@ -227,6 +219,14 @@ int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM, bool& inconclusive)
             hasBOM = true;
             return 12001; // UTF32_BE
         }
+    }
+    // scan the whole buffer for a 0x00000000 sequence
+    // if found, we assume a binary file
+    int nDwords = cb / 4;
+    for (int i = 0; i < nDwords; ++i)
+    {
+        if (0x00000000 == pVal32[i])
+            return -1;
     }
     if (*pVal16 == 0xFEFF)
     {
