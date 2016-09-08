@@ -203,7 +203,10 @@ int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM, bool& inconclusive)
     inconclusive = false;
     hasBOM = false;
     if (cb < 2)
+    {
+        inconclusive = true;
         return CP_ACP;
+    }
     const UINT32 * const pVal32 = (UINT32 *)pBuffer;
     const UINT16 * const pVal16 = (UINT16 *)pBuffer;
     const UINT8 * const pVal8 = (UINT8 *)pBuffer;
@@ -239,7 +242,10 @@ int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM, bool& inconclusive)
         return 1201; // UTF16_BE
     }
     if (cb < 3)
+    {
+        inconclusive = true;
         return CP_ACP;
+    }
     if (*pVal16 == 0xBBEF)
     {
         if (pVal8[2] == 0xBF)
