@@ -44,7 +44,7 @@ std::wstring MultibyteToWide(const std::string& multibyte, bool stopAtNull = tru
 std::wstring UTF8ToWide(const std::string& multibyte, bool stopAtNull = true);
 
 /// determines the codepage from a text buffer. Returns -1 for binary
-int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM);
+int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM, bool& inconclusive);
 
 #ifdef UNICODE
     tstring UTF8ToString(const std::string& string, bool stopAtNull = true);

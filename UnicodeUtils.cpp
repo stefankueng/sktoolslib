@@ -198,8 +198,9 @@ int LoadStringEx(HINSTANCE hInstance, UINT uID, LPTSTR lpBuffer, int nBufferMax,
     return ret;
 }
 
-int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM)
+int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM, bool& inconclusive)
 {
+    inconclusive = false;
     hasBOM = false;
     if (cb < 2)
         return CP_ACP;
@@ -315,6 +316,8 @@ int GetCodepageFromBuf(LPVOID pBuffer, int cb, bool& hasBOM)
     }
     if (bNonANSI && nNeedData == 0)
         return CP_UTF8;
+
+    inconclusive = true;
 
     return CP_ACP;
 }
