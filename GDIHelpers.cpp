@@ -74,7 +74,7 @@ void GDIHelpers::FillSolidRect(HDC hDC, int left, int top, int right, int bottom
     ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
 }
 
-void GDIHelpers::FillSolidRect(HDC hDC, RECT * rc, COLORREF clr)
+void GDIHelpers::FillSolidRect(HDC hDC, const RECT* rc, COLORREF clr)
 {
     ::SetBkColor(hDC, clr);
     ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, rc, nullptr, 0, nullptr);

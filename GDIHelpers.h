@@ -31,6 +31,6 @@ public:
     static COLORREF Lighter(COLORREF crBase, float fFactor);
 
     static void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COLORREF clr);
-    static void FillSolidRect(HDC hDC, RECT * rc, COLORREF clr);
+    static void FillSolidRect(HDC hDC, const RECT* rc, COLORREF clr);
     static Gdiplus::ARGB MakeARGB(IN BYTE a, IN BYTE r, IN BYTE g, IN BYTE b);
 };
