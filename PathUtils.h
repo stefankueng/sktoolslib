@@ -55,4 +55,5 @@ public:
     static bool         Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder);
     static bool         IsKnownExtension(const std::wstring& ext);
     static bool         IsPathRelative(const std::wstring& path);
+    static bool         CreateRecursiveDirectory(const std::wstring& path);
 };
