@@ -664,6 +664,34 @@ bool CPathUtils::IsPathRelative(const std::wstring& path)
     return PathIsRelative(path.c_str()) ? true : false;
 }
 
+bool CPathUtils::CreateRecursiveDirectory(const std::wstring& path)
+{
+    if (path.empty() || PathIsRoot(path.c_str()))
+        return false;
+
+    auto ret = CreateDirectory(path.c_str(), NULL);
+    if (ret == FALSE)
+    {
+        if (GetLastError() == ERROR_PATH_NOT_FOUND)
+        {
+            if (CPathUtils::CreateRecursiveDirectory(CPathUtils::GetParentDirectory(path)))
+            {
+                // some file systems (e.g. webdav mounted drives) take time until
+                // a dir is properly created. So we try a few times with a wait in between
+                // to create the sub dir after just having created the parent dir.
+                int retrycount = 5;
+                do
+                {
+                    ret = CreateDirectory(path.c_str(), NULL);
+                    if (ret == FALSE)
+                        Sleep(50);
+                } while (retrycount-- && (ret == FALSE));
+            }
+        }
+    }
+    return ret != FALSE;
+}
+
 // poor mans code tests
 #ifdef _DEBUG
 static class CPathTests
