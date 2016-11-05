@@ -84,7 +84,6 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
     else if (PathCanonicalize(pathbufcanonicalized, path.c_str()))
     {
         ret = ::GetLongPathName(pathbufcanonicalized, nullptr, 0);
-        // TODO REIVEW: Why + 2 and not + 1? A few other instances of this exist too.
         auto pathbuf = std::make_unique<TCHAR[]>(ret+2);
         ret = ::GetLongPathName(pathbufcanonicalized, pathbuf.get(), ret+1);
         // GetFullPathName() sometimes returns the full path with the wrong
