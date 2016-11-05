@@ -67,7 +67,7 @@ public:
     // number of continuation bytes for a given valid first character (0 for single byte characters)
     inline static int  continuationBytes(UCHAR c)
     {
-        static const char len[] = { 1,1,2,3 };
+        static constexpr char len[] = { 1,1,2,3 };
         return (c < 0xC0) ? 0 : len[(c & 0x30) >>  4];
     }
 
