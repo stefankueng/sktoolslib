@@ -24,7 +24,7 @@
 
 static BOOL sse2supported = ::IsProcessorFeaturePresent( PF_XMMI64_INSTRUCTIONS_AVAILABLE );
 
-static const char iri_escape_chars[256] = {
+static constexpr char iri_escape_chars[256] = {
     1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1,
@@ -70,7 +70,7 @@ const char uri_autoescape_chars[256] = {
     0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,
 };
 
-static const char uri_char_validity[256] = {
+static constexpr char uri_char_validity[256] = {
     0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,
     0, 1, 0, 0, 1, 0, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,
@@ -134,7 +134,7 @@ char* CEscapeUtils::Unescape( char * psz )
     char * pszSource = psz;
     char * pszDest = psz;
 
-    static const char szHex[] = "0123456789ABCDEF";
+    static constexpr char szHex[] = "0123456789ABCDEF";
 
     // Unescape special characters. The number of characters
     // in the *pszDest is assumed to be <= the number of characters
