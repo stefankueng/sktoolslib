@@ -33,4 +33,8 @@ public:
     static void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COLORREF clr);
     static void FillSolidRect(HDC hDC, const RECT* rc, COLORREF clr);
     static Gdiplus::ARGB MakeARGB(IN BYTE a, IN BYTE r, IN BYTE g, IN BYTE b);
+
+    static void                                     RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness);
+    static void                                     RGBtoHSL(COLORREF color, float& h, float& s, float& l);
+    static COLORREF                                 HSLtoRGB(float h, float s, float l);
 };
