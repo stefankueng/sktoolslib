@@ -118,7 +118,7 @@ int CSysImageList::GetFileIconIndex(const std::wstring& file) const
     return sfi.iIcon;
 }
 
-CSysImageList::operator HIMAGELIST()
+CSysImageList::operator HIMAGELIST() const
 {
     return m_hSystemImageList;
 }
