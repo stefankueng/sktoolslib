@@ -20,7 +20,6 @@
 #pragma once
 
 #include <string>
-#include <map>
 #include <shellapi.h>
 #include <Commctrl.h>
 
@@ -78,8 +77,6 @@ public:
 private:
     static CSysImageList *              instance;
 
-    typedef std::map<std::wstring, int> IconIndexMap;
-    mutable IconIndexMap                m_indexCache;
     HIMAGELIST                          m_hSystemImageList;
 };
 
