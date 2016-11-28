@@ -72,7 +72,7 @@ public:
      */
     int GetFileIconIndex(const std::wstring& file) const;
 
-    operator HIMAGELIST();
+    operator HIMAGELIST() const;
 
 private:
     static CSysImageList *              instance;
