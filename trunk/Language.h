@@ -45,7 +45,6 @@ public:
     void TranslateMenu(HMENU hMenu);
 
 private:
-    void AdjustEOLs(std::wstring& str);
     static BOOL CALLBACK TranslateWindowProc(HWND hwnd, LPARAM lParam);
     static std::wstring GetTranslatedString(const std::wstring& s, std::map<std::wstring, std::wstring>* pLangMap);
 

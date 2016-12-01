@@ -151,45 +151,6 @@ bool CLanguage::LoadFile( const std::wstring& path )
     return true;
 }
 
-void CLanguage::AdjustEOLs(std::wstring& str)
-{
-    std::wstring result;
-    std::wstring::size_type pos = 0;
-    for ( ; ; ) // while (true)
-    {
-        std::wstring::size_type next = str.find(L"\\r\\n", pos);
-        result.append(str, pos, next-pos);
-        if( next != std::string::npos )
-        {
-            result.append(L"\\n");
-            pos = next + 4; // 4 = sizeof("\\r\\n")
-        }
-        else
-        {
-            break;  // exit loop
-        }
-    }
-    str.swap(result);
-    result.clear();
-    pos = 0;
-
-    for ( ; ; ) // while (true)
-    {
-        std::wstring::size_type next = str.find(L"\\n", pos);
-        result.append(str, pos, next-pos);
-        if( next != std::string::npos )
-        {
-            result.append(L"\\r\\n");
-            pos = next + 2; // 2 = sizeof("\\n")
-        }
-        else
-        {
-            break;  // exit loop
-        }
-    }
-    str.swap(result);
-}
-
 std::wstring CLanguage::GetTranslatedString( const std::wstring& s )
 {
     return GetTranslatedString(s, &langmap);
