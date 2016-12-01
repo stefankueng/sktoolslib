@@ -64,8 +64,7 @@ CCmdLineParser::~CCmdLineParser()
 
 BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
 {
-    const stdstring sEmpty = _T("");            //use this as a value if no actual value is given in commandline
-    int nArgs = 0;
+    const stdstring sEmpty = _T("");            // use this as a value if no actual value is given in commandline
 
     if (!sCmdLine)
         return false;
@@ -84,11 +83,11 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
 
         LPCTSTR sArg = _tcspbrk(sCurrent, m_sDelims);
         if (!sArg)
-            break; // no (more) delimiters found
+            break;      // no (more) delimiters found
         sArg =  _tcsinc(sArg);
 
         if (sArg[0] == '\0')
-            break; // ends with delim
+            break;      // ends with delim
 
         LPCTSTR sVal = _tcspbrk(sArg, m_sValueSep);
         if (sVal == NULL)
@@ -172,7 +171,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
         }
     }
 
-    return (nArgs > 0);     //TRUE if arguments were found
+    return TRUE;
 }
 
 CCmdLineParser::CValsMap::const_iterator CCmdLineParser::findKey(LPCTSTR sKey) const
