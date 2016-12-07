@@ -50,7 +50,7 @@ private:
     void DrawSolidWndRectOnParent(HWND hWnd,Gdiplus:: Color clr);
     void DrawEditBorder(HWND hWnd);
     BOOL GetEditBorderColor(HWND hWnd, COLORREF *pClr);
-    void GetRoundRectPath(Gdiplus::GraphicsPath *pPath, Gdiplus::Rect r, int dia) const;
+    void GetRoundRectPath(Gdiplus::GraphicsPath *pPath, const Gdiplus::Rect& r, int dia) const;
 
     CDwmApiImpl                 m_dwm;
     CUxThemeAeroImpl            m_theme;
