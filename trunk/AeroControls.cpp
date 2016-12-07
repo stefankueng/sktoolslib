@@ -1048,7 +1048,7 @@ void AeroControlBase::ScreenToClient(HWND hWnd, LPRECT lprc)
     lprc->bottom = pt.y;
 }
 
-void AeroControlBase::GetRoundRectPath(GraphicsPath *pPath, Rect r, int dia) const
+void AeroControlBase::GetRoundRectPath(GraphicsPath *pPath, const Rect& r, int dia) const
 {
     // diameter can't exceed width or height
     if(dia > r.Width)   dia = r.Width;
