@@ -538,13 +538,14 @@ bool CPathUtils::Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder)
     VARIANT Options, OutFolder, InZipFile, Item;
     HRESULT hr = S_OK;
     CoInitialize(nullptr);
-    __try
+    try
     {
         if (CoCreateInstance(CLSID_Shell, nullptr, CLSCTX_INPROC_SERVER, IID_IShellDispatch, (void **)&pISD) != S_OK)
             return false;
 
         InZipFile.vt = VT_BSTR;
-        InZipFile.bstrVal = const_cast<BSTR>(lpZipFile);
+        _bstr_t bstr = lpZipFile; // back reading
+        InZipFile.bstrVal = bstr.Detach();
         hr = pISD->NameSpace(InZipFile, &pZippedFile);
         if (FAILED(hr) || !pZippedFile)
         {
@@ -553,7 +554,8 @@ bool CPathUtils::Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder)
         }
 
         OutFolder.vt = VT_BSTR;
-        OutFolder.bstrVal = const_cast<BSTR>(lpFolder);
+        bstr = lpFolder; // back reading
+        OutFolder.bstrVal = bstr.Detach();
         pISD->NameSpace(OutFolder, &pDestination);
         if (!pDestination)
         {
@@ -600,7 +602,7 @@ bool CPathUtils::Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder)
         return retval;
 
     }
-    __finally
+    catch (std::exception&)
     {
         CoUninitialize();
     }
