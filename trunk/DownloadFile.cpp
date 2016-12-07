@@ -53,14 +53,14 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
     if (!hConnectHandle)
     {
         DWORD err = GetLastError();
-        CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed on InternetConnect: %d\n", url, err);
+        CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed on InternetConnect: %d\n", url.c_str(), err);
         return err == 0;
     }
     HINTERNET hResourceHandle = HttpOpenRequest(hConnectHandle, nullptr, urlpath, nullptr, nullptr, nullptr, INTERNET_FLAG_KEEP_CONNECTION | (isHttps ? INTERNET_FLAG_SECURE : 0), 0);
     if (!hResourceHandle)
     {
         DWORD err = GetLastError();
-        CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed on HttpOpenRequest: %d\n", url, err);
+        CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed on HttpOpenRequest: %d\n", url.c_str(), err);
         InternetCloseHandle(hConnectHandle);
         return err == 0;
     }
@@ -77,7 +77,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
         if (!httpsendrequest)
         {
             DWORD err = GetLastError();
-            CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed: %d, %d\n", url, httpsendrequest, err);
+            CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed: %d, %d\n", url.c_str(), httpsendrequest, err);
             InternetCloseHandle(hResourceHandle);
             InternetCloseHandle(hConnectHandle);
             return err == 0;
@@ -94,7 +94,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
         DWORD length = sizeof(statusCode);
         if (!HttpQueryInfo(hResourceHandle, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&statusCode, &length, NULL) || statusCode != 200)
         {
-            CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s returned %d\n", url, statusCode);
+            CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s returned %d\n", url.c_str(), statusCode);
             InternetCloseHandle(hResourceHandle);
             InternetCloseHandle(hConnectHandle);
             if (statusCode == 404)
@@ -120,7 +120,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
         if (!InternetQueryDataAvailable(hResourceHandle, &size, 0, 0))
         {
             DWORD err = GetLastError();
-            CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed on InternetQueryDataAvailable: %d\n", url, err);
+            CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed on InternetQueryDataAvailable: %d\n", url.c_str(), err);
             InternetCloseHandle(hResourceHandle);
             InternetCloseHandle(hConnectHandle);
             return err == 0;
@@ -132,7 +132,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
         {
             delete[] lpszData;
             DWORD err = GetLastError();
-            CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed on InternetReadFile: %d\n", url, err);
+            CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed on InternetReadFile: %d\n", url.c_str(), err);
             InternetCloseHandle(hResourceHandle);
             InternetCloseHandle(hConnectHandle);
             return err == 0;
@@ -177,7 +177,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
     InternetCloseHandle(hConnectHandle);
     if (downloadedSum == 0)
     {
-        CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download size of %s was zero or user canceled.\n", url);
+        CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download size of %s was zero or user canceled.\n", url.c_str());
         return false;// INET_E_DOWNLOAD_FAILURE;
     }
     return true;
