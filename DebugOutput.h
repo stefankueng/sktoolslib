@@ -166,8 +166,8 @@ class ProfileTimer
 {
 public:
     ProfileTimer(LPCWSTR text)
+        : info(text)
     {
-        info = text;
         QueryPerformanceCounter(&startTime);
     }
     ~ProfileTimer()
