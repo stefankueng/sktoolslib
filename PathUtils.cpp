@@ -606,6 +606,7 @@ bool CPathUtils::Unzip2Folder(LPCWSTR lpZipFile, LPCWSTR lpFolder)
     {
         CoUninitialize();
     }
+    return false;
 }
 
 bool CPathUtils::IsKnownExtension(const std::wstring& ext)
