@@ -101,6 +101,8 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     if (lint.HighPart)
     {
         // file is way too big for us!
+        // assume a binary file
+        type = BINARY;
         CloseHandle(hFile);
         return false;
     }
