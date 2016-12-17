@@ -171,9 +171,7 @@ public:
 protected:
     T& m_lock;
 private:
-    CAutoReadLockT & operator=( const CAutoReadLockT & )
-    {
-    }
+    CAutoReadLockT & operator=(const CAutoReadLockT &) = delete;
 };
 
 template<typename T>
@@ -191,9 +189,7 @@ public :
 protected:
     T& m_lock;
 private:
-    CAutoWriteLockT & operator=( const CAutoWriteLockT & )
-    {
-    }
+    CAutoWriteLockT & operator=(const CAutoWriteLockT &) = delete;
 };
 
 template<typename T>
