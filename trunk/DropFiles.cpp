@@ -397,7 +397,6 @@ HRESULT STDMETHODCALLTYPE FileDataObject::SetDropDescription(DROPIMAGETYPE image
     fetc.dwAspect = DVASPECT_CONTENT;
     fetc.lindex = -1;
     fetc.tymed = TYMED_HGLOBAL;
-    fetc.tymed = TYMED_HGLOBAL;
 
     STGMEDIUM medium = {0};
     medium.hGlobal = GlobalAlloc(GHND, sizeof(DROPDESCRIPTION));
@@ -525,13 +524,19 @@ STDMETHODIMP CSVNEnumFormatEtc::Clone(IEnumFORMATETC** ppCloneEnumFormatEtc)
     if (ppCloneEnumFormatEtc == NULL)
         return E_POINTER;
 
-    CSVNEnumFormatEtc *newEnum = new CSVNEnumFormatEtc(m_vecFormatEtc);
-    if (newEnum == NULL)
-        return E_OUTOFMEMORY;
+    try
+    {
+        CSVNEnumFormatEtc *newEnum = new CSVNEnumFormatEtc(m_vecFormatEtc);
 
-    newEnum->AddRef();
-    newEnum->m_iCur = m_iCur;
-    *ppCloneEnumFormatEtc = newEnum;
+        newEnum->AddRef();
+        newEnum->m_iCur = m_iCur;
+        *ppCloneEnumFormatEtc = newEnum;
+    }
+    catch (const std::bad_alloc&)
+    {
+        return E_OUTOFMEMORY;
+    }
+
     return S_OK;
 }
 
@@ -559,7 +564,7 @@ size_t CDropFiles::GetCount()
 
 void CDropFiles::CreateStructure(HWND hWnd)
 {
-    CIDropSource* pdsrc = new CIDropSource;
+    CIDropSource* pdsrc = new (std::nothrow) CIDropSource;
     if (pdsrc == NULL)
         return;
     pdsrc->AddRef();
