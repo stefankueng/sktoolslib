@@ -29,10 +29,11 @@
 #include <Shlwapi.h>
 #include <Shldisp.h>
 #include <Shlobj.h>
+#include <comutil.h>
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "version.lib")
-
+#pragma comment(lib, "comsuppw.lib")
 
 // New code should probably use filesystem V3 when it is standard.
 
