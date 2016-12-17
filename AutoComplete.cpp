@@ -260,12 +260,17 @@ STDMETHODIMP CAutoCompleteEnum::Clone(IEnumString** ppenum)
     if (ppenum == NULL)
         return E_POINTER;
 
-    CAutoCompleteEnum *newEnum = new CAutoCompleteEnum(m_vecStrings);
-    if (newEnum == NULL)
-        return E_OUTOFMEMORY;
+    try
+    {
+        CAutoCompleteEnum *newEnum = new CAutoCompleteEnum(m_vecStrings);
 
-    newEnum->AddRef();
-    newEnum->m_iCur = m_iCur;
-    *ppenum = newEnum;
+        newEnum->AddRef();
+        newEnum->m_iCur = m_iCur;
+        *ppenum = newEnum;
+    }
+    catch (const std::bad_alloc&)
+    {
+        return E_OUTOFMEMORY;
+    }
     return S_OK;
 }
