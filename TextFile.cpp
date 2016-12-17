@@ -98,20 +98,16 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
         CloseHandle(hFile);
         return false;
     }
-    if (lint.HighPart)
-    {
-        // file is way too big for us!
-        // assume a binary file
-        type = BINARY;
-        CloseHandle(hFile);
-        return false;
-    }
 
     MEMORYSTATUSEX memex = {sizeof(MEMORYSTATUSEX)};
     GlobalMemoryStatusEx(&memex);
 
     DWORD bytesread = 0;
     DWORD bytestoread = min(lint.LowPart, DWORD(memex.ullAvailPhys/100UL));
+    if (lint.HighPart)
+        bytestoread = 500000;   // read 50kb if the file is too big: we only
+                                // need to scan for the file type then.
+
     // if there isn't enough RAM available, only load a small part of the file
     // to do the encoding check. Then only load the full file in case
     // the encoding is UNICODE_LE since that's the only encoding we have
@@ -126,6 +122,12 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
         }
         encoding = CheckUnicodeType(tempfilebuf.get(), bytesread);
         type = encoding;
+        if (lint.HighPart)
+        {
+            CloseHandle(hFile);
+            return false;
+        }
+
         switch(encoding)
         {
         case BINARY:
