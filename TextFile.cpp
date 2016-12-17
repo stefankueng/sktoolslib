@@ -170,7 +170,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
 
     if (encoding == UNICODE_LE)
     {
-        if ((bytesread > 1) && (*(char*)pFileBuf == 0xFF))
+        if ((bytesread > 1) && (*(unsigned char*)pFileBuf == 0xFF))
         {
             // remove the BOM
             textcontent = std::wstring(((wchar_t*)pFileBuf+1), (bytesread/sizeof(wchar_t))-1);
@@ -459,7 +459,7 @@ std::wstring CTextFile::GetLineString(long lineNumber) const
     long startpos = 0;
     if (lineNumber > 1)
         startpos = (long)linepositions[lineNumber-2];
-    size_t endpos = textcontent.find(_T("\n"), startpos+1);
+    size_t endpos = textcontent.find(_T('\n'), startpos+1);
     std::wstring line;
     if (endpos != std::wstring::npos)
         line = std::wstring(textcontent.begin()+startpos, textcontent.begin() + endpos);
