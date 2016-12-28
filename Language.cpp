@@ -35,16 +35,23 @@
 
 bool CLanguage::LoadFile( const std::wstring& path )
 {
+    static std::wstring lastLangPath;
+
     // revert to original language
-    std::map<std::wstring, std::wstring> langmap2;
-    for (auto it = langmap.cbegin(); it != langmap.cend(); ++it)
+    if (_wcsicmp(lastLangPath.c_str(), path.c_str()))
     {
-        langmap2[it->second] = it->first;
+        std::map<std::wstring, std::wstring> langmap2;
+        for (auto it = langmap.cbegin(); it != langmap.cend(); ++it)
+        {
+            langmap2[it->second] = it->first;
+        }
+        langmap = langmap2;
     }
-    langmap = langmap2;
 
     if (!PathFileExists(path.c_str()))
         return false;
+
+    lastLangPath = path;
 
     // since stream classes still expect the filepath in char and not wchar_t
     // we need to convert the filepath to multibyte first
