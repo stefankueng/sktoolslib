@@ -540,7 +540,8 @@ RECT CDialog::AdjustControlSize(UINT nID)
             {
                 // we're dealing with radio buttons and check boxes,
                 // which means we have to add a little space for the checkbox
-                controlrectorig.right = controlrectorig.left + (controlrect.right - controlrect.left) + 20;
+                const int checkWidth = GetSystemMetrics(SM_CXMENUCHECK) + 2 * GetSystemMetrics(SM_CXEDGE) + 3;
+                controlrectorig.right = controlrectorig.left + (controlrect.right - controlrect.left) + checkWidth;
                 MoveWindow(hwndDlgItem, controlrectorig.left, controlrectorig.top, controlrectorig.right - controlrectorig.left, controlrectorig.bottom - controlrectorig.top, TRUE);
             }
         }
