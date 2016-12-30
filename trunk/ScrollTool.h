@@ -30,7 +30,7 @@
  *    m_ScrollTool.Clear();
  *    break;
  *   case SB_THUMBTRACK:
- *    m_ScrollTool.Init(&thumbpoint);
+ *    m_ScrollTool.Init();
  *    m_ScrollTool.SetText(&thumbpoint, L"Line: %*ld", maxchars, nTrackPos);
  *    break;
  * }
@@ -49,7 +49,7 @@ public:
      * \param bRightAligned if set to true, the tooltip is right aligned with pos,
      *        depending on the text width shown in the tooltip
      */
-    bool Init(HWND hParent, LPPOINT pos, bool bRightAligned = false);
+    bool Init(bool bRightAligned = false);
     /**
      * Sets the text which should be shown in the tooltip.
      * \param pos the position in screen coordinates where the tooltip should be shown
