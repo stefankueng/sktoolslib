@@ -32,7 +32,7 @@ CScrollTool::~CScrollTool()
 {
 }
 
-bool CScrollTool::Init(HWND hParent, LPPOINT pos, bool bRightAligned /* = false */)
+bool CScrollTool::Init(bool bRightAligned /* = false */)
 {
     if (!m_bInitCalled)
     {
