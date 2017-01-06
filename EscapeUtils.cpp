@@ -22,6 +22,8 @@
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
 
+#include <emmintrin.h>
+
 static BOOL sse2supported = ::IsProcessorFeaturePresent( PF_XMMI64_INSTRUCTIONS_AVAILABLE );
 
 static constexpr char iri_escape_chars[256] = {
