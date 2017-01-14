@@ -368,7 +368,7 @@ public:
 
     static inline void emplace_to_lower(std::string& s)
     {
-        std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+        std::transform(s.begin(), s.end(), s.begin(), [](char c) { return (char)::tolower(c); });
     }
 
     static inline std::wstring to_lower(const std::wstring& s)
@@ -381,7 +381,7 @@ public:
     static inline std::string to_lower(const std::string& s)
     {
         std::string ls(s);
-        std::transform(ls.begin(), ls.end(), ls.begin(), ::tolower);
+        std::transform(ls.begin(), ls.end(), ls.begin(), [](char c) { return (char)::tolower(c); });
         return ls;
     }
 
