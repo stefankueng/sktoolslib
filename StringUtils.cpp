@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2016 - Stefan Kueng
+// Copyright (C) 2012-2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -94,6 +94,49 @@ int wcswildcmp(const wchar_t *wild, const wchar_t *str)
             cp = str +1;
         }
         else if ((*wild == *str) || (*wild == L'?'))
+        {
+            wild++;
+            str++;
+        }
+        else
+        {
+            wild = mp;
+            str = cp++;
+        }
+    }
+
+    while (*wild == L'*')
+    {
+        wild++;
+    }
+    return !*wild;
+}
+
+int wcswildicmp(const wchar_t *wild, const wchar_t *str)
+{
+    const wchar_t *cp = nullptr;
+    const wchar_t *mp = nullptr;
+    while ((*str) && (*wild != L'*'))
+    {
+        if ((*wild != L'?') && (::towlower(*wild) != ::towlower(*str)))
+        {
+            return 0;
+        }
+        wild++;
+        str++;
+    }
+    while (*str)
+    {
+        if (*wild == L'*')
+        {
+            if (!*++wild)
+            {
+                return 1;
+            }
+            mp = wild;
+            cp = str + 1;
+        }
+        else if ((*wild == L'?') || (::towlower(*wild) == ::towlower(*str)))
         {
             wild++;
             str++;
