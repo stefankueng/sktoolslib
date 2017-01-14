@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2016 - Stefan Kueng
+// Copyright (C) 2012-2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -55,6 +55,7 @@
  */
 int strwildcmp(const char * wild, const char * string);
 int wcswildcmp(const wchar_t * wild, const wchar_t * string);
+int wcswildicmp(const wchar_t * wild, const wchar_t * string);
 
 bool WriteAsciiStringToClipboard(const wchar_t * sClipdata, HWND hOwningWnd);
 void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::wstring& replacewith);
@@ -283,7 +284,7 @@ struct ci_lessW : std::binary_function<std::wstring, std::wstring, bool>
     {
         bool operator() (const wchar_t& c1, const wchar_t& c2) const
         {
-            return tolower(c1) < tolower(c2);
+            return towlower(c1) < towlower(c2);
         }
     };
     bool operator() (const std::wstring & s1, const std::wstring & s2) const
@@ -361,28 +362,63 @@ public:
     static std::wstring Format(const wchar_t* frmt, ...);
     static std::string Format(const char* frmt, ...);
 
+    [[deprecated("use case insensitive string comparison instead, or the ci_less container helper")]]
     static inline void emplace_to_lower(std::wstring& s)
     {
         std::transform(s.begin(), s.end(), s.begin(), ::towlower);
     }
 
+    [[deprecated("use case insensitive string comparison instead, or the ci_less container helper")]]
     static inline void emplace_to_lower(std::string& s)
     {
         std::transform(s.begin(), s.end(), s.begin(), [](char c) { return (char)::tolower(c); });
     }
 
+    /// converts a string to lowercase
+    /// note: please use only where absolutely necessary!
+    /// better use stricmp functions if possible since for non ANSI strings there just are too many exceptions
+    /// and special cases to handle.
     static inline std::wstring to_lower(const std::wstring& s)
     {
-        std::wstring ls(s);
-        std::transform(ls.begin(), ls.end(), ls.begin(), ::towlower);
-        return ls;
+        auto len = LCMapStringEx(LOCALE_NAME_INVARIANT, LCMAP_LOWERCASE, s.c_str(), -1, nullptr, 0, nullptr, nullptr, 0);
+        auto outbuf = std::make_unique<wchar_t[]>(len + 1);
+        LCMapStringEx(LOCALE_NAME_INVARIANT, LCMAP_LOWERCASE, s.c_str(), -1, outbuf.get(), len, nullptr, nullptr, 0);
+        return outbuf.get();
     }
 
+    [[deprecated("use case insensitive string comparison instead, or the ci_less container helper")]]
     static inline std::string to_lower(const std::string& s)
     {
         std::string ls(s);
         std::transform(ls.begin(), ls.end(), ls.begin(), [](char c) { return (char)::tolower(c); });
         return ls;
+    }
+
+    //static inline std::wstring::const_iterator find_caseinsensitive(const std::wstring& haystack, const std::wstring& needle)
+    //{
+    //    std::wstring::const_iterator it = haystack.end();
+    //    for (auto& i = haystack.begin(); i != haystack.end(); ++i)
+    //    {
+    //        if (_wcsnicmp(&(*i), needle.c_str(), needle.size()) == 0)
+    //        {
+    //            it = i;
+    //            break;
+    //        }
+    //    }
+    //    return it;
+    //}
+    static inline size_t find_caseinsensitive(const std::wstring& haystack, const std::wstring& needle)
+    {
+        auto ret = std::wstring::npos;
+        for (size_t i = 0; i < haystack.size(); ++i)
+        {
+            if (_wcsnicmp(&haystack[i], needle.c_str(), needle.size()) == 0)
+            {
+                ret = i;
+                break;
+            }
+        }
+        return ret;
     }
 
     template<typename T, typename T2> static void TrimLeading(T& s, const T2& vals)
