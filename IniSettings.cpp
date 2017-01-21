@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -105,6 +105,8 @@ void CIniSettings::RestoreWindowPos( LPCWSTR windowname, HWND hWnd, UINT showCmd
 
     if (wpl.showCmd != UINT(-1))
     {
+        if (wpl.showCmd == SW_HIDE)
+            wpl.showCmd = SW_SHOWDEFAULT;
         if ((wpl.showCmd == SW_MINIMIZE) || (wpl.showCmd == SW_SHOWMINNOACTIVE))
             wpl.showCmd = SW_RESTORE;
         if (showCmd)
