@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -57,14 +57,14 @@ public:
     void ScalePoint(__inout POINT *pPoint)
     {
         pPoint->x = ScaleX(pPoint->x);
-        pPoint->y = ScaleX(pPoint->y);
+        pPoint->y = ScaleY(pPoint->y);
     }
 
     // Scale Size from raw pixels to relative pixels.
     void ScaleSize(__inout SIZE *pSize)
     {
         pSize->cx = ScaleX(pSize->cx);
-        pSize->cy = ScaleX(pSize->cy);
+        pSize->cy = ScaleY(pSize->cy);
     }
 
     // Determine if screen resolution meets minimum requirements in relative pixels.
