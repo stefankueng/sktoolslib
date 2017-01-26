@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -127,10 +127,9 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
         }
 
         DWORD downloaded; // size of the downloaded data
-        LPTSTR lpszData = new TCHAR[size + 1];
-        if (!InternetReadFile(hResourceHandle, (LPVOID)lpszData, size, &downloaded))
+        auto Data = std::make_unique<TCHAR[]>(size + 1);
+        if (!InternetReadFile(hResourceHandle, (LPVOID)Data.get(), size, &downloaded))
         {
-            delete[] lpszData;
             DWORD err = GetLastError();
             CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s failed on InternetReadFile: %d\n", url.c_str(), err);
             InternetCloseHandle(hResourceHandle);
@@ -140,14 +139,12 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
 
         if (downloaded == 0)
         {
-            delete[] lpszData;
             break;
         }
 
-        lpszData[downloaded] = '\0';
+        Data[downloaded] = '\0';
         DWORD dwWritten = 0;
-        WriteFile(hDestFile, lpszData, downloaded, &dwWritten, NULL);
-        delete[] lpszData;
+        WriteFile(hDestFile, Data.get(), downloaded, &dwWritten, NULL);
 
         downloadedSum += downloaded;
 
