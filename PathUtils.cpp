@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2015, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -53,14 +53,6 @@ inline bool IsFolderSeparator(wchar_t c)
     return (c == ThisOSPathSeparator || c == OtherOSPathSeparator);
 }
 
-struct task_mem_deleter
-{
-    void operator()(wchar_t buf[])
-    {
-        if (buf != nullptr)
-            CoTaskMemFree(buf);
-    }
-};
 }
 
 std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
@@ -469,8 +461,8 @@ std::wstring CPathUtils::GetAppDataPath(HMODULE hMod)
     PWSTR path = nullptr;
     if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, nullptr, &path) == S_OK)
     {
-        std::unique_ptr<wchar_t[], task_mem_deleter> path_ptr(path);
-        std::wstring sPath = path_ptr.get();
+        std::wstring sPath = path;
+        CoTaskMemFree(path);
         sPath += L"\\";
         sPath += CPathUtils::GetFileNameWithoutExtension(CPathUtils::GetModulePath(hMod));
         CreateDirectory(sPath.c_str(), nullptr);
