@@ -203,6 +203,7 @@ void CRichStatusBar::CalcRequestedWidths(int index)
         w.calculatedWidth = 0;
         w.shortened = false;
         w.collapsed = false;
+        w.canCollapse = part.collapsedIcon != nullptr;
         w.defaultWidth = part.width;
         w.shortWidth = part.width;
         w.fixed = part.fixedWidth;
@@ -211,6 +212,7 @@ void CRichStatusBar::CalcRequestedWidths(int index)
     {
         w.calculatedWidth = 0;
         w.collapsed = false;
+        w.canCollapse = part.collapsedIcon != nullptr;
         w.shortened = false;
         w.fixed = part.fixedWidth;
 
@@ -305,7 +307,7 @@ void CRichStatusBar::CalcWidths()
                 {
                     if (!it->fixed)
                     {
-                        if (!it->collapsed)
+                        if (!it->collapsed && it->canCollapse)
                         {
                             it->collapsed = true;
                             bAdjusted = true;

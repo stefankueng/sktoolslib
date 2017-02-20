@@ -63,6 +63,7 @@ struct PartWidths
     bool fixed = false;
     bool shortened = false;
     bool collapsed = false;
+    bool canCollapse = false;
     int calculatedWidth = 0;
 };
 
