@@ -55,8 +55,9 @@ public:
     /// when the text is right-aligned, the icon is shown right of the text.
     /// note: the icon will be shown with the same width and height.
     HICON               icon;
-    /// the requested width of the part, in pixels. If set to -1, the width is calculated
-    /// at runtime from the text and icon
+    /// the requested width of the part, in pixels. If set to 0, the width is calculated
+    /// at runtime from the text and icon. A negative value is used as padding to the
+    /// calculated width.
     int                 width;
     /// determines whether the part can be resized with the main window
     bool                fixedWidth;
@@ -82,6 +83,10 @@ struct PartWidths
 
 /**
  * a custom status bar control
+ * Note: you have to define the message WM_STATUSBAR_MSG somewhere for this to work.
+ * E.g.:
+ * #define WM_STATUSBAR_MSG (WM_APP + 1)
+ * it needs to be an WM_APP message!
  */
 class CRichStatusBar : public CWindow
 {
@@ -105,8 +110,9 @@ public:
     /// calculates the widths of all parts and updates the status bar.
     /// call this after changing parts or inserting new ones
     void                CalcWidths();
-
-    void SetHandlerFunc(std::function<COLORREF(const COLORREF&)> themeColor) { m_ThemeColorFunc = themeColor; }
+    /// sets a callback function that takes a COLORREF and returns a (modified) COLORREF.
+    /// useful if you want the color to change depending on a selected theme.
+    void                SetHandlerFunc(std::function<COLORREF(const COLORREF&)> themeColor) { m_ThemeColorFunc = themeColor; }
 protected:
     LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     void                CalcRequestedWidths(int index);

@@ -188,6 +188,33 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             CalcWidths();
         }
         break;
+        case WM_LBUTTONDBLCLK:
+        case WM_LBUTTONUP:
+        case WM_LBUTTONDOWN:
+        case WM_CONTEXTMENU:
+        {
+            POINT pt;
+            pt.x = GET_X_LPARAM(lParam);
+            pt.y = GET_Y_LPARAM(lParam);
+            if (uMsg == WM_CONTEXTMENU)
+                ScreenToClient(*this, &pt);
+            RECT rect;
+            GetClientRect(*this, &rect);
+            int width = 0;
+            for (size_t i = 0; i < m_partwidths.size(); ++i)
+            {
+                RECT rc = rect;
+                rc.left = width;
+                rc.right = rc.left + m_partwidths[i].calculatedWidth;
+                if (PtInRect(&rc, pt))
+                {
+                    SendMessage(::GetParent(*this), WM_STATUSBAR_MSG, uMsg, i);
+                    break;
+                }
+                width += m_partwidths[i].calculatedWidth;
+            }
+        }
+        break;
     }
     if (prevWndProc)
         return prevWndProc(hwnd, uMsg, wParam, lParam);
@@ -233,6 +260,12 @@ void CRichStatusBar::CalcRequestedWidths(int index)
         }
         w.shortWidth += (2 * border_width);
         w.defaultWidth += (2 * border_width);
+        if (part.width < 0)
+        {
+            // add padding
+            w.defaultWidth -= part.width;
+            w.shortWidth -= part.width;
+        }
     }
     m_partwidths[index] = w;
     ReleaseDC(*this, hdc);
