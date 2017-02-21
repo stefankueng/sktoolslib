@@ -29,6 +29,7 @@ CRichStatusBar::CRichStatusBar(HINSTANCE hInst)
     : CWindow(hInst)
     , m_fonts{ nullptr }
     , m_tooltip(nullptr)
+    , m_ThemeColorFunc(nullptr)
 {
 }
 
@@ -132,10 +133,10 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             HDC hdc = BeginPaint(hwnd, &ps);
             RECT rect;
             GetClientRect(*this, &rect);
-            GDIHelpers::FillSolidRect(hdc, &rect, GetSysColor(COLOR_3DFACE));
+            GDIHelpers::FillSolidRect(hdc, &rect, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
 
-            SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
-            SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
+            SetTextColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT));
+            SetBkColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
 
 
             RECT partRect = rect;
@@ -252,8 +253,8 @@ void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring & text, RECT & rec
     int font = 0;
     auto oldFont = SelectObject(hdc, m_fonts[font]);
 
-    SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
-    SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
+    SetTextColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT));
+    SetBkColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
 
     size_t pos = 0;
     auto percPos = text.find('%', pos);
@@ -311,6 +312,8 @@ void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring & text, RECT & rec
                         auto sColor = text.substr(percPos + 2, 6);
                         auto color = wcstoul(sColor.c_str(), nullptr, 16);
                         color = RGB(GetBValue(color), GetGValue(color), GetRValue(color));
+                        if (m_ThemeColorFunc)
+                            color = m_ThemeColorFunc(color);
                         textControls.color = color;
                         textControls.command = text[pos];
                         SetTextColor(hdc, color);
@@ -324,8 +327,8 @@ void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring & text, RECT & rec
                     for (auto& obj : objStack)
                         SelectObject(hdc, obj);
                     objStack.clear();
-                    SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
-                    SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
+                    SetTextColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT));
+                    SetBkColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
                     textControls.font = nullptr;
                     textControls.color = (COLORREF)-1;
                     textControls.command = text[pos];
@@ -382,8 +385,8 @@ void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring & text, RECT & rec
                 for (auto& obj : objStack)
                     SelectObject(hdc, obj);
                 objStack.clear();
-                SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
-                SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
+                SetTextColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT));
+                SetBkColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
                 break;
             }
             RECT temprect = rect;
