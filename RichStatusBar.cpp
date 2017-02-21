@@ -47,6 +47,7 @@ bool CRichStatusBar::Init(HWND hParent)
     wcx.hInstance = hResource;
     wcx.lpszClassName = L"RichStatusBar_{226E35DD-FFAC-4D97-A040-B94AF5BE39EC}";
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wcx.hCursor = ::LoadCursor(NULL, IDC_ARROW);
     if (RegisterWindow(&wcx))
     {
         if (CreateEx(0, WS_CHILD | WS_VISIBLE, hParent))
