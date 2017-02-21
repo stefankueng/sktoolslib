@@ -20,10 +20,11 @@
 #include "BaseWindow.h"
 #include <string>
 #include <vector>
+#include <functional>
 
 /**
  * defines a status bar part with all the properties it can have.
- * 
+ *
  * The text is a custom rich text format. The '%' char serves as a
  * command token. To actually write a '%' you need to put '%%' in
  * the string.
@@ -105,6 +106,7 @@ public:
     /// call this after changing parts or inserting new ones
     void                CalcWidths();
 
+    void SetHandlerFunc(std::function<COLORREF(const COLORREF&)> themeColor) { m_ThemeColorFunc = themeColor; }
 protected:
     LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     void                CalcRequestedWidths(int index);
@@ -115,5 +117,6 @@ private:
     std::vector<PartWidths>             m_partwidths;
     HFONT                               m_fonts[4];
     HWND                                m_tooltip;
+    std::function<COLORREF(const COLORREF&)> m_ThemeColorFunc;
 };
 
