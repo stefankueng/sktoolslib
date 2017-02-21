@@ -21,6 +21,21 @@
 #include <string>
 #include <vector>
 
+/**
+ * defines a status bar part with all the properties it can have.
+ * 
+ * The text is a custom rich text format. The '%' char serves as a
+ * command token. To actually write a '%' you need to put '%%' in
+ * the string.
+ *
+ * the commands available are:
+ * %i : changes the font to italic
+ * %b : changes the font to bold
+ * %cRRGGBB : changes the color of the font to the RGB value specified in HEX
+ * %r : resets the text to default (font and color)
+ * example:
+ * "normal text %i italic %b italic bold %r%b only bold %cFF0000 red text"
+ */
 class CRichStatusBarItem
 {
 public:
@@ -47,10 +62,6 @@ public:
     /// icon to show if the width is too small for text.
     /// if not set, the text is shown cropped
     HICON               collapsedIcon;
-    /// indicates the priority of this part. The higher the number the eariler
-    /// the part is shortened or even collapsed.
-    /// parts with the same priority are shortened and then collapsed from right to left.
-    int                 shortenPriority;
 };
 
 /**
@@ -97,11 +108,12 @@ public:
 protected:
     LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     void                CalcRequestedWidths(int index);
+    void                DrawRichText(HDC hdc, const std::wstring& text, RECT& rect, UINT flags);
 
 private:
     std::vector<CRichStatusBarItem>     m_parts;
     std::vector<PartWidths>             m_partwidths;
-    HFONT                               m_hFont;
+    HFONT                               m_fonts[4];
     HWND                                m_tooltip;
 };
 

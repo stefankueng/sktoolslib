@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "RichStatusBar.h"
 #include "GDIHelpers.h"
+#include <deque>
 
 constexpr int icon_width = 24;
 constexpr int border_width = 3;
@@ -26,7 +27,7 @@ constexpr int border_width = 3;
 
 CRichStatusBar::CRichStatusBar(HINSTANCE hInst)
     : CWindow(hInst)
-    , m_hFont(nullptr)
+    , m_fonts{ nullptr }
     , m_tooltip(nullptr)
 {
 }
@@ -34,7 +35,8 @@ CRichStatusBar::CRichStatusBar(HINSTANCE hInst)
 
 CRichStatusBar::~CRichStatusBar()
 {
-    DeleteObject(m_hFont);
+    for (auto & font : m_fonts)
+        DeleteObject(font);
 }
 
 bool CRichStatusBar::Init(HWND hParent)
@@ -52,8 +54,15 @@ bool CRichStatusBar::Init(HWND hParent)
             NONCLIENTMETRICS ncm;
             ncm.cbSize = sizeof(NONCLIENTMETRICS);
             SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
-            m_hFont = CreateFontIndirect(&ncm.lfStatusFont);
-
+            m_fonts[0] = CreateFontIndirect(&ncm.lfStatusFont);
+            ncm.lfStatusFont.lfItalic = TRUE;
+            m_fonts[1] = CreateFontIndirect(&ncm.lfStatusFont);
+            ncm.lfStatusFont.lfItalic = FALSE;
+            ncm.lfStatusFont.lfWeight = FW_BOLD;
+            m_fonts[2] = CreateFontIndirect(&ncm.lfStatusFont);
+            ncm.lfStatusFont.lfItalic = TRUE;
+            ncm.lfStatusFont.lfWeight = FW_BOLD;
+            m_fonts[3] = CreateFontIndirect(&ncm.lfStatusFont);
 
             // create the tooltip window
             m_tooltip = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
@@ -123,12 +132,9 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             RECT rect;
             GetClientRect(*this, &rect);
             GDIHelpers::FillSolidRect(hdc, &rect, GetSysColor(COLOR_3DFACE));
-            auto oldFont = SelectObject(hdc, m_hFont);
 
-            const auto faceClr = GetSysColor(COLOR_3DFACE);
-
-            auto textFgc = GetSysColor(COLOR_WINDOWTEXT);
-            auto textBgc = faceClr;
+            SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
+            SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
 
 
             RECT partRect = rect;
@@ -149,8 +155,6 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                     x = 2 + cy;
                 }
                 partRect.left += x;
-                SetTextColor(hdc, textFgc);
-                SetBkColor(hdc, textBgc);
                 RECT temprect = partRect;
                 InflateRect(&temprect, -2, 0);
                 if (!m_partwidths[i].collapsed || !part.collapsedIcon)
@@ -161,7 +165,7 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                         format |= DT_CENTER;
                     if (part.align == 2)
                         format |= DT_RIGHT;
-                    DrawText(hdc, text.c_str(), -1, &temprect, format);
+                    DrawRichText(hdc, text, temprect, format);
                 }
                 else
                 {
@@ -171,7 +175,6 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 }
             }
 
-            SelectObject(hdc, oldFont);
             EndPaint(hwnd, &ps);
             return 0;
         }
@@ -192,7 +195,6 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 void CRichStatusBar::CalcRequestedWidths(int index)
 {
     auto hdc = GetDC(*this);
-    auto oldFont = SelectObject(hdc, m_hFont);
     RECT rect = { 0 };
     GetClientRect(*this, &rect);
     auto& part = m_parts[index];
@@ -217,10 +219,10 @@ void CRichStatusBar::CalcRequestedWidths(int index)
         w.fixed = part.fixedWidth;
 
         RECT rc = rect;
-        DrawText(hdc, part.shortText.c_str(), -1, &rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
+        DrawRichText(hdc, part.shortText, rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
         w.shortWidth = rc.right - rc.left;
         rc = rect;
-        DrawText(hdc, part.text.c_str(), -1, &rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
+        DrawRichText(hdc, part.text, rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
         w.defaultWidth = rc.right - rc.left;
         if (part.icon)
         {
@@ -231,8 +233,165 @@ void CRichStatusBar::CalcRequestedWidths(int index)
         w.defaultWidth += (2 * border_width);
     }
     m_partwidths[index] = w;
-    SelectObject(hdc, oldFont);
     ReleaseDC(*this, hdc);
+}
+
+void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring & text, RECT & rect, UINT flags)
+{
+    struct TextControls
+    {
+        int             xPos = 0;
+        std::wstring    text;
+        COLORREF        color = (COLORREF)-1;
+        HFONT           font = nullptr;
+        wchar_t         command = '\0';
+    };
+
+    std::list<HGDIOBJ> objStack;
+    int font = 0;
+    auto oldFont = SelectObject(hdc, m_fonts[font]);
+
+    SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
+    SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
+
+    size_t pos = 0;
+    auto percPos = text.find('%', pos);
+    int textWidth = 0;
+    std::deque<TextControls> tokens;
+    TextControls textControls;
+    while (percPos != std::wstring::npos)
+    {
+        if (percPos < text.size() - 1)
+        {
+            RECT temprc = rect;
+            textControls.text = text.substr(pos, percPos - pos);
+            DrawText(hdc, textControls.text.c_str(), -1, &temprc, flags | DT_CALCRECT);
+            textControls.xPos = textWidth;
+            textWidth += (temprc.right - temprc.left);
+            tokens.push_back(textControls);
+
+            pos = percPos + 1;
+            switch (text[pos])
+            {
+                case '%':
+                {
+                    textControls.command = '\0';
+                    textControls.text = L"%";
+                    textControls.xPos = textWidth;
+                    tokens.push_back(textControls);
+                    temprc = rect;
+                    DrawText(hdc, L"%", 1, &temprc, flags | DT_CALCRECT);
+                    textWidth += (temprc.right - temprc.left);
+                    ++pos;
+                }
+                break;
+                case 'i':   // italic
+                {
+                    font |= 1;
+                    textControls.font = m_fonts[font];
+                    textControls.command = text[pos];
+                    objStack.push_front(SelectObject(hdc, m_fonts[font]));
+                    ++pos;
+                }
+                break;
+                case 'b':   // bold
+                {
+                    font |= 2;
+                    textControls.font = m_fonts[font];
+                    textControls.command = text[pos];
+                    objStack.push_front(SelectObject(hdc, m_fonts[font]));
+                    ++pos;
+                }
+                break;
+                case 'c':   // color
+                {
+                    if (percPos < text.size() - 7)
+                    {
+                        auto sColor = text.substr(percPos + 2, 6);
+                        auto color = wcstoul(sColor.c_str(), nullptr, 16);
+                        color = RGB(GetBValue(color), GetGValue(color), GetRValue(color));
+                        textControls.color = color;
+                        textControls.command = text[pos];
+                        SetTextColor(hdc, color);
+                        pos += 7;
+                    }
+                }
+                break;
+                case 'r':   // reset
+                {
+                    font = 0;
+                    for (auto& obj : objStack)
+                        SelectObject(hdc, obj);
+                    objStack.clear();
+                    SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
+                    SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
+                    textControls.font = nullptr;
+                    textControls.color = (COLORREF)-1;
+                    textControls.command = text[pos];
+                    ++pos;
+                }
+                break;
+            }
+        }
+        else
+            break;
+        percPos = text.find('%', pos);
+    }
+    RECT temprc = rect;
+    textControls.text = text.substr(pos);
+    DrawText(hdc, textControls.text.c_str(), -1, &temprc, flags | DT_CALCRECT);
+    textControls.xPos = textWidth;
+    textWidth += (temprc.right - temprc.left);
+    textControls.command = '\0';
+    tokens.push_back(textControls);
+
+    for (auto& obj : objStack)
+        SelectObject(hdc, obj);
+
+    if (flags & DT_CALCRECT)
+    {
+        rect.right = textWidth;
+    }
+    else
+    {
+        flags &= ~DT_CALCRECT;
+        if (flags & DT_CENTER)
+        {
+            flags &= ~DT_CENTER;
+            rect.left = rect.left + ((rect.right - rect.left) - textWidth) / 2;
+        }
+        if (flags & DT_RIGHT)
+        {
+            flags &= ~DT_RIGHT;
+            rect.left = rect.right - textWidth;
+        }
+
+        for (auto& token : tokens)
+        {
+            switch (token.command)
+            {
+                case 'i':
+                case 'b':
+                objStack.push_front(SelectObject(hdc, token.font));
+                break;
+                case 'c':
+                SetTextColor(hdc, token.color);
+                break;
+                case 'r':
+                for (auto& obj : objStack)
+                    SelectObject(hdc, obj);
+                objStack.clear();
+                SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
+                SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
+                break;
+            }
+            RECT temprect = rect;
+            temprect.left += token.xPos;
+            DrawText(hdc, token.text.c_str(), -1, &temprect, flags);
+        }
+    }
+
+    SelectObject(hdc, oldFont);
 }
 
 void CRichStatusBar::CalcWidths()
