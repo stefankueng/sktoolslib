@@ -106,10 +106,10 @@ public:
     /// \param redraw redraws the status bar after setting/inserting the part. Set to false while initializing.
     /// \param replace if true, the index must exist or be set to -1. if set to false,
     ///               the item is inserted before the index
-    bool                SetPart(int index, CRichStatusBarItem item, bool redraw, bool replace = true);
+    bool                SetPart(int index, const CRichStatusBarItem& item, bool redraw, bool replace = true);
     bool                SetPart(int index, const std::wstring& text, const std::wstring& shortText, const std::wstring& tooltip, int width, int align = 0, bool fixedWidth = false, bool hover = false, HICON icon = nullptr, HICON collapsedIcon = nullptr);
     /// returns the recommended height of the status bar
-    int                 GetHeight() const { return 22; }
+    int                 GetHeight() const { return m_height; }
     /// calculates the widths of all parts and updates the status bar.
     /// call this after changing parts or inserting new ones
     void                CalcWidths();
@@ -117,7 +117,7 @@ public:
     /// useful if you want the color to change depending on a selected theme.
     void                SetHandlerFunc(std::function<COLORREF(const COLORREF&)> themeColor) { m_ThemeColorFunc = themeColor; }
     /// returns the index of the part at the specified client coordinates
-    int                 GetPartIndexAt(const POINT& pt);
+    int                 GetPartIndexAt(const POINT& pt) const;
 protected:
     LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     void                CalcRequestedWidths(int index);
@@ -130,5 +130,6 @@ private:
     HWND                                m_tooltip;
     std::function<COLORREF(const COLORREF&)> m_ThemeColorFunc;
     int                                 m_hoverPart;
+    int                                 m_height;
 };
 
