@@ -84,7 +84,13 @@ bool CRichStatusBar::Init(HWND hParent)
 bool CRichStatusBar::SetPart(int index, CRichStatusBarItem item, bool redraw, bool replace)
 {
     if (index >= (int)m_parts.size())
-        return false;
+    {
+        for (auto i = m_parts.size(); i <= index; ++i)
+        {
+            m_parts.push_back(std::move(CRichStatusBarItem()));
+            m_partwidths.push_back({});
+        }
+    }
     if (index < 0)
     {
         m_parts.push_back(item);
