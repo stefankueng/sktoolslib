@@ -30,6 +30,7 @@ CRichStatusBar::CRichStatusBar(HINSTANCE hInst)
     , m_fonts{ nullptr }
     , m_tooltip(nullptr)
     , m_ThemeColorFunc(nullptr)
+    , m_hoverPart(-1)
 {
 }
 
@@ -109,7 +110,7 @@ bool CRichStatusBar::SetPart(int index, CRichStatusBarItem item, bool redraw, bo
     return true;
 }
 
-bool CRichStatusBar::SetPart(int index, const std::wstring & text, const std::wstring & shortText, const std::wstring & tooltip, int width, int align, bool fixedWidth, HICON icon, HICON collapsedIcon)
+bool CRichStatusBar::SetPart(int index, const std::wstring & text, const std::wstring & shortText, const std::wstring & tooltip, int width, int align, bool fixedWidth, bool hover, HICON icon, HICON collapsedIcon)
 {
     CRichStatusBarItem part;
     part.text = text;
@@ -118,9 +119,30 @@ bool CRichStatusBar::SetPart(int index, const std::wstring & text, const std::ws
     part.width = width;
     part.align = align;
     part.fixedWidth = fixedWidth;
+    part.hoverActive = hover;
     part.icon = icon;
     part.collapsedIcon = collapsedIcon;
     return SetPart(index, part, false);
+}
+
+int CRichStatusBar::GetPartIndexAt(const POINT & pt)
+{
+    RECT rect;
+    GetClientRect(*this, &rect);
+    int width = 0;
+    for (size_t i = 0; i < m_partwidths.size(); ++i)
+    {
+        RECT rc = rect;
+        rc.left = width;
+        rc.right = rc.left + m_partwidths[i].calculatedWidth;
+        if (PtInRect(&rc, pt))
+        {
+            return (int)i;
+            break;
+        }
+        width += m_partwidths[i].calculatedWidth;
+    }
+    return -1;
 }
 
 LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -148,7 +170,7 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 partRect.left = right;
                 partRect.right = partRect.left + m_partwidths[i].calculatedWidth;
                 right = partRect.right;
-                DrawEdge(hdc, &partRect, BDR_SUNKENOUTER, BF_RECT | BF_ADJUST);
+                DrawEdge(hdc, &partRect, i == m_hoverPart ? EDGE_ETCHED : BDR_SUNKENOUTER, BF_RECT | BF_ADJUST);
                 int x = 0;
                 if (part.icon && !m_partwidths[i].collapsed)
                 {
@@ -198,21 +220,40 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             pt.y = GET_Y_LPARAM(lParam);
             if (uMsg == WM_CONTEXTMENU)
                 ScreenToClient(*this, &pt);
-            RECT rect;
-            GetClientRect(*this, &rect);
-            int width = 0;
-            for (size_t i = 0; i < m_partwidths.size(); ++i)
-            {
-                RECT rc = rect;
-                rc.left = width;
-                rc.right = rc.left + m_partwidths[i].calculatedWidth;
-                if (PtInRect(&rc, pt))
-                {
-                    SendMessage(::GetParent(*this), WM_STATUSBAR_MSG, uMsg, i);
-                    break;
-                }
-                width += m_partwidths[i].calculatedWidth;
-            }
+            auto index = GetPartIndexAt(pt);
+            if (index >= 0)
+                SendMessage(::GetParent(*this), WM_STATUSBAR_MSG, uMsg, index);
+        }
+        break;
+        case WM_MOUSEMOVE:
+        {
+            TRACKMOUSEEVENT tme = { 0 };
+            tme.cbSize = sizeof(TRACKMOUSEEVENT);
+            tme.dwFlags = TME_LEAVE;
+            tme.hwndTrack = *this;
+            TrackMouseEvent(&tme);
+
+            POINT pt;
+            pt.x = GET_X_LPARAM(lParam);
+            pt.y = GET_Y_LPARAM(lParam);
+            auto oldHover = m_hoverPart;
+            m_hoverPart = GetPartIndexAt(pt);
+            if ((m_hoverPart != oldHover) && (m_parts[m_hoverPart].hoverActive))
+                InvalidateRect(hwnd, nullptr, FALSE);
+            else
+                m_hoverPart = -1;
+        }
+        break;
+        case WM_MOUSELEAVE:
+        {
+            TRACKMOUSEEVENT tme = { 0 };
+            tme.cbSize = sizeof(TRACKMOUSEEVENT);
+            tme.dwFlags = TME_LEAVE | TME_CANCEL;
+            tme.hwndTrack = *this;
+            TrackMouseEvent(&tme);
+            if (m_hoverPart >= 0)
+                InvalidateRect(hwnd, nullptr, FALSE);
+            m_hoverPart = -1;
         }
         break;
     }

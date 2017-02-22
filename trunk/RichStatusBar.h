@@ -61,6 +61,9 @@ public:
     int                 width;
     /// determines whether the part can be resized with the main window
     bool                fixedWidth;
+    /// if set to true, the part indicates when the mouse pointer hovers over it.
+    /// can be used to indicate that a click/right-click does something
+    bool                hoverActive;
     /// icon to show if the width is too small for text.
     /// if not set, the text is shown cropped
     HICON               collapsedIcon;
@@ -104,7 +107,7 @@ public:
     /// \param replace if true, the index must exist or be set to -1. if set to false,
     ///               the item is inserted before the index
     bool                SetPart(int index, CRichStatusBarItem item, bool redraw, bool replace = true);
-    bool                SetPart(int index, const std::wstring& text, const std::wstring& shortText, const std::wstring& tooltip, int width, int align = 0, bool fixedWidth = false, HICON icon = nullptr, HICON collapsedIcon = nullptr);
+    bool                SetPart(int index, const std::wstring& text, const std::wstring& shortText, const std::wstring& tooltip, int width, int align = 0, bool fixedWidth = false, bool hover = false, HICON icon = nullptr, HICON collapsedIcon = nullptr);
     /// returns the recommended height of the status bar
     int                 GetHeight() const { return 22; }
     /// calculates the widths of all parts and updates the status bar.
@@ -113,6 +116,8 @@ public:
     /// sets a callback function that takes a COLORREF and returns a (modified) COLORREF.
     /// useful if you want the color to change depending on a selected theme.
     void                SetHandlerFunc(std::function<COLORREF(const COLORREF&)> themeColor) { m_ThemeColorFunc = themeColor; }
+    /// returns the index of the part at the specified client coordinates
+    int                 GetPartIndexAt(const POINT& pt);
 protected:
     LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     void                CalcRequestedWidths(int index);
@@ -124,5 +129,6 @@ private:
     HFONT                               m_fonts[4];
     HWND                                m_tooltip;
     std::function<COLORREF(const COLORREF&)> m_ThemeColorFunc;
+    int                                 m_hoverPart;
 };
 
