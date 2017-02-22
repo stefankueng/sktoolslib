@@ -446,7 +446,6 @@ void CRichStatusBar::CalcWidths()
     RECT rect;
     GetClientRect(*this, &rect);
     int maxWidth = rect.right - rect.left;
-    maxWidth -= (2 * border_width);
     bool bAdjusted = false;
     do
     {
