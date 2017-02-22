@@ -31,6 +31,7 @@ CRichStatusBar::CRichStatusBar(HINSTANCE hInst)
     , m_tooltip(nullptr)
     , m_ThemeColorFunc(nullptr)
     , m_hoverPart(-1)
+    , m_height(22)
 {
 }
 
@@ -67,6 +68,14 @@ bool CRichStatusBar::Init(HWND hParent)
             ncm.lfStatusFont.lfWeight = FW_BOLD;
             m_fonts[3] = CreateFontIndirect(&ncm.lfStatusFont);
 
+            // calculate the height of the status bar from the font size
+            RECT fr;
+            auto hdc = GetDC(*this);
+            DrawText(hdc, L"W", 1, &fr, DT_SINGLELINE | DT_CALCRECT);
+            ReleaseDC(*this, hdc);
+            m_height = fr.bottom - fr.top;
+            m_height += 4;
+
             // create the tooltip window
             m_tooltip = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
                                        WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
@@ -81,7 +90,7 @@ bool CRichStatusBar::Init(HWND hParent)
     return false;
 }
 
-bool CRichStatusBar::SetPart(int index, CRichStatusBarItem item, bool redraw, bool replace)
+bool CRichStatusBar::SetPart(int index, const CRichStatusBarItem& item, bool redraw, bool replace)
 {
     if (index >= (int)m_parts.size())
     {
@@ -131,7 +140,7 @@ bool CRichStatusBar::SetPart(int index, const std::wstring & text, const std::ws
     return SetPart(index, part, false);
 }
 
-int CRichStatusBar::GetPartIndexAt(const POINT & pt)
+int CRichStatusBar::GetPartIndexAt(const POINT & pt) const
 {
     RECT rect;
     GetClientRect(*this, &rect);
