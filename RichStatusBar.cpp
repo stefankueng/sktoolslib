@@ -125,13 +125,14 @@ bool CRichStatusBar::SetPart(int index, const CRichStatusBarItem& item, bool red
     return true;
 }
 
-bool CRichStatusBar::SetPart(int index, const std::wstring & text, const std::wstring & shortText, const std::wstring & tooltip, int width, int align, bool fixedWidth, bool hover, HICON icon, HICON collapsedIcon)
+bool CRichStatusBar::SetPart(int index, const std::wstring & text, const std::wstring & shortText, const std::wstring & tooltip, int width, int shortWidth, int align, bool fixedWidth, bool hover, HICON icon, HICON collapsedIcon)
 {
     CRichStatusBarItem part;
     part.text = text;
     part.shortText = shortText;
     part.tooltip = tooltip;
     part.width = width;
+    part.shortWidth = shortWidth;
     part.align = align;
     part.fixedWidth = fixedWidth;
     part.hoverActive = hover;
@@ -285,44 +286,40 @@ void CRichStatusBar::CalcRequestedWidths(int index)
     auto& part = m_parts[index];
 
     PartWidths w;
-    if ((part.fixedWidth) && (part.width > 0))
-    {
-        w.calculatedWidth = 0;
-        w.shortened = false;
-        w.collapsed = false;
-        w.canCollapse = part.collapsedIcon != nullptr;
-        w.defaultWidth = part.width;
-        w.shortWidth = part.width;
-        w.fixed = part.fixedWidth;
-    }
+    w.calculatedWidth = 0;
+    w.collapsed = false;
+    w.canCollapse = part.collapsedIcon != nullptr;
+    w.shortened = false;
+    w.fixed = part.fixedWidth;
+
+    if (part.shortWidth > 0)
+        w.shortWidth = part.shortWidth;
     else
     {
-        w.calculatedWidth = 0;
-        w.collapsed = false;
-        w.canCollapse = part.collapsedIcon != nullptr;
-        w.shortened = false;
-        w.fixed = part.fixedWidth;
-
         RECT rc = rect;
-        DrawRichText(hdc, part.shortText, rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
+        DrawRichText(hdc, part.shortText.empty() ? part.text : part.shortText, rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
         w.shortWidth = rc.right - rc.left;
-        rc = rect;
+    }
+    if (part.width > 0)
+        w.defaultWidth = part.width;
+    else
+    {
+        RECT rc = rect;
         DrawRichText(hdc, part.text, rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
         w.defaultWidth = rc.right - rc.left;
-        if (part.icon)
-        {
-            w.defaultWidth += icon_width;
-            w.shortWidth += icon_width;
-        }
-        w.shortWidth += (2 * border_width);
-        w.defaultWidth += (2 * border_width);
-        if (part.width < 0)
-        {
-            // add padding
-            w.defaultWidth -= part.width;
-            w.shortWidth -= part.width;
-        }
     }
+    if (part.icon)
+    {
+        w.defaultWidth += icon_width;
+        w.shortWidth += icon_width;
+    }
+    w.shortWidth += (2 * border_width);
+    w.defaultWidth += (2 * border_width);
+    // add padding
+    if (part.width < 0)
+        w.defaultWidth -= part.width;
+    if (part.shortWidth < 0)
+        w.shortWidth -= part.shortWidth;
     m_partwidths[index] = w;
     ReleaseDC(*this, hdc);
 }
@@ -435,7 +432,6 @@ void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring & text, RECT & rec
     DrawText(hdc, textControls.text.c_str(), -1, &temprc, flags | DT_CALCRECT);
     textControls.xPos = textWidth;
     textWidth += (temprc.right - temprc.left);
-    textControls.command = '\0';
     tokens.push_back(textControls);
 
     for (auto& obj : objStack)
@@ -447,6 +443,8 @@ void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring & text, RECT & rec
     }
     else
     {
+        SetTextColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT));
+        SetBkColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
         flags &= ~DT_CALCRECT;
         if (flags & DT_CENTER)
         {
@@ -542,14 +540,11 @@ void CRichStatusBar::CalcWidths()
         {
             for (auto it = m_partwidths.rbegin(); it != m_partwidths.rend(); ++it)
             {
-                if (!it->fixed)
+                if (!it->shortened)
                 {
-                    if (!it->shortened)
-                    {
-                        it->shortened = true;
-                        bAdjusted = true;
-                        break;
-                    }
+                    it->shortened = true;
+                    bAdjusted = true;
+                    break;
                 }
             }
             if (!bAdjusted)

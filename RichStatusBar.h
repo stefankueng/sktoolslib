@@ -59,6 +59,8 @@ public:
     /// at runtime from the text and icon. A negative value is used as padding to the
     /// calculated width.
     int                 width;
+    /// if \b fixedWidth is set to true, then this sets the width for the short text
+    int                 shortWidth;
     /// determines whether the part can be resized with the main window
     bool                fixedWidth;
     /// if set to true, the part indicates when the mouse pointer hovers over it.
@@ -107,7 +109,7 @@ public:
     /// \param replace if true, the index must exist or be set to -1. if set to false,
     ///               the item is inserted before the index
     bool                SetPart(int index, const CRichStatusBarItem& item, bool redraw, bool replace = true);
-    bool                SetPart(int index, const std::wstring& text, const std::wstring& shortText, const std::wstring& tooltip, int width, int align = 0, bool fixedWidth = false, bool hover = false, HICON icon = nullptr, HICON collapsedIcon = nullptr);
+    bool                SetPart(int index, const std::wstring& text, const std::wstring& shortText, const std::wstring& tooltip, int width, int shortWidth, int align = 0, bool fixedWidth = false, bool hover = false, HICON icon = nullptr, HICON collapsedIcon = nullptr);
     /// returns the recommended height of the status bar
     int                 GetHeight() const { return m_height; }
     /// calculates the widths of all parts and updates the status bar.
