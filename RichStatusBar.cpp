@@ -171,10 +171,16 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             HDC hdc = BeginPaint(hwnd, &ps);
             RECT rect;
             GetClientRect(*this, &rect);
-            GDIHelpers::FillSolidRect(hdc, &rect, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
 
-            SetTextColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT));
-            SetBkColor(hdc, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
+            auto hMyMemDC = ::CreateCompatibleDC(hdc);
+            auto hBitmap = CreateCompatibleBitmap(hdc, rect.right - rect.left, rect.bottom - rect.top);
+            auto hOldBitmap = (HBITMAP)SelectObject(hMyMemDC, hBitmap);
+
+
+            GDIHelpers::FillSolidRect(hMyMemDC, &rect, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
+
+            SetTextColor(hMyMemDC, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT));
+            SetBkColor(hMyMemDC, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
 
 
             RECT partRect = rect;
@@ -186,12 +192,12 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 partRect.left = right;
                 partRect.right = partRect.left + m_partwidths[i].calculatedWidth;
                 right = partRect.right;
-                DrawEdge(hdc, &partRect, i == m_hoverPart ? EDGE_ETCHED : BDR_SUNKENOUTER, BF_RECT | BF_ADJUST);
+                DrawEdge(hMyMemDC, &partRect, i == m_hoverPart ? EDGE_ETCHED : BDR_SUNKENOUTER, BF_RECT | BF_ADJUST);
                 int x = 0;
                 if (part.icon && !m_partwidths[i].collapsed)
                 {
                     auto cy = partRect.bottom - partRect.top;
-                    DrawIconEx(hdc, partRect.left + 2, partRect.top, part.icon, 0, 0, 0, 0, DI_NORMAL);
+                    DrawIconEx(hMyMemDC, partRect.left + 2, partRect.top, part.icon, 0, 0, 0, 0, DI_NORMAL);
                     x = 2 + cy;
                 }
                 partRect.left += x;
@@ -205,15 +211,22 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                         format |= DT_CENTER;
                     if (part.align == 2)
                         format |= DT_RIGHT;
-                    DrawRichText(hdc, text, temprect, format);
+                    DrawRichText(hMyMemDC, text, temprect, format);
                 }
                 else
                 {
                     auto cy = temprect.bottom - temprect.top;
-                    DrawIconEx(hdc, temprect.left + 2, temprect.top, part.icon, 0, 0, 0, 0, DI_NORMAL);
+                    DrawIconEx(hMyMemDC, temprect.left + 2, temprect.top, part.icon, 0, 0, 0, 0, DI_NORMAL);
                     x = 2 + cy;
                 }
             }
+
+            // Copy the off screen bitmap onto the screen.
+            BitBlt(hdc, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, hMyMemDC, rect.left, rect.top, SRCCOPY);
+            //Swap back the original bitmap.
+            SelectObject(hMyMemDC, hOldBitmap);
+            DeleteObject(hBitmap);
+            DeleteDC(hMyMemDC);
 
             EndPaint(hwnd, &ps);
             return 0;
