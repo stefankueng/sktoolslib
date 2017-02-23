@@ -253,10 +253,11 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             pt.x = GET_X_LPARAM(lParam);
             pt.y = GET_Y_LPARAM(lParam);
             auto oldHover = m_hoverPart;
+            auto oldActive = m_parts[m_hoverPart].hoverActive;
             m_hoverPart = GetPartIndexAt(pt);
-            if ((m_hoverPart != oldHover) && (m_parts[m_hoverPart].hoverActive))
+            if ((m_hoverPart != oldHover) || (m_parts[m_hoverPart].hoverActive != oldActive))
                 InvalidateRect(hwnd, nullptr, FALSE);
-            else
+            if (!m_parts[m_hoverPart].hoverActive)
                 m_hoverPart = -1;
         }
         break;
