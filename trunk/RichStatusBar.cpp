@@ -264,7 +264,7 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 else
                 {
                     auto cy = temprect.bottom - temprect.top;
-                    DrawIconEx(hMyMemDC, temprect.left + 2, temprect.top, part.icon, 0, 0, 0, 0, DI_NORMAL);
+                    DrawIconEx(hMyMemDC, temprect.left + 3, temprect.top, part.collapsedIcon, 0, 0, 0, 0, DI_NORMAL);
                     x = 2 + cy;
                 }
             }
@@ -575,7 +575,7 @@ void CRichStatusBar::CalcWidths()
             if (p.shortened)
                 p.calculatedWidth = p.shortWidth;
             if (p.collapsed)
-                p.calculatedWidth = icon_width + (2 * border_width);
+                p.calculatedWidth = icon_width + border_width;
             total += p.calculatedWidth;
             if (!p.fixed)
                 ++nonFixed;
@@ -613,14 +613,11 @@ void CRichStatusBar::CalcWidths()
             {
                 for (auto it = m_partwidths.rbegin(); it != m_partwidths.rend(); ++it)
                 {
-                    if (!it->fixed)
+                    if (!it->collapsed && it->canCollapse)
                     {
-                        if (!it->collapsed && it->canCollapse)
-                        {
-                            it->collapsed = true;
-                            bAdjusted = true;
-                            break;
-                        }
+                        it->collapsed = true;
+                        bAdjusted = true;
+                        break;
                     }
                 }
             }
