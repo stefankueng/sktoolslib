@@ -21,9 +21,8 @@
 #include "GDIHelpers.h"
 #include <deque>
 
-constexpr int icon_width = 24;
 constexpr int border_width = 8;
-
+#define icon_width (GetHeight())
 
 CRichStatusBar::CRichStatusBar(HINSTANCE hInst)
     : CWindow(hInst)
@@ -222,7 +221,6 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             auto hBitmap = CreateCompatibleBitmap(hdc, rect.right - rect.left, rect.bottom - rect.top);
             auto hOldBitmap = (HBITMAP)SelectObject(hMyMemDC, hBitmap);
 
-
             GDIHelpers::FillSolidRect(hMyMemDC, &rect, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
             if (m_drawGrip)
                 DrawSizeGrip(hMyMemDC, &rect);
@@ -240,19 +238,21 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 partRect.left = right;
                 partRect.right = partRect.left + m_partwidths[i].calculatedWidth;
                 right = partRect.right;
-                DrawEdge(hMyMemDC, &partRect, i == m_hoverPart ? EDGE_ETCHED : BDR_SUNKENOUTER, BF_RECT| BF_MONO | BF_SOFT | BF_ADJUST);
+                DrawEdge(hMyMemDC, &partRect, i == m_hoverPart ? EDGE_ETCHED : BDR_SUNKENOUTER, BF_RECT | BF_MONO | BF_SOFT | BF_ADJUST);
                 int x = 0;
                 if (part.icon && !m_partwidths[i].collapsed)
                 {
-                    auto cy = partRect.bottom - partRect.top;
-                    DrawIconEx(hMyMemDC, partRect.left + 2, partRect.top, part.icon, 0, 0, 0, 0, DI_NORMAL);
+                    RECT temprect = partRect;
+                    InflateRect(&temprect, -2, -2);
+                    auto cy = temprect.bottom - temprect.top;
+                    DrawIconEx(hMyMemDC, temprect.left , temprect.top, part.icon, cy, cy, 0, 0, DI_NORMAL);
                     x = 2 + cy;
                 }
                 partRect.left += x;
                 RECT temprect = partRect;
-                InflateRect(&temprect, -(border_width - 2), 0);
                 if (!m_partwidths[i].collapsed || !part.collapsedIcon)
                 {
+                    InflateRect(&temprect, -(border_width - 2), 0);
                     auto text = m_partwidths[i].shortened && !part.shortText.empty() ? part.shortText : part.text;
                     UINT format = DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER;
                     if (part.align == 1)
@@ -263,8 +263,9 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 }
                 else
                 {
+                    InflateRect(&temprect, -2, -2);
                     auto cy = temprect.bottom - temprect.top;
-                    DrawIconEx(hMyMemDC, temprect.left + 3, temprect.top, part.collapsedIcon, 0, 0, 0, 0, DI_NORMAL);
+                    DrawIconEx(hMyMemDC, temprect.left, temprect.top, part.collapsedIcon, cy, cy, 0, 0, DI_NORMAL);
                     x = 2 + cy;
                 }
             }
@@ -575,7 +576,7 @@ void CRichStatusBar::CalcWidths()
             if (p.shortened)
                 p.calculatedWidth = p.shortWidth;
             if (p.collapsed)
-                p.calculatedWidth = icon_width + border_width;
+                p.calculatedWidth = icon_width;
             total += p.calculatedWidth;
             if (!p.fixed)
                 ++nonFixed;
