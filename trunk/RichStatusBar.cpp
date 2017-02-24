@@ -75,6 +75,7 @@ bool CRichStatusBar::Init(HWND hParent)
             ReleaseDC(*this, hdc);
             m_height = fr.bottom - fr.top;
             m_height += 4;
+            m_height *= m_dpiScaleY;
 
             // create the tooltip window
             m_tooltip = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
