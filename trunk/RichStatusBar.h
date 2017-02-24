@@ -120,6 +120,8 @@ public:
     void                SetHandlerFunc(std::function<COLORREF(const COLORREF&)> themeColor) { m_ThemeColorFunc = themeColor; }
     /// returns the index of the part at the specified client coordinates
     int                 GetPartIndexAt(const POINT& pt) const;
+    /// returns a plain string without the formatting chars
+    static std::wstring GetPlainString(const std::wstring& text);
 protected:
     LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     void                CalcRequestedWidths(int index);
