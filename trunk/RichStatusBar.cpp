@@ -32,6 +32,7 @@ CRichStatusBar::CRichStatusBar(HINSTANCE hInst)
     , m_ThemeColorFunc(nullptr)
     , m_hoverPart(-1)
     , m_height(22)
+    , m_drawGrip(false)
 {
 }
 
@@ -42,8 +43,9 @@ CRichStatusBar::~CRichStatusBar()
         DeleteObject(font);
 }
 
-bool CRichStatusBar::Init(HWND hParent)
+bool CRichStatusBar::Init(HWND hParent, bool drawGrip)
 {
+    m_drawGrip = drawGrip;
     WNDCLASSEX wcx = { sizeof(WNDCLASSEX) };
 
     wcx.lpfnWndProc = CWindow::stWinMsgHandler;
@@ -75,7 +77,7 @@ bool CRichStatusBar::Init(HWND hParent)
             ReleaseDC(*this, hdc);
             m_height = fr.bottom - fr.top;
             m_height += 4;
-            m_height *= m_dpiScaleY;
+            m_height = int(m_height*m_dpiScaleY);
 
             // create the tooltip window
             m_tooltip = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
@@ -162,6 +164,49 @@ int CRichStatusBar::GetPartIndexAt(const POINT & pt) const
     return -1;
 }
 
+void CRichStatusBar::DrawSizeGrip(HDC hdc, LPCRECT lpRect)
+{
+    HPEN hPenFace, hPenShadow, hPenHighlight, hOldPen;
+    POINT pt;
+    INT i;
+
+    pt.x = lpRect->right - 1;
+    pt.y = lpRect->bottom - 1;
+
+    hPenFace = CreatePen(PS_SOLID, 1, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
+    hOldPen = (HPEN)SelectObject(hdc, hPenFace);
+    MoveToEx(hdc, pt.x - 12, pt.y, nullptr);
+    LineTo(hdc, pt.x, pt.y);
+    LineTo(hdc, pt.x, pt.y - 13);
+
+    pt.x--;
+    pt.y--;
+
+    hPenShadow = CreatePen(PS_SOLID, 1, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DSHADOW)) : GetSysColor(COLOR_3DSHADOW));
+    SelectObject(hdc, hPenShadow);
+    for (i = 1; i < 11; i += 4)
+    {
+        MoveToEx(hdc, pt.x - i, pt.y, nullptr);
+        LineTo(hdc, pt.x + 1, pt.y - i - 1);
+
+        MoveToEx(hdc, pt.x - i - 1, pt.y, nullptr);
+        LineTo(hdc, pt.x + 1, pt.y - i - 2);
+    }
+
+    hPenHighlight = CreatePen(PS_SOLID, 1, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DHIGHLIGHT)) : GetSysColor(COLOR_3DHIGHLIGHT));
+    SelectObject(hdc, hPenHighlight);
+    for (i = 3; i < 13; i += 4)
+    {
+        MoveToEx(hdc, pt.x - i, pt.y, nullptr);
+        LineTo(hdc, pt.x + 1, pt.y - i - 1);
+    }
+
+    SelectObject(hdc, hOldPen);
+    DeleteObject(hPenFace);
+    DeleteObject(hPenShadow);
+    DeleteObject(hPenHighlight);
+}
+
 LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
@@ -179,6 +224,8 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 
 
             GDIHelpers::FillSolidRect(hMyMemDC, &rect, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
+            if (m_drawGrip)
+                DrawSizeGrip(hMyMemDC, &rect);
 
             SetTextColor(hMyMemDC, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT));
             SetBkColor(hMyMemDC, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));

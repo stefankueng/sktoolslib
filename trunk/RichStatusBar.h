@@ -99,7 +99,7 @@ public:
     CRichStatusBar(HINSTANCE hInst);
     ~CRichStatusBar();
 
-    bool Init(HWND hParent);
+    bool Init(HWND hParent, bool drawGrip);
 
     /// Sets/Updates or inserts a part.
     /// \param index the index to update. If the index does not exist, the function returns false.
@@ -124,6 +124,7 @@ protected:
     LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     void                CalcRequestedWidths(int index);
     void                DrawRichText(HDC hdc, const std::wstring& text, RECT& rect, UINT flags);
+    void                DrawSizeGrip(HDC hdc, LPCRECT lpRect);
 
 private:
     std::vector<CRichStatusBarItem>     m_parts;
@@ -133,5 +134,6 @@ private:
     std::function<COLORREF(const COLORREF&)> m_ThemeColorFunc;
     int                                 m_hoverPart;
     int                                 m_height;
+    bool                                m_drawGrip;
 };
 
