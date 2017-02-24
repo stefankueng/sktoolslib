@@ -22,7 +22,7 @@
 #include <deque>
 
 constexpr int icon_width = 24;
-constexpr int border_width = 3;
+constexpr int border_width = 8;
 
 
 CRichStatusBar::CRichStatusBar(HINSTANCE hInst)
@@ -202,7 +202,7 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 }
                 partRect.left += x;
                 RECT temprect = partRect;
-                InflateRect(&temprect, -2, 0);
+                InflateRect(&temprect, -(border_width - 2), 0);
                 if (!m_partwidths[i].collapsed || !part.collapsedIcon)
                 {
                     auto text = m_partwidths[i].shortened && !part.shortText.empty() ? part.shortText : part.text;
