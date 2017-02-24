@@ -245,7 +245,7 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                     RECT temprect = partRect;
                     InflateRect(&temprect, -2, -2);
                     auto cy = temprect.bottom - temprect.top;
-                    DrawIconEx(hMyMemDC, temprect.left , temprect.top, part.icon, cy, cy, 0, 0, DI_NORMAL);
+                    DrawIconEx(hMyMemDC, temprect.left, temprect.top, part.icon, cy, cy, 0, 0, DI_NORMAL);
                     x = 2 + cy;
                 }
                 partRect.left += x;
@@ -385,6 +385,49 @@ void CRichStatusBar::CalcRequestedWidths(int index)
         w.shortWidth -= part.shortWidth;
     m_partwidths[index] = w;
     ReleaseDC(*this, hdc);
+}
+
+std::wstring CRichStatusBar::GetPlainString(const std::wstring & text)
+{
+    std::wstring result;
+    size_t pos = 0;
+    auto percPos = text.find('%', pos);
+    int textWidth = 0;
+    while (percPos != std::wstring::npos)
+    {
+        if (percPos < text.size() - 1)
+        {
+            result += text.substr(pos, percPos - pos);
+            pos = percPos + 1;
+            switch (text[pos])
+            {
+                case '%':
+                {
+                    result += L"%";
+                    ++pos;
+                }
+                break;
+                case 'i':   // italic
+                case 'b':   // bold
+                case 'r':   // reset
+                    ++pos;
+                break;
+                case 'c':   // color
+                {
+                    if (percPos < text.size() - 7)
+                    {
+                        pos += 7;
+                    }
+                }
+                break;
+            }
+        }
+        else
+            break;
+        percPos = text.find('%', pos);
+    }
+    result += text.substr(pos);
+    return result;
 }
 
 void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring & text, RECT & rect, UINT flags)
