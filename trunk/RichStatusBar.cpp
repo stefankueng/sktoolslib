@@ -410,7 +410,7 @@ std::wstring CRichStatusBar::GetPlainString(const std::wstring & text)
                 case 'i':   // italic
                 case 'b':   // bold
                 case 'r':   // reset
-                    ++pos;
+                ++pos;
                 break;
                 case 'c':   // color
                 {
@@ -615,9 +615,9 @@ void CRichStatusBar::CalcWidths()
         for (auto& p : m_partwidths)
         {
             if (p.calculatedWidth == 0)
-                p.calculatedWidth = p.defaultWidth;
+                p.calculatedWidth = int(p.defaultWidth*m_dpiScaleX);
             if (p.shortened)
-                p.calculatedWidth = p.shortWidth;
+                p.calculatedWidth = int(p.shortWidth*m_dpiScaleX);
             if (p.collapsed)
                 p.calculatedWidth = icon_width;
             total += p.calculatedWidth;
