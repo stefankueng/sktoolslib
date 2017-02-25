@@ -356,7 +356,7 @@ void CRichStatusBar::CalcRequestedWidths(int index)
     w.fixed = part.fixedWidth;
 
     if (part.shortWidth > 0)
-        w.shortWidth = part.shortWidth;
+        w.shortWidth = int(part.shortWidth*m_dpiScaleX);
     else
     {
         RECT rc = rect;
@@ -364,7 +364,7 @@ void CRichStatusBar::CalcRequestedWidths(int index)
         w.shortWidth = rc.right - rc.left;
     }
     if (part.width > 0)
-        w.defaultWidth = part.width;
+        w.defaultWidth = int(part.width*m_dpiScaleX);
     else
     {
         RECT rc = rect;
@@ -410,7 +410,7 @@ std::wstring CRichStatusBar::GetPlainString(const std::wstring & text)
                 case 'i':   // italic
                 case 'b':   // bold
                 case 'r':   // reset
-                ++pos;
+                    ++pos;
                 break;
                 case 'c':   // color
                 {
@@ -615,9 +615,9 @@ void CRichStatusBar::CalcWidths()
         for (auto& p : m_partwidths)
         {
             if (p.calculatedWidth == 0)
-                p.calculatedWidth = int(p.defaultWidth*m_dpiScaleX);
+                p.calculatedWidth = p.defaultWidth;
             if (p.shortened)
-                p.calculatedWidth = int(p.shortWidth*m_dpiScaleX);
+                p.calculatedWidth = p.shortWidth;
             if (p.collapsed)
                 p.calculatedWidth = icon_width;
             total += p.calculatedWidth;
