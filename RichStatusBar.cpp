@@ -392,7 +392,6 @@ std::wstring CRichStatusBar::GetPlainString(const std::wstring & text)
     std::wstring result;
     size_t pos = 0;
     auto percPos = text.find('%', pos);
-    int textWidth = 0;
     while (percPos != std::wstring::npos)
     {
         if (percPos < text.size() - 1)
