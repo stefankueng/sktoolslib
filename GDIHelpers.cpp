@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013 - Stefan Kueng
+// Copyright (C) 2012-2013, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -217,4 +217,71 @@ COLORREF GDIHelpers::HSLtoRGB(float h, float s, float l)
     BYTE g = BYTE(pcg / 100 * 255);
     BYTE b = BYTE(pcb / 100 * 255);
     return RGB(r, g, b);
+}
+
+bool GDIHelpers::ShortHexStringToCOLORREF(const std::string& s, COLORREF* clr)
+{
+    if (s.length() != 3)
+        return false;
+    BYTE rgb[3]; // [0]=red, [1]=green, [2]=blue
+    char dig[2];
+    dig[1] = '\0';
+    for (int i = 0; i < 3; ++i)
+    {
+        dig[0] = s[i];
+        BYTE& v = rgb[i];
+        char* ep = nullptr;
+        errno = 0;
+        // Must convert all digits of string.
+        v = (BYTE)strtoul(dig, &ep, 16);
+        if (errno == 0 && ep == &dig[1])
+            v = v * 16 + v;
+        else
+        {
+            *clr = 0;
+            return false;
+        }
+    }
+    auto color = RGB(rgb[0], rgb[1], rgb[2]);
+    *clr = (RGB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF)) | (color & 0xFF000000);
+    return true;
+}
+
+bool GDIHelpers::HexStringToCOLORREF(const std::string& s, COLORREF* clr)
+{
+    if (s.length() != 6)
+        return false;
+    char* ep = nullptr;
+    errno = 0;
+    unsigned long v = strtoul(s.c_str(), &ep, 16);
+    // Must convert all digits of string.
+    if (errno == 0 && ep == &s[6])
+    {
+        BYTE r = (v >> 16) & 0xFF;
+        BYTE g = (v >> 8) & 0xFF;
+        BYTE b = v & 0xFF;
+        *clr = RGB(r, g, b) | (v & 0xFF000000);
+        return true;
+    }
+    *clr = RGB(0, 0, 0);
+    return false;
+}
+
+bool GDIHelpers::HexStringToCOLORREF(const std::wstring& s, COLORREF* clr)
+{
+    if (s.length() != 6)
+        return false;
+    wchar_t* ep = nullptr;
+    errno = 0;
+    unsigned long v = wcstoul(s.c_str(), &ep, 16);
+    if (errno == 0 && ep == &s[6])
+    {
+        BYTE r = (v >> 16) & 0xFF;
+        BYTE g = (v >> 8) & 0xFF;
+        BYTE b = v & 0xFF;
+        *clr = RGB(r, g, b) | (v & 0xFF000000);
+        return true;
+    }
+    *clr = RGB(0, 0, 0);
+    return false;
 }
