@@ -267,6 +267,26 @@ bool GDIHelpers::HexStringToCOLORREF(const std::string& s, COLORREF* clr)
     return false;
 }
 
+bool GDIHelpers::LongHexStringToCOLORREF(const std::string& s, COLORREF* clr)
+{
+    if (s.length() != 8)
+        return false;
+    char* ep = nullptr;
+    errno = 0;
+    unsigned long v = strtoul(s.c_str(), &ep, 16);
+    // Must convert all digits of string.
+    if (errno == 0 && ep == &s[8])
+    {
+        BYTE b = (v >> 16) & 0xFF;
+        BYTE g = (v >> 8) & 0xFF;
+        BYTE r = v & 0xFF;
+        *clr = RGB(r, g, b) | (v & 0xFF000000);
+        return true;
+    }
+    *clr = RGB(0, 0, 0);
+    return false;
+}
+
 bool GDIHelpers::HexStringToCOLORREF(const std::wstring& s, COLORREF* clr)
 {
     if (s.length() != 6)

@@ -39,4 +39,5 @@ public:
     static bool             HexStringToCOLORREF(const std::string& s, COLORREF* clr);
     static bool             HexStringToCOLORREF(const std::wstring& s, COLORREF* clr);
     static bool             ShortHexStringToCOLORREF(const std::string& s, COLORREF* clr);
+    static bool             LongHexStringToCOLORREF(const std::string& s, COLORREF* clr);
 };
