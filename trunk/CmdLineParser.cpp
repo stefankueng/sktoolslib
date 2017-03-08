@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -93,7 +93,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
         if (sVal == NULL)
         {
             stdstring Key(sArg);
-            std::transform(Key.begin(), Key.end(), Key.begin(), ::tolower);
+            std::transform(Key.begin(), Key.end(), Key.begin(), ::towlower);
             m_valueMap.insert(CValsMap::value_type(Key, sEmpty));
             break;
         }
@@ -103,7 +103,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
             stdstring Key(sArg, (int)(sVal - sArg));
             if (!Key.empty())
             {
-                std::transform(Key.begin(), Key.end(), Key.begin(), ::tolower);
+                std::transform(Key.begin(), Key.end(), Key.begin(), ::towlower);
                 m_valueMap.insert(CValsMap::value_type(Key, sEmpty));
             }
             sCurrent = _tcsinc(sVal);
@@ -113,7 +113,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
         {
             // key has value
             stdstring Key(sArg, (int)(sVal - sArg));
-            std::transform(Key.begin(), Key.end(), Key.begin(), ::tolower);
+            std::transform(Key.begin(), Key.end(), Key.begin(), ::towlower);
 
             sVal = _tcsinc(sVal);
 
@@ -177,7 +177,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
 CCmdLineParser::CValsMap::const_iterator CCmdLineParser::findKey(LPCTSTR sKey) const
 {
     stdstring s(sKey);
-    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    std::transform(s.begin(), s.end(), s.begin(), ::towlower);
     return m_valueMap.find(s);
 }
 
