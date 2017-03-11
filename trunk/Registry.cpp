@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -70,12 +70,12 @@ void CRegRect::InternalRead (HKEY hKey, CRect& value)
 {
     DWORD size = 0;
     DWORD type = 0;
-    LastError = RegQueryValueEx(hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
+    LastError = RegQueryValueEx(hKey, m_key, NULL, &type, nullptr, (LPDWORD) &size);
 
     if (LastError == ERROR_SUCCESS)
     {
         auto buffer = std::make_unique<char[]>(size);
-        if ((LastError = RegQueryValueEx(hKey, m_key, NULL, &type, (BYTE*) buffer.get(), &size))==ERROR_SUCCESS)
+        if ((LastError = RegQueryValueEx(hKey, m_key, nullptr, &type, (BYTE*) buffer.get(), &size))==ERROR_SUCCESS)
         {
             ASSERT(type==REG_BINARY);
             value = CRect((LPRECT)buffer.get());
@@ -108,12 +108,12 @@ void CRegPoint::InternalRead (HKEY hKey, CPoint& value)
 {
     DWORD size = 0;
     DWORD type = 0;
-    LastError = RegQueryValueEx(hKey, m_key, NULL, &type, NULL, (LPDWORD) &size);
+    LastError = RegQueryValueEx(hKey, m_key, nullptr, &type, nullptr, (LPDWORD) &size);
 
     if (LastError == ERROR_SUCCESS)
     {
         auto buffer = std::make_unique<char[]>(size);
-        if ((LastError = RegQueryValueEx(hKey, m_key, NULL, &type, (BYTE*) buffer.get(), &size))==ERROR_SUCCESS)
+        if ((LastError = RegQueryValueEx(hKey, m_key, nullptr, &type, (BYTE*) buffer.get(), &size))==ERROR_SUCCESS)
         {
             ASSERT(type==REG_BINARY);
             value = CPoint(*(POINT*)buffer.get());
@@ -133,7 +133,7 @@ void CRegPoint::InternalWrite (HKEY hKey, const CPoint& value)
 CRegistryKey::CRegistryKey(const CString& key, HKEY base, REGSAM sam)
 {
     m_base = base;
-    m_hKey = NULL;
+    m_hKey = nullptr;
     m_sam = sam;
     m_path = key;
     m_path.TrimLeft(_T("\\"));
@@ -148,7 +148,7 @@ CRegistryKey::~CRegistryKey()
 DWORD CRegistryKey::createKey()
 {
     DWORD disp;
-    DWORD rc = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE|m_sam, NULL, &m_hKey, &disp);
+    DWORD rc = RegCreateKeyEx(m_base, m_path, 0, _T(""), REG_OPTION_NON_VOLATILE, KEY_WRITE|m_sam, nullptr, &m_hKey, &disp);
     if (rc != ERROR_SUCCESS)
     {
         return rc;
@@ -172,7 +172,7 @@ bool CRegistryKey::getValues(CStringList& values)
         {
             TCHAR value[255];
             DWORD size = _countof(value);
-            rc = RegEnumValue(m_hKey, i, value, &size, NULL, NULL, NULL, NULL);
+            rc = RegEnumValue(m_hKey, i, value, &size, nullptr, nullptr, nullptr, nullptr);
             if (rc == ERROR_SUCCESS)
             {
                 values.AddTail(value);
@@ -194,7 +194,7 @@ bool CRegistryKey::getSubKeys(CStringList& subkeys)
             TCHAR value[1024];
             DWORD size = _countof(value);
             FILETIME last_write_time;
-            rc = RegEnumKeyEx(m_hKey, i, value, &size, NULL, NULL, NULL, &last_write_time);
+            rc = RegEnumKeyEx(m_hKey, i, value, &size, nullptr, nullptr, nullptr, &last_write_time);
             if (rc == ERROR_SUCCESS)
             {
                 subkeys.AddTail(value);

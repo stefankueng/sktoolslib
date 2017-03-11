@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2014, 2017 - Stefan Kueng
 
@@ -71,7 +71,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
         do
         {
             httpsendrequest = !!HttpSendRequest(hResourceHandle, nullptr, 0, nullptr, 0);
-            dwError = InternetErrorDlg(NULL, hResourceHandle, ERROR_SUCCESS, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA, nullptr);
+            dwError = InternetErrorDlg(nullptr, hResourceHandle, ERROR_SUCCESS, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA, nullptr);
         } while (dwError == ERROR_INTERNET_FORCE_RETRY);
 
         if (!httpsendrequest)
@@ -87,12 +87,12 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
     DWORD contentLength = 0;
     {
         DWORD length = sizeof(contentLength);
-        HttpQueryInfo(hResourceHandle, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&contentLength, &length, NULL);
+        HttpQueryInfo(hResourceHandle, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&contentLength, &length, nullptr);
     }
     {
         DWORD statusCode = 0;
         DWORD length = sizeof(statusCode);
-        if (!HttpQueryInfo(hResourceHandle, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&statusCode, &length, NULL) || statusCode != 200)
+        if (!HttpQueryInfo(hResourceHandle, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&statusCode, &length, nullptr) || statusCode != 200)
         {
             CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L": Download of %s returned %d\n", url.c_str(), statusCode);
             InternetCloseHandle(hResourceHandle);
@@ -105,7 +105,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
         }
     }
 
-    HANDLE hDestFile = CreateFile(dest.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hDestFile = CreateFile(dest.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (hDestFile == INVALID_HANDLE_VALUE)
     {
@@ -144,7 +144,7 @@ bool CDownloadFile::DownloadFile(const std::wstring& url, const std::wstring& de
 
         Data[downloaded] = '\0';
         DWORD dwWritten = 0;
-        WriteFile(hDestFile, Data.get(), downloaded, &dwWritten, NULL);
+        WriteFile(hDestFile, Data.get(), downloaded, &dwWritten, nullptr);
 
         downloadedSum += downloaded;
 

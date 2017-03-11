@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -281,7 +281,7 @@ public:
      *                result is unspecified).
      * \param  pbIsDirectory Pointer to a bool variable which will hold
      *                TRUE if the \c result path is a directory, FALSE
-     *                if it's a file. Pass NULL if you don't need that information.
+     *                if it's a file. Pass nullptr if you don't need that information.
      * \param  recurse true if recursing into subdirectories is requested.
      * \return TRUE iff a file was found, false at end of the iteration.
      */

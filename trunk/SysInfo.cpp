@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013 - Stefan Kueng
+// Copyright (C) 2012-2013, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,7 +33,7 @@ SysInfo::SysInfo(void)
     if (IsWindowsVistaOrGreater())
 #endif
     {
-        HANDLE hToken = NULL;
+        HANDLE hToken = nullptr;
         if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &hToken))
         {
             TOKEN_ELEVATION te = {0};

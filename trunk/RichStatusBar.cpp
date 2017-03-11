@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2017 Stefan Kueng
 
@@ -51,7 +51,7 @@ bool CRichStatusBar::Init(HWND hParent, bool drawGrip)
     wcx.hInstance = hResource;
     wcx.lpszClassName = L"RichStatusBar_{226E35DD-FFAC-4D97-A040-B94AF5BE39EC}";
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
-    wcx.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+    wcx.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
     if (RegisterWindow(&wcx))
     {
         if (CreateEx(0, WS_CHILD | WS_VISIBLE, hParent))
@@ -79,12 +79,12 @@ bool CRichStatusBar::Init(HWND hParent, bool drawGrip)
             m_height = int(m_height*m_dpiScaleY);
 
             // create the tooltip window
-            m_tooltip = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
+            m_tooltip = CreateWindowEx(0, TOOLTIPS_CLASS, nullptr,
                                        WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
                                        CW_USEDEFAULT, CW_USEDEFAULT,
                                        CW_USEDEFAULT, CW_USEDEFAULT,
-                                       *this, NULL, hResource,
-                                       NULL);
+                                       *this, nullptr, hResource,
+                                       nullptr);
             SendMessage(m_tooltip, TTM_SETMAXTIPWIDTH, 0, 600);
             return true;
         }

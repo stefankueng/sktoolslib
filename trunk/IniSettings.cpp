@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2013, 2017 - Stefan Kueng
 
@@ -41,7 +41,7 @@ void CIniSettings::SetIniPath( const std::wstring& p )
     if (p.empty())
     {
         wchar_t buf[MAX_PATH] = {0};
-        GetModuleFileName(NULL, buf, _countof(buf));
+        GetModuleFileName(nullptr, buf, _countof(buf));
         m_iniPath = buf;
         m_iniPath = m_iniPath.substr(0, m_iniPath.find_last_of('\\'));
         m_iniPath += L"\\settings";
@@ -53,7 +53,7 @@ void CIniSettings::SetIniPath( const std::wstring& p )
 
 void CIniSettings::Save()
 {
-    FILE * pFile = NULL;
+    FILE * pFile = nullptr;
     _tfopen_s(&pFile, m_iniPath.c_str(), _T("wb"));
     m_IniFile.SaveFile(pFile);
     fclose(pFile);
@@ -62,11 +62,11 @@ void CIniSettings::Save()
 __int64 CIniSettings::GetInt64( LPCWSTR section, LPCWSTR key, __int64 default )
 {
     _ASSERT(m_iniPath.size());
-    const wchar_t * v = m_IniFile.GetValue(section, key, NULL);
-    if (v == NULL)
+    const wchar_t * v = m_IniFile.GetValue(section, key, nullptr);
+    if (v == nullptr)
         return default;
 
-    return _wcstoi64(v, NULL, 10);
+    return _wcstoi64(v, nullptr, 10);
 }
 
 void CIniSettings::SetInt64( LPCWSTR section, LPCWSTR key, __int64 value )

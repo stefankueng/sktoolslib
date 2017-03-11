@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -37,12 +37,12 @@ public:
     static std::wstring GetLongFileExtension(const std::wstring& path);
     static std::wstring GetFileName(const std::wstring& path);
     // module/app paths
-    static std::wstring GetModulePath(HMODULE hMod = NULL);
-    static std::wstring GetModuleDir(HMODULE hMod = NULL);
+    static std::wstring GetModulePath(HMODULE hMod = nullptr);
+    static std::wstring GetModuleDir(HMODULE hMod = nullptr);
     static std::wstring Append(const std::wstring& path, const std::wstring& append);
     static std::wstring GetTempFilePath();
     static std::wstring GetVersionFromFile(const std::wstring& path);
-    static std::wstring GetAppDataPath(HMODULE hMod = NULL);
+    static std::wstring GetAppDataPath(HMODULE hMod = nullptr);
     static std::wstring GetCWD();
     static void         NormalizeFolderSeparators( std::wstring& path);
     static int          PathCompare(const std::wstring& path1, const std::wstring& path2);

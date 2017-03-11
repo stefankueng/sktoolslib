@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -57,7 +57,7 @@ bool CLanguage::LoadFile( const std::wstring& path )
     // we need to convert the filepath to multibyte first
     char filepath[MAX_PATH+1];
     SecureZeroMemory(filepath, sizeof(filepath));
-    WideCharToMultiByte(CP_ACP, NULL, path.c_str(), -1, filepath, _countof(filepath)-1, NULL, NULL);
+    WideCharToMultiByte(CP_ACP, 0, path.c_str(), -1, filepath, _countof(filepath)-1, nullptr, nullptr);
 
     std::wifstream File;
     File.imbue(std::locale(std::locale(), new utf8_conversion()));
@@ -187,7 +187,7 @@ void CLanguage::TranslateMenu(HMENU hMenu)
         MENUITEMINFO mii = { 0 };
         mii.cbSize = sizeof(MENUITEMINFO);
         mii.fMask = MIIM_STRING | MIIM_SUBMENU;
-        mii.dwTypeData = NULL;
+        mii.dwTypeData = 0;
         if (GetMenuItemInfo(hMenu, i, MF_BYPOSITION, &mii))
         {
             if (mii.hSubMenu)
@@ -251,7 +251,7 @@ BOOL CALLBACK CLanguage::TranslateWindowProc( HWND hwnd, LPARAM lParam )
                 RECT controlrect;
                 RECT controlrectorig;
                 GetWindowRect(hwnd, &controlrect);
-                ::MapWindowPoints(NULL, GetParent(hwnd), (LPPOINT)&controlrect, 2);
+                ::MapWindowPoints(nullptr, GetParent(hwnd), (LPPOINT)&controlrect, 2);
                 controlrectorig = controlrect;
                 if (hDC)
                 {

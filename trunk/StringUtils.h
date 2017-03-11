@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2012-2017 - Stefan Kueng
 
@@ -335,7 +335,7 @@ public:
 
     static std::wstring ExpandEnvironmentStrings (const std::wstring& s)
     {
-        DWORD len = ::ExpandEnvironmentStrings (s.c_str(), NULL, 0);
+        DWORD len = ::ExpandEnvironmentStrings (s.c_str(), nullptr, 0);
         if (len == 0)
             return s;
 

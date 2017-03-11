@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,11 +21,11 @@
 #include "ProgressDlg.h"
 
 CProgressDlg::CProgressDlg()
-    : m_pIDlg(NULL)
+    : m_pIDlg(nullptr)
     , m_bValid(false)       //not valid by default
     , m_isVisible(false)
     , m_dwDlgFlags(PROGDLG_NORMAL)
-    , m_hWndProgDlg(NULL)
+    , m_hWndProgDlg(nullptr)
 {
     EnsureValid();
 }
@@ -38,7 +38,7 @@ CProgressDlg::~CProgressDlg()
             m_pIDlg->StopProgressDialog();
 
         m_pIDlg->Release();
-        m_hWndProgDlg = NULL;
+        m_hWndProgDlg = nullptr;
     }
 }
 
@@ -48,7 +48,7 @@ bool CProgressDlg::EnsureValid()
     {
         HRESULT hr;
 
-        hr = CoCreateInstance (CLSID_ProgressDialog, NULL, CLSCTX_INPROC_SERVER,
+        hr = CoCreateInstance (CLSID_ProgressDialog, nullptr, CLSCTX_INPROC_SERVER,
             IID_IProgressDialog, (void**)&m_pIDlg);
 
         if (SUCCEEDED(hr))
@@ -69,7 +69,7 @@ void CProgressDlg::SetLine(DWORD dwLine, LPCWSTR szText, bool bCompactPath /* = 
 {
     if (m_bValid)
     {
-        m_pIDlg->SetLine(dwLine, szText, bCompactPath, NULL);
+        m_pIDlg->SetLine(dwLine, szText, bCompactPath, nullptr);
     }
 }
 
@@ -84,7 +84,7 @@ void CProgressDlg::SetCancelMsg(LPCWSTR szMessage)
 {
     if (m_bValid)
     {
-        m_pIDlg->SetCancelMsg(szMessage, NULL);
+        m_pIDlg->SetCancelMsg(szMessage, nullptr);
     }
 }
 
@@ -169,9 +169,9 @@ HRESULT CProgressDlg::ShowModal (HWND hWndParent)
     {
         HRESULT hr;
         hr = m_pIDlg->StartProgressDialog(hWndParent,
-            NULL,
-            m_dwDlgFlags | PROGDLG_MODAL,
-            NULL);
+                                          nullptr,
+                                          m_dwDlgFlags | PROGDLG_MODAL,
+                                          nullptr);
 
         if (SUCCEEDED(hr))
         {
@@ -186,10 +186,10 @@ HRESULT CProgressDlg::ShowModeless(HWND hWndParent)
 {
     EnsureValid();
     HRESULT hr = E_FAIL;
-    m_hWndProgDlg = NULL;
+    m_hWndProgDlg = nullptr;
     if (m_bValid)
     {
-        hr = m_pIDlg->StartProgressDialog(hWndParent, NULL, m_dwDlgFlags, NULL);
+        hr = m_pIDlg->StartProgressDialog(hWndParent, nullptr, m_dwDlgFlags, nullptr);
 
         if (SUCCEEDED(hr))
         {
@@ -254,7 +254,7 @@ void CProgressDlg::Stop()
         m_isVisible = false;
         m_pIDlg->Release();
         m_bValid = false;
-        m_hWndProgDlg = NULL;
+        m_hWndProgDlg = nullptr;
     }
 }
 
@@ -262,6 +262,6 @@ void CProgressDlg::ResetTimer()
 {
     if (m_bValid)
     {
-        m_pIDlg->Timer(PDTIMER_RESET, NULL);
+        m_pIDlg->Timer(PDTIMER_RESET, nullptr);
     }
 }

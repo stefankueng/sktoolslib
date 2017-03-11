@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2016 Stefan Kueng
+// Copyright (C) 2016-2017 Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -47,8 +47,8 @@ bool CScrollTool::Init(bool bRightAligned /* = false */)
 
         ti.cbSize = sizeof(TOOLINFO);
         ti.uFlags = TTF_TRACK;
-        ti.hwnd = NULL;
-        ti.hinst = NULL;
+        ti.hwnd = nullptr;
+        ti.hinst = nullptr;
         ti.uId = 0;
         ti.lpszText = L" ";
 

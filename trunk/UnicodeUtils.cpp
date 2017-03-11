@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013 - Stefan Kueng
+// Copyright (C) 2012-2013, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -37,7 +37,7 @@ std::string CUnicodeUtils::StdGetUTF8(const std::wstring& wide, bool stopAtNull/
         return std::string();
     int size = len * 4;
     auto narrow = std::make_unique<char[]>(size);
-    int ret = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), len, narrow.get(), size - 1, NULL, NULL);
+    int ret = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), len, narrow.get(), size - 1, nullptr, nullptr);
     narrow[ret] = 0;
     if (stopAtNull)
         return std::string(narrow.get());
@@ -51,7 +51,7 @@ std::string CUnicodeUtils::StdGetANSI(const std::wstring& wide, bool stopAtNull/
         return std::string();
     int size = len * 4;
     auto narrow = std::make_unique<char[]>(size);
-    int ret = WideCharToMultiByte(CP_ACP, 0, wide.c_str(), len, narrow.get(), size - 1, NULL, NULL);
+    int ret = WideCharToMultiByte(CP_ACP, 0, wide.c_str(), len, narrow.get(), size - 1, nullptr, nullptr);
     narrow[ret] = 0;
     if (stopAtNull)
         return std::string(narrow.get());
@@ -87,7 +87,7 @@ std::string WideToMultibyte(const std::wstring& wide, bool stopAtNull/* = true*/
 std::string WideToUTF8(const std::wstring& wide, bool stopAtNull/* = true*/)
 {
     auto narrow = std::make_unique<char[]>(wide.length() * 3 + 2);
-    int ret = (int)WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), (int)wide.size(), narrow.get(), (int)wide.length() * 3 - 1, NULL, NULL);
+    int ret = (int)WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), (int)wide.size(), narrow.get(), (int)wide.length() * 3 - 1, nullptr, nullptr);
     narrow[ret] = 0;
     if (stopAtNull)
         return narrow.get();
@@ -101,7 +101,7 @@ std::wstring MultibyteToWide(const std::string& multibyte, bool stopAtNull/* = t
         return std::wstring();
 
     auto wide = std::make_unique<wchar_t[]>(multibyte.length() * 2 + 2);
-    if (wide == NULL)
+    if (wide == nullptr)
         return std::wstring();
     int ret = (int)MultiByteToWideChar(CP_ACP, 0, multibyte.c_str(), (int)multibyte.size(), wide.get(), (int)length * 2 - 1);
     wide[ret] = 0;
@@ -117,7 +117,7 @@ std::wstring UTF8ToWide(const std::string& multibyte, bool stopAtNull/* = true*/
         return std::wstring();
 
     auto wide = std::make_unique<wchar_t[]>(length * 2 + 2);
-    if (wide == NULL)
+    if (wide == nullptr)
         return std::wstring();
     int ret = (int)MultiByteToWideChar(CP_UTF8, 0, multibyte.c_str(), (int)multibyte.size(), wide.get(), (int)length * 2 - 1);
     wide[ret] = 0;
@@ -154,7 +154,7 @@ int LoadStringEx(HINSTANCE hInstance, UINT uID, LPTSTR lpBuffer, int nBufferMax,
 #endif
     int ret;
 
-    if (lpBuffer == NULL)
+    if (lpBuffer == nullptr)
         return 0;
     lpBuffer[0] = 0;
     HRSRC hResource = FindResourceEx(hInstance, RT_STRING, MAKEINTRESOURCE(((uID >> 4) + 1)), wLanguage);

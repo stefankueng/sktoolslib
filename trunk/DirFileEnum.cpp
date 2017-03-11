@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -147,7 +147,7 @@ inline void CDirFileEnum::PushStack(const std::wstring& sDirName)
 }
 
 CDirFileEnum::CDirFileEnum(const std::wstring& sDirName) :
-    m_seStack(NULL),
+    m_seStack(nullptr),
     m_bIsNew(true)
 {
     PushStack(sDirName);
@@ -155,7 +155,7 @@ CDirFileEnum::CDirFileEnum(const std::wstring& sDirName) :
 
 CDirFileEnum::~CDirFileEnum()
 {
-    while (m_seStack != NULL) {
+    while (m_seStack != nullptr) {
         PopStack();
     }
 }
@@ -178,7 +178,7 @@ bool CDirFileEnum::NextFile(std::wstring &sResult, bool* pbIsDirectory, bool rec
     if (m_seStack)
     {
         sResult = m_seStack->GetFilePath();
-        if (pbIsDirectory != NULL)
+        if (pbIsDirectory != nullptr)
         {
             *pbIsDirectory = m_seStack->IsDirectory();
         }

@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -56,7 +56,7 @@ public:
     HRESULT BufferedPaintInit(void);
     HRESULT BufferedPaintUnInit(void);
     HTHEME OpenThemeData(HWND hwnd, LPCWSTR pszClassList);
-    BOOL DetermineGlowSize(int *piSize, LPCWSTR pszClassIdList = NULL);
+    BOOL DetermineGlowSize(int *piSize, LPCWSTR pszClassIdList = nullptr);
     HRESULT CloseThemeData(HTHEME hTheme);
     HPAINTBUFFER BeginBufferedPaint(HDC hdcTarget, const RECT* prcTarget, BP_BUFFERFORMAT dwFormat, BP_PAINTPARAMS *pPaintParams, HDC *phdc);
     HRESULT EndBufferedPaint(HPAINTBUFFER hBufferedPaint, BOOL fUpdateTarget);

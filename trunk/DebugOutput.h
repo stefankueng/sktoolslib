@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2015 - Stefan Kueng
+// Copyright (C) 2012, 2015, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 
 // A little like a release build assert. Always evaluate expr.
 // Does not abort in this variant.
-#define APPVERIFY(expr) CTraceToOutputDebugString::Instance().Verify(expr, __FUNCTION__, __LINE__, (const char*)NULL)
+#define APPVERIFY(expr) CTraceToOutputDebugString::Instance().Verify(expr, __FUNCTION__, __LINE__, (const char*)nullptr)
 #define APPVERIFYM(expr,msg,...) CTraceToOutputDebugString::Instance().Verify(expr, __FUNCTION__, __LINE__, msg, ##__VA_ARGS__)
 
 class CTraceToOutputDebugString
@@ -32,7 +32,7 @@ class CTraceToOutputDebugString
 public:
     static CTraceToOutputDebugString& Instance()
     {
-        if (m_pInstance == NULL)
+        if (m_pInstance == nullptr)
             m_pInstance = new CTraceToOutputDebugString;
         return *m_pInstance;
     }
