@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -67,7 +67,7 @@ public:
      * Creates a CCmdLineParser object and parses the parameters in.
      * \param sCmdLine the command line
      */
-    CCmdLineParser(LPCTSTR sCmdLine = NULL);
+    CCmdLineParser(LPCTSTR sCmdLine = nullptr);
     virtual ~CCmdLineParser();
 
     /**
@@ -115,7 +115,7 @@ public:
     BOOL HasVal(LPCTSTR sKey) const;
 
     /**
-     * Reads the value for a key. If the key has no value then NULL is returned.
+     * Reads the value for a key. If the key has no value then nullptr is returned.
      * \param sKey the key to get the value from
      * \return the value string of the key
      */

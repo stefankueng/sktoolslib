@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2012-2017 - Stefan Kueng
 
@@ -230,11 +230,11 @@ bool CStringUtils::FromHexString( const std::wstring& src, BYTE* pDest )
 std::unique_ptr<char[]> CStringUtils::Decrypt(const char * text)
 {
     DWORD dwLen = 0;
-    if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, NULL, &dwLen, NULL, NULL) == FALSE)
+    if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, nullptr, &dwLen, nullptr, nullptr) == FALSE)
         return nullptr;
 
     auto strIn = std::make_unique<BYTE[]>(dwLen + 1);
-    if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, NULL, NULL) == FALSE)
+    if (CryptStringToBinaryA(text, (DWORD)strlen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, nullptr, nullptr) == FALSE)
         return nullptr;
 
     DATA_BLOB blobin;
@@ -242,7 +242,7 @@ std::unique_ptr<char[]> CStringUtils::Decrypt(const char * text)
     blobin.pbData = strIn.get();
     LPWSTR descr = nullptr;
     DATA_BLOB blobout = { 0 };
-    if (CryptUnprotectData(&blobin, &descr, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
+    if (CryptUnprotectData(&blobin, &descr, nullptr, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
         return nullptr;
     SecureZeroMemory(blobin.pbData, blobin.cbData);
 
@@ -257,11 +257,11 @@ std::unique_ptr<char[]> CStringUtils::Decrypt(const char * text)
 std::unique_ptr<wchar_t[]> CStringUtils::Decrypt(const wchar_t * text)
 {
     DWORD dwLen = 0;
-    if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, NULL, &dwLen, NULL, NULL) == FALSE)
+    if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, nullptr, &dwLen, nullptr, nullptr) == FALSE)
         return nullptr;
 
     auto strIn = std::make_unique<BYTE[]>(dwLen + 1);
-    if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, NULL, NULL) == FALSE)
+    if (CryptStringToBinaryW(text, (DWORD)wcslen(text), CRYPT_STRING_HEX, strIn.get(), &dwLen, nullptr, nullptr) == FALSE)
         return nullptr;
 
     DATA_BLOB blobin;
@@ -269,7 +269,7 @@ std::unique_ptr<wchar_t[]> CStringUtils::Decrypt(const wchar_t * text)
     blobin.pbData = strIn.get();
     LPWSTR descr = nullptr;
     DATA_BLOB blobout = { 0 };
-    if (CryptUnprotectData(&blobin, &descr, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
+    if (CryptUnprotectData(&blobin, &descr, nullptr, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
         return nullptr;
     SecureZeroMemory(blobin.pbData, blobin.cbData);
 
@@ -289,10 +289,10 @@ std::string CStringUtils::Encrypt(const char * text)
 
     blobin.cbData = (DWORD)strlen(text);
     blobin.pbData = (BYTE*)(LPCSTR)text;
-    if (CryptProtectData(&blobin, L"TSVNAuth", NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
+    if (CryptProtectData(&blobin, L"TSVNAuth", nullptr, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
         return result;
     DWORD dwLen = 0;
-    if (CryptBinaryToStringA(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, NULL, &dwLen) == FALSE)
+    if (CryptBinaryToStringA(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, nullptr, &dwLen) == FALSE)
         return result;
     auto strOut = std::make_unique<char[]>(dwLen + 1);
     if (CryptBinaryToStringA(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, strOut.get(), &dwLen) == FALSE)
@@ -312,10 +312,10 @@ std::wstring CStringUtils::Encrypt(const wchar_t * text)
 
     blobin.cbData = (DWORD)wcslen(text)*sizeof(wchar_t);
     blobin.pbData = (BYTE*)(LPCWSTR)text;
-    if (CryptProtectData(&blobin, L"TSVNAuth", NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
+    if (CryptProtectData(&blobin, L"TSVNAuth", nullptr, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &blobout) == FALSE)
         return result;
     DWORD dwLen = 0;
-    if (CryptBinaryToStringW(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, NULL, &dwLen) == FALSE)
+    if (CryptBinaryToStringW(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, nullptr, &dwLen) == FALSE)
         return result;
     auto strOut = std::make_unique<wchar_t[]>(dwLen + 1);
     if (CryptBinaryToStringW(blobout.pbData, blobout.cbData, CRYPT_STRING_HEX | CRYPT_STRING_NOCRLF, strOut.get(), &dwLen) == FALSE)

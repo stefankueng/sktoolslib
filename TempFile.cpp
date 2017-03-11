@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@ CTempFiles& CTempFiles::Instance()
 
 std::wstring CTempFiles::ConstructTempPath(const std::wstring& path) const
 {
-    DWORD len = ::GetTempPath(0, NULL);
+    DWORD len = ::GetTempPath(0, nullptr);
     auto temppath = std::make_unique<TCHAR[]>(len+1);
     auto tempF = std::make_unique<TCHAR[]>(len+50);
     ::GetTempPath (len+1, temppath.get());
@@ -92,7 +92,7 @@ std::wstring CTempFiles::CreateTempPath(bool bRemoveAtEnd, const std::wstring& p
         if (directory)
         {
             DeleteFile(tempfile.c_str());
-            if (CreateDirectory (tempfile.c_str(), NULL) == FALSE)
+            if (CreateDirectory (tempfile.c_str(), nullptr) == FALSE)
             {
                 if (GetLastError() != ERROR_ALREADY_EXISTS)
                     return std::wstring();
@@ -102,7 +102,7 @@ std::wstring CTempFiles::CreateTempPath(bool bRemoveAtEnd, const std::wstring& p
         }
         else
         {
-            CAutoFile hFile = CreateFile(tempfile.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
+            CAutoFile hFile = CreateFile(tempfile.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, nullptr);
             if (!hFile)
             {
                 if (GetLastError() != ERROR_ALREADY_EXISTS)

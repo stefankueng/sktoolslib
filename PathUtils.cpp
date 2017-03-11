@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2013-2015, 2017 - Stefan Kueng
 
@@ -664,7 +664,7 @@ bool CPathUtils::CreateRecursiveDirectory(const std::wstring& path)
     if (path.empty() || PathIsRoot(path.c_str()))
         return false;
 
-    auto ret = CreateDirectory(path.c_str(), NULL);
+    auto ret = CreateDirectory(path.c_str(), nullptr);
     if (ret == FALSE)
     {
         if (GetLastError() == ERROR_PATH_NOT_FOUND)
@@ -677,7 +677,7 @@ bool CPathUtils::CreateRecursiveDirectory(const std::wstring& path)
                 int retrycount = 5;
                 do
                 {
-                    ret = CreateDirectory(path.c_str(), NULL);
+                    ret = CreateDirectory(path.c_str(), nullptr);
                     if (ret == FALSE)
                         Sleep(50);
                 } while (retrycount-- && (ret == FALSE));

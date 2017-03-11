@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@ CSysImageList * CSysImageList::instance = 0;
 
 CSysImageList::CSysImageList()
 {
-    m_hSystemImageList = NULL;
+    m_hSystemImageList = nullptr;
     SHFILEINFO ssfi = {0};
     TCHAR windir[MAX_PATH];
     GetWindowsDirectory(windir, _countof(windir));  // MAX_PATH ok.

@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2012-2013, 2017 - Stefan Kueng
 
@@ -62,8 +62,8 @@ public:
     void SetTransparency(BYTE alpha, COLORREF color = 0xFF000000);
 
     virtual bool Create();
-    virtual bool Create(DWORD dwStyles, HWND hParent = NULL, RECT* rect = NULL);
-    virtual bool CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent = NULL, RECT* rect = NULL, LPCTSTR classname = NULL, HMENU hMenu = NULL);
+    virtual bool Create(DWORD dwStyles, HWND hParent = nullptr, RECT* rect = nullptr);
+    virtual bool CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent = nullptr, RECT* rect = nullptr, LPCTSTR classname = nullptr, HMENU hMenu = nullptr);
 
     //void MsgLoop();
     bool IsWindowClosed() { return bWindowClosed; };
@@ -86,10 +86,10 @@ protected:
     float m_dpiScaleY;
 
     //constructor
-    CWindow(HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL)
-        : m_hwnd(NULL)
-        , hResource(NULL)
-        , m_hParent(NULL)
+    CWindow(HINSTANCE hInst, CONST WNDCLASSEX* wcx = nullptr)
+        : m_hwnd(nullptr)
+        , hResource(nullptr)
+        , m_hParent(nullptr)
         , bWindowClosed(FALSE)
         , bWindowRestored(false)
         , bRegisterWindowCalled(false)
@@ -98,7 +98,7 @@ protected:
         , m_dpiScaleY(1.0)
     {
         hResource = hInst;
-        if (wcx != NULL)
+        if (wcx != nullptr)
             RegisterWindow(wcx);
     };
 

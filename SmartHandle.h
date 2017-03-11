@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2015 - Stefan Kueng
+// Copyright (C) 2012, 2015, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@
  */
 template <typename HandleType,
     template <class> class CloseFunction,
-    HandleType NULL_VALUE = NULL>
+    HandleType NULL_VALUE = nullptr>
 class CSmartHandle : public CloseFunction<HandleType>
 {
 public:
@@ -247,7 +247,7 @@ void CompilerTests()
         CAutoFile hFile = h;                    // C2280
         CAutoFile hFile2 = std::move(h);        // OK
         // OK, uses move semantics
-        CAutoFile hFile3 = CreateFile(L"c:\\test.txt", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        CAutoFile hFile3 = CreateFile(L"c:\\test.txt", GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
         CAutoFile hFile4 = hFile3;              // C2280
         CAutoFile hFile5 = std::move(hFile3);   // OK
     }

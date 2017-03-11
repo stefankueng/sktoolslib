@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -48,16 +48,16 @@ inline void CFormatMessageWrapper::obtainMessage(DWORD errorCode)
     // First of all release the buffer to make it possible to call this
     // method more than once on the same object.
     release();
-    result = FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                            FORMAT_MESSAGE_FROM_SYSTEM |
-                            FORMAT_MESSAGE_IGNORE_INSERTS,
-                            NULL,
-                            errorCode,
-                            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-                            (LPTSTR) &buffer,
-                            0,
-                            NULL
-                            );
+    result = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                           FORMAT_MESSAGE_FROM_SYSTEM |
+                           FORMAT_MESSAGE_IGNORE_INSERTS,
+                           nullptr,
+                           errorCode,
+                           MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+                           (LPTSTR)&buffer,
+                           0,
+                           nullptr
+    );
 }
 
 inline void CFormatMessageWrapper::release()

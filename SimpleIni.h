@@ -1,4 +1,4 @@
-// Library: SimpleIni
+﻿// Library: SimpleIni
 // File:    SimpleIni.h
 // Author:  Brodie Thiesfield <code@jellycan.com>
 // Source:  http://code.jellycan.com/simpleini/
@@ -505,9 +505,9 @@ public:
      * when multiple keys are enabled.
      *
      * @param a_pSection    Section to add or update
-     * @param a_pKey        Key to add or update. Set to NULL to
+     * @param a_pKey        Key to add or update. Set to nullptr to
      *                      create an empty section.
-     * @param a_pValue      Value to set. Set to NULL to create an
+     * @param a_pValue      Value to set. Set to nullptr to create an
      *                      empty section.
      *
      * @return SI_Error     See error definitions
@@ -531,9 +531,9 @@ public:
      * in this situation.
      *
      * @param a_pSection        Section to delete key from, or if
-     *                          a_pKey is NULL, the section to remove.
+     *                          a_pKey is nullptr, the section to remove.
      * @param a_pKey            Key to remove from the section. Set to
-     *                          NULL to remove the entire section.
+     *                          nullptr to remove the entire section.
      * @param a_bRemoveEmpty    If the section is empty after this key has
      *                          been deleted, should the empty section be
      *                          removed?
@@ -1806,7 +1806,7 @@ public:
             return (6 * uLen) + 1;
         }
         else {
-            size_t uLen = wcstombs(NULL, a_pInputData, 0);
+            size_t uLen = wcstombs(nullptr, a_pInputData, 0);
             if (uLen == (size_t)(-1)) {
                 return uLen;
             }
@@ -1892,17 +1892,17 @@ class SI_ConvertW {
     const char * m_pEncoding;
     UConverter * m_pConverter;
 protected:
-    SI_ConvertW() : m_pEncoding(NULL), m_pConverter(NULL) { }
+    SI_ConvertW() : m_pEncoding(nullptr), m_pConverter(nullptr) { }
 public:
-    SI_ConvertW(bool a_bStoreIsUtf8) : m_pConverter(NULL) {
-        m_pEncoding = a_bStoreIsUtf8 ? "UTF-8" : NULL;
+    SI_ConvertW(bool a_bStoreIsUtf8) : m_pConverter(nullptr) {
+        m_pEncoding = a_bStoreIsUtf8 ? "UTF-8" : nullptr;
     }
 
     /* copy and assignment */
     SI_ConvertW(const SI_ConvertW & rhs) { operator=(rhs); }
     SI_ConvertW & operator=(const SI_ConvertW & rhs) {
         m_pEncoding = rhs.m_pEncoding;
-        m_pConverter = NULL;
+        m_pConverter = nullptr;
         return *this;
     }
     ~SI_ConvertW() { if (m_pConverter) ucnv_close(m_pConverter); }

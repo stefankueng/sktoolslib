@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -67,7 +67,7 @@ inline bool CCreateProcessHelper::CreateProcess(LPCTSTR applicationName,
 
     SecureZeroMemory(processInfo, sizeof(PROCESS_INFORMATION));
     const BOOL result = ::CreateProcess( applicationName,
-                    commandLine, NULL, NULL, FALSE, dwCreationFlags, 0, currentDirectory,
+                    commandLine, nullptr, nullptr, FALSE, dwCreationFlags, 0, currentDirectory,
                     &startupInfo, processInfo );
     return result != 0;
 }

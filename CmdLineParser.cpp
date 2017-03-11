@@ -90,7 +90,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
             break;      // ends with delim
 
         LPCTSTR sVal = _tcspbrk(sArg, m_sValueSep);
-        if (sVal == NULL)
+        if (sVal == nullptr)
         {
             stdstring Key(sArg);
             std::transform(Key.begin(), Key.end(), Key.begin(), ::towlower);
@@ -117,7 +117,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
 
             sVal = _tcsinc(sVal);
 
-            LPCTSTR sQuote = _tcspbrk(sVal, m_sQuotes), sEndQuote(NULL);
+            LPCTSTR sQuote = _tcspbrk(sVal, m_sQuotes), sEndQuote(nullptr);
             bool hasEscapedQuotes = false;
             if (sQuote == sVal)
             {
@@ -143,7 +143,7 @@ BOOL CCmdLineParser::Parse(LPCTSTR sCmdLine)
                 }
             }
 
-            if (sEndQuote == NULL)
+            if (sEndQuote == nullptr)
             {
                 // no end quotes or terminating space, take the rest of the string to its end
                 stdstring csVal(sQuote);

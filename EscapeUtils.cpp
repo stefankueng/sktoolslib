@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -155,19 +155,19 @@ char* CEscapeUtils::Unescape( char * psz )
             }
 
             char nValue = '?';
-            const char * pszHigh = NULL;
+            const char * pszHigh = nullptr;
             pszSource++;
 
             *pszSource = (char) toupper(*pszSource);
             pszHigh = strchr(szHex, *pszSource);
 
-            if (pszHigh != NULL)
+            if (pszHigh != nullptr)
             {
                 pszSource++;
                 *pszSource = (char) toupper(*pszSource);
                 const char * pszLow = strchr(szHex, *pszSource);
 
-                if (pszLow != NULL)
+                if (pszLow != nullptr)
                 {
                     nValue = (char) (((pszHigh - szHex) << 4) +
                         (pszLow - szHex));

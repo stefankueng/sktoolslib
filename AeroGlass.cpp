@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -35,7 +35,7 @@ typedef HRESULT (__stdcall *DWM_IS_COMPOSITION_ENABLED)(BOOL *pfEnabled);
 typedef HRESULT (__stdcall *DWM_ENABLE_COMPOSITION)(UINT uCompositionAction);
 
 CDwmApiImpl::CDwmApiImpl(void)
-    : m_hDwmApiLib(NULL)
+    : m_hDwmApiLib(nullptr)
 {
 }
 
@@ -53,7 +53,7 @@ BOOL CDwmApiImpl::Initialize(void)
 
 BOOL CDwmApiImpl::IsInitialized(void)
 {
-    return (NULL != m_hDwmApiLib);
+    return (nullptr != m_hDwmApiLib);
 }
 
 CDwmApiImpl::~CDwmApiImpl(void)
@@ -61,7 +61,7 @@ CDwmApiImpl::~CDwmApiImpl(void)
     if (IsInitialized())
     {
         FreeLibrary(m_hDwmApiLib);
-        m_hDwmApiLib = NULL;
+        m_hDwmApiLib = nullptr;
     }
 }
 
@@ -116,7 +116,7 @@ HRESULT CDwmApiImpl::DwmEnableComposition(UINT uCompositionAction)
 }
 
 CUxThemeAeroImpl::CUxThemeAeroImpl(void)
-    : m_hUxThemeLib(NULL)
+    : m_hUxThemeLib(nullptr)
 {
 }
 
@@ -157,7 +157,7 @@ typedef HRESULT (__stdcall *GET_THEME_RECT)(HTHEME hTheme, int iPartId, int iSta
 
 BOOL CUxThemeAeroImpl::IsInitialized(void)
 {
-    return (NULL != m_hUxThemeLib);
+    return (nullptr != m_hUxThemeLib);
 }
 
 CUxThemeAeroImpl::~CUxThemeAeroImpl(void)
@@ -165,7 +165,7 @@ CUxThemeAeroImpl::~CUxThemeAeroImpl(void)
     if (IsInitialized())
     {
         FreeLibrary(m_hUxThemeLib);
-        m_hUxThemeLib = NULL;
+        m_hUxThemeLib = nullptr;
     }
 }
 
@@ -200,11 +200,11 @@ HTHEME CUxThemeAeroImpl::OpenThemeData(HWND hwnd, LPCWSTR pszClassList)
     if(!IsInitialized())
     {
         SetLastError((DWORD)OLE_E_BLANK);
-        return NULL;
+        return nullptr;
     }
     OPEN_THEME_DATA pfnOpenThemeData = (OPEN_THEME_DATA)GetProcAddress(m_hUxThemeLib, "OpenThemeData");
     if(!pfnOpenThemeData)
-        return NULL;
+        return nullptr;
 
     return pfnOpenThemeData(hwnd, pszClassList);
 }
@@ -227,11 +227,11 @@ HANDLE CUxThemeAeroImpl::BeginBufferedPaint(HDC hdcTarget, const RECT* prcTarget
     if(!IsInitialized())
     {
         SetLastError((DWORD)OLE_E_BLANK);
-        return NULL;
+        return nullptr;
     }
     BEGIN_BUFFERED_PAINT pfnBeginBufferedPaint = (BEGIN_BUFFERED_PAINT)GetProcAddress(m_hUxThemeLib, "BeginBufferedPaint");
     if(!pfnBeginBufferedPaint)
-        return NULL;
+        return nullptr;
 
     return pfnBeginBufferedPaint(hdcTarget, prcTarget, dwFormat, pPaintParams, phdc);
 }
@@ -363,7 +363,7 @@ HRESULT CUxThemeAeroImpl::GetThemeBitmap(HTHEME hTheme, int iPartId, int iStateI
     return pfnGetThemeBitmap(hTheme, iPartId, iStateId, iPropId, dwFlags, phBitmap);
 }
 
-BOOL CUxThemeAeroImpl::DetermineGlowSize(int *piSize, LPCWSTR pszClassIdList /*= NULL*/)
+BOOL CUxThemeAeroImpl::DetermineGlowSize(int *piSize, LPCWSTR pszClassIdList /*= nullptr*/)
 {
     if(!piSize)
     {
@@ -374,8 +374,8 @@ BOOL CUxThemeAeroImpl::DetermineGlowSize(int *piSize, LPCWSTR pszClassIdList /*=
     if(!pszClassIdList)
         pszClassIdList = L"CompositedWindow::Window";
 
-    HTHEME hThemeWindow = OpenThemeData(NULL, pszClassIdList);
-    if (hThemeWindow != NULL)
+    HTHEME hThemeWindow = OpenThemeData(nullptr, pszClassIdList);
+    if (hThemeWindow != nullptr)
     {
         GetThemeInt(hThemeWindow, 0, 0, TMT_TEXTGLOWSIZE, piSize);
         CloseThemeData(hThemeWindow);

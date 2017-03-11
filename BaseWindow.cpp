@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2012-2013, 2015-2017 - Stefan Kueng
 
@@ -121,18 +121,18 @@ bool CWindow::Create()
     rect.right = 600;
     rect.bottom = 400;
 
-    return Create(WS_OVERLAPPEDWINDOW | WS_VISIBLE, NULL, &rect);
+    return Create(WS_OVERLAPPEDWINDOW | WS_VISIBLE, nullptr, &rect);
 }
 
-bool CWindow::Create(DWORD dwStyles, HWND hParent /* = NULL */, RECT* rect /* = NULL */)
+bool CWindow::Create(DWORD dwStyles, HWND hParent /* = nullptr */, RECT* rect /* = nullptr */)
 {
     return CreateEx(0, dwStyles, hParent, rect);
 }
 
-bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = NULL */, RECT* rect /* = NULL */, LPCTSTR classname /* = NULL */, HMENU hMenu /* = NULL */)
+bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = nullptr */, RECT* rect /* = nullptr */, LPCTSTR classname /* = nullptr */, HMENU hMenu /* = nullptr */)
 {
     // send the this pointer as the window creation parameter
-    if (rect == NULL)
+    if (rect == nullptr)
         m_hwnd = CreateWindowEx(dwExStyles, classname ? classname : sClassName.c_str(), sWindowTitle.c_str(), dwStyles, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hParent, hMenu, hResource, (void *)this);
     else
     {
@@ -154,7 +154,7 @@ bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = NULL 
     m_dpiScaleY = GetDeviceCaps(hdc, LOGPIXELSY) / 96.0f;
     ReleaseDC(*this, hdc);
 
-    return (m_hwnd != NULL);
+    return (m_hwnd != nullptr);
 }
 
 void CWindow::SetTransparency(BYTE alpha, COLORREF color /* = 0xFF000000 */)

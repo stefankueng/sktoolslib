@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2014, 2017 - Stefan Kueng
 
@@ -86,7 +86,7 @@ private:
     {
         if (!m_fInitialized)
         {
-            HDC hdc = GetDC(NULL);
+            HDC hdc = GetDC(nullptr);
             if (hdc)
             {
                 // Initialize the DPI member variable
@@ -94,7 +94,7 @@ private:
                 // With all Windows OS's to date the X and Y DPI will be identical
                 m_dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
                 m_dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
-                ReleaseDC(NULL, hdc);
+                ReleaseDC(nullptr, hdc);
             }
             m_fInitialized = true;
         }

@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2014 - Stefan Kueng
+// Copyright (C) 2012, 2014, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -26,10 +26,10 @@
 
 BOOL CBrowseFolder::m_bCheck = FALSE;
 BOOL CBrowseFolder::m_bCheck2 = FALSE;
-WNDPROC CBrowseFolder::CBProc = NULL;
-HWND CBrowseFolder::checkbox = NULL;
-HWND CBrowseFolder::checkbox2 = NULL;
-HWND CBrowseFolder::ListView = NULL;
+WNDPROC CBrowseFolder::CBProc = nullptr;
+HWND CBrowseFolder::checkbox = nullptr;
+HWND CBrowseFolder::checkbox2 = nullptr;
+HWND CBrowseFolder::ListView = nullptr;
 TCHAR CBrowseFolder::m_CheckText[200];
 TCHAR CBrowseFolder::m_CheckText2[200];
 std::wstring CBrowseFolder::m_sDefaultPath;
@@ -38,7 +38,7 @@ bool CBrowseFolder::m_DisableCheckbox2WhenCheckbox1IsChecked = false;
 
 CBrowseFolder::CBrowseFolder(void)
     : m_style(0)
-    , m_root(NULL)
+    , m_root(nullptr)
 {
     SecureZeroMemory(m_displayName, sizeof(m_displayName));
     SecureZeroMemory(m_title, sizeof(m_title));
@@ -50,7 +50,7 @@ CBrowseFolder::~CBrowseFolder(void)
 }
 
 //show the dialog
-CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, LPTSTR path, size_t pathlen, LPCTSTR szDefaultPath /* = NULL */)
+CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, LPTSTR path, size_t pathlen, LPCTSTR szDefaultPath /* = nullptr */)
 {
     std::wstring temp;
     temp = path;
@@ -74,8 +74,8 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
     HRESULT hr;
 
     // Create a new common open file dialog
-    IFileOpenDialog* pfd = NULL;
-    hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd));
+    IFileOpenDialog* pfd = nullptr;
+    hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd));
     if (SUCCEEDED(hr))
     {
         // Set the dialog as a folder picker
@@ -106,7 +106,7 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
                 if (pSHCIFPN)
                 {
                     IShellItem *psiDefault = 0;
-                    hr = pSHCIFPN(m_sDefaultPath.c_str(), NULL, IID_PPV_ARGS(&psiDefault));
+                    hr = pSHCIFPN(m_sDefaultPath.c_str(), nullptr, IID_PPV_ARGS(&psiDefault));
                     if (SUCCEEDED(hr))
                     {
                         hr = pfd->SetFolder(psiDefault);
@@ -138,11 +138,11 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
         if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(parent)))
         {
             // Get the selection from the user
-            IShellItem* psiResult = NULL;
+            IShellItem* psiResult = nullptr;
             hr = pfd->GetResult(&psiResult);
             if (SUCCEEDED(hr))
             {
-                PWSTR pszPath = NULL;
+                PWSTR pszPath = nullptr;
                 hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
                 if (SUCCEEDED(hr))
                 {
@@ -179,7 +179,7 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
         browseInfo.pszDisplayName   = m_displayName;
         browseInfo.lpszTitle        = m_title;
         browseInfo.ulFlags          = m_style;
-        browseInfo.lpfn             = NULL;
+        browseInfo.lpfn             = nullptr;
         browseInfo.lParam           = (LPARAM)this;
 
         if ((m_CheckText[0] != '\0') || (m_sDefaultPath.size()))
@@ -271,9 +271,9 @@ int CBrowseFolder::BrowseCallBackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARA
                 0,100,100,50,
                 hwnd,
                 0,
-                NULL,
-                NULL);
-            if (checkbox == NULL)
+                nullptr,
+                nullptr);
+            if (checkbox == nullptr)
                 return 0;
 
             if (bSecondCheckbox)
@@ -286,17 +286,17 @@ int CBrowseFolder::BrowseCallBackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARA
                     0,100,100,50,
                     hwnd,
                     0,
-                    NULL,
-                    NULL);
-                if (checkbox2 == NULL)
+                    nullptr,
+                    nullptr);
+                if (checkbox2 == nullptr)
                     return 0;
             }
 
-            ListView = FindWindowEx(hwnd,NULL,_T("SysTreeView32"),NULL);
-            if (ListView == NULL)
-                ListView = FindWindowEx(hwnd,NULL,_T("SHBrowseForFolder ShellNameSpace Control"),NULL);
+            ListView = FindWindowEx(hwnd, nullptr,_T("SysTreeView32"), nullptr);
+            if (ListView == nullptr)
+                ListView = FindWindowEx(hwnd, nullptr,_T("SHBrowseForFolder ShellNameSpace Control"), nullptr);
 
-            if (ListView == NULL)
+            if (ListView == nullptr)
                 return 0;
 
             //Gets the dimensions of the windows
@@ -334,7 +334,7 @@ int CBrowseFolder::BrowseCallBackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARA
                     controlHeight,
                     SWP_NOZORDER);
             }
-            HWND label = FindWindowEx(hwnd, NULL, _T("STATIC"), NULL);
+            HWND label = FindWindowEx(hwnd, nullptr, _T("STATIC"), nullptr);
             if (label)
             {
                 HFONT hFont = (HFONT)::SendMessage(label, WM_GETFONT, 0, 0);
