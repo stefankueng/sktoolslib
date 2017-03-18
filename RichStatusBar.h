@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2017 Stefan Kueng
 
@@ -18,6 +18,7 @@
 //
 #pragma once
 #include "BaseWindow.h"
+#include "AnimationManager.h"
 #include <string>
 #include <vector>
 #include <functional>
@@ -137,5 +138,6 @@ private:
     int                                 m_hoverPart;
     int                                 m_height;
     bool                                m_drawGrip;
+    std::vector<IUIAnimationVariablePtr>m_AnimVars;
 };
 
