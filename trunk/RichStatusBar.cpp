@@ -100,12 +100,14 @@ bool CRichStatusBar::SetPart(int index, const CRichStatusBarItem& item, bool red
         {
             m_parts.push_back(std::move(CRichStatusBarItem()));
             m_partwidths.push_back({});
+            m_AnimVars.push_back(Animator::Instance().CreateAnimationVariable(0.0));
         }
     }
     if (index < 0)
     {
         m_parts.push_back(item);
         m_partwidths.push_back({});
+        m_AnimVars.push_back(Animator::Instance().CreateAnimationVariable(0.0));
         index = (int)m_parts.size() - 1;
     }
     else if (replace)
@@ -116,6 +118,7 @@ bool CRichStatusBar::SetPart(int index, const CRichStatusBarItem& item, bool red
     {
         m_parts.insert(m_parts.begin() + index - 1, item);
         m_partwidths.insert(m_partwidths.begin() + index - 1, {});
+        m_AnimVars.insert(m_AnimVars.begin() + index - 1, Animator::Instance().CreateAnimationVariable(0.0));
     }
     CalcRequestedWidths(index);
     if (redraw)
@@ -221,12 +224,14 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             auto hBitmap = CreateCompatibleBitmap(hdc, rect.right - rect.left, rect.bottom - rect.top);
             auto hOldBitmap = (HBITMAP)SelectObject(hMyMemDC, hBitmap);
 
-            GDIHelpers::FillSolidRect(hMyMemDC, &rect, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
+            auto foreColor = m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT);
+            auto backColor = m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE);
+            GDIHelpers::FillSolidRect(hMyMemDC, &rect, backColor);
             if (m_drawGrip)
                 DrawSizeGrip(hMyMemDC, &rect);
 
-            SetTextColor(hMyMemDC, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_WINDOWTEXT)) : GetSysColor(COLOR_WINDOWTEXT));
-            SetBkColor(hMyMemDC, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
+            SetTextColor(hMyMemDC, foreColor);
+            SetBkColor(hMyMemDC, backColor);
 
 
             RECT partRect = rect;
@@ -238,7 +243,33 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 partRect.left = right;
                 partRect.right = partRect.left + m_partwidths[i].calculatedWidth;
                 right = partRect.right;
-                DrawEdge(hMyMemDC, &partRect, i == m_hoverPart ? EDGE_ETCHED : BDR_SUNKENOUTER, BF_RECT | BF_MONO | BF_SOFT | BF_ADJUST);
+                auto penColor = m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_GRAYTEXT)) : GetSysColor(COLOR_GRAYTEXT);
+                auto pen = CreatePen(PS_SOLID, 1, penColor);
+                auto oldpen = SelectObject(hMyMemDC, pen);
+                MoveToEx(hMyMemDC, partRect.left, partRect.top, nullptr);
+                LineTo(hMyMemDC, partRect.left, partRect.bottom);
+                LineTo(hMyMemDC, partRect.right, partRect.bottom);
+                LineTo(hMyMemDC, partRect.right, partRect.top);
+                LineTo(hMyMemDC, partRect.left, partRect.top);
+                SelectObject(hMyMemDC, oldpen);
+                DeleteObject(pen);
+                InflateRect(&partRect, -1, -1);
+                auto fraction = Animator::GetValue(m_AnimVars[i]);
+                auto animForeClr = RGB((GetRValue(penColor) - GetRValue(backColor))*fraction + GetRValue(backColor),
+                                       (GetGValue(penColor) - GetGValue(backColor))*fraction + GetGValue(backColor),
+                                       (GetBValue(penColor) - GetBValue(backColor))*fraction + GetBValue(backColor));
+                pen = CreatePen(PS_SOLID, 1, animForeClr);
+                oldpen = SelectObject(hMyMemDC, pen);
+
+                MoveToEx(hMyMemDC, partRect.left, partRect.top, nullptr);
+                LineTo(hMyMemDC, partRect.left, partRect.bottom);
+                LineTo(hMyMemDC, partRect.right, partRect.bottom);
+                LineTo(hMyMemDC, partRect.right, partRect.top);
+                LineTo(hMyMemDC, partRect.left, partRect.top);
+                SelectObject(hMyMemDC, oldpen);
+                DeleteObject(pen);
+                InflateRect(&partRect, -1, -1);
+                //DrawEdge(hMyMemDC, &partRect, i == m_hoverPart ? EDGE_ETCHED : BDR_SUNKENOUTER, BF_RECT | BF_MONO | BF_SOFT | BF_ADJUST);
                 int x = 0;
                 if (part.icon && !m_partwidths[i].collapsed)
                 {
@@ -318,9 +349,34 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             auto oldActive = m_parts[m_hoverPart].hoverActive;
             m_hoverPart = GetPartIndexAt(pt);
             if ((m_hoverPart != oldHover) || (m_parts[m_hoverPart].hoverActive != oldActive))
+            {
                 InvalidateRect(hwnd, nullptr, FALSE);
+            }
             if (!m_parts[m_hoverPart].hoverActive)
                 m_hoverPart = -1;
+            if (m_hoverPart != oldHover)
+            {
+                if ((m_hoverPart >= 0) && m_parts[m_hoverPart].hoverActive)
+                {
+                    auto transHot = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+                    auto storyBoard = Animator::Instance().CreateStoryBoard();
+                    storyBoard->AddTransition(m_AnimVars[m_hoverPart], transHot);
+                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+                    {
+                        InvalidateRect(*this, nullptr, false);
+                    });
+                }
+                if (oldHover >= 0)
+                {
+                    auto transHot = Animator::Instance().CreateLinearTransition(0.3, 0.0);
+                    auto storyBoard = Animator::Instance().CreateStoryBoard();
+                    storyBoard->AddTransition(m_AnimVars[oldHover], transHot);
+                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+                    {
+                        InvalidateRect(*this, nullptr, false);
+                    });
+                }
+            }
         }
         break;
         case WM_MOUSELEAVE:
@@ -331,7 +387,15 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             tme.hwndTrack = *this;
             TrackMouseEvent(&tme);
             if (m_hoverPart >= 0)
-                InvalidateRect(hwnd, nullptr, FALSE);
+            {
+                auto transHot = Animator::Instance().CreateLinearTransition(0.3, 0.0);
+                auto storyBoard = Animator::Instance().CreateStoryBoard();
+                storyBoard->AddTransition(m_AnimVars[m_hoverPart], transHot);
+                Animator::Instance().RunStoryBoard(storyBoard, [this]()
+                {
+                    InvalidateRect(*this, nullptr, false);
+                });
+            }
             m_hoverPart = -1;
         }
         break;
