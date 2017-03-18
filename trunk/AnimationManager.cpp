@@ -122,13 +122,24 @@ public:
     /// Constructor
     NotificationAnimationEventHandler()
         : ref(0)
+        , timerEventHandler(nullptr)
     {
+    }
+
+    ~NotificationAnimationEventHandler()
+    {
+        if (timerEventHandler)
+            timerEventHandler->Release();
     }
 
     /// Sets the timer object event handler
     void SetTimerObj(CTimerEventHandler * handler)
     {
+        if (timerEventHandler)
+            timerEventHandler->Release();
+
         timerEventHandler = handler;
+        timerEventHandler->AddRef();
     }
 
     /// Inherited via IUIAnimationStoryboardEventHandler
@@ -179,7 +190,8 @@ public:
         {
             // since the StoryBoard is now not in use anymore, remove
             // the timer callback function for it.
-            timerEventHandler->RemoveCallback(storyboard);
+            if (timerEventHandler)
+                timerEventHandler->RemoveCallback(storyboard);
         }
         return S_OK;
     }
@@ -335,10 +347,13 @@ IUIAnimationStoryboardPtr Animator::CreateStoryBoard()
 HRESULT Animator::RunStoryBoard(IUIAnimationStoryboardPtr storyBoard, std::function<void()> callback)
 {
     // set up the notification handlers and the timer callback function
-    NotificationAnimationEventHandler* notificationAnimEvHandler = new NotificationAnimationEventHandler();
-    timerEventHandler->AddCallback(storyBoard.GetInterfacePtr(), callback);
-    notificationAnimEvHandler->SetTimerObj(timerEventHandler);
-    storyBoard->SetStoryboardEventHandler(notificationAnimEvHandler);
+    if (timerEventHandler)
+    {
+        NotificationAnimationEventHandler* notificationAnimEvHandler = new NotificationAnimationEventHandler();
+        timerEventHandler->AddCallback(storyBoard.GetInterfacePtr(), callback);
+        notificationAnimEvHandler->SetTimerObj(timerEventHandler);
+        storyBoard->SetStoryboardEventHandler(notificationAnimEvHandler);
+    }
 
     // start the animation
     UI_ANIMATION_SECONDS secs = 0;
