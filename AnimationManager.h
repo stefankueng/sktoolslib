@@ -76,7 +76,11 @@ class CTimerEventHandler;
 class Animator
 {
 public:
+    /// the singleton accessor
     static Animator& Instance();
+    /// shuts down the animation manager.
+    /// call this *before* COM gets shut down, i.e. before CoUninitialize() or OleUninitialize().
+    static void ShutDown();
     /// Disable copying
     Animator(const Animator&) = delete;
     Animator& operator=(const Animator&) = delete;
@@ -103,10 +107,11 @@ public:
 
     HRESULT RunStoryBoard(IUIAnimationStoryboardPtr storyBoard, std::function<void()> callback);
 
+    virtual ~Animator();
 private:
     Animator();
-    ~Animator();
 
+    static std::unique_ptr<Animator> instance;
     /// The holder of the UIAnimationManager
     IUIAnimationManagerPtr pAnimMgr;
     /// The holder of the UIAnimationTimer
