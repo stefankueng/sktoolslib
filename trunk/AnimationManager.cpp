@@ -208,12 +208,6 @@ private:
 };
 
 
-Animator & Animator::Instance()
-{
-    static Animator instance;
-    return instance;
-}
-
 IUIAnimationVariablePtr Animator::CreateAnimationVariable(double start)
 {
     IUIAnimationVariablePtr pAnimVar = nullptr;
@@ -409,3 +403,18 @@ Animator::~Animator()
     // shut down the animation manager: No methods can be called on any animation object after Shutdown
     pAnimMgr->Shutdown();
 }
+
+Animator & Animator::Instance()
+{
+    if (instance == nullptr)
+        instance.reset(new Animator());
+    return *instance.get();
+}
+
+void Animator::ShutDown()
+{
+    instance.reset(nullptr);
+}
+
+std::unique_ptr<Animator> Animator::instance = nullptr;
+
