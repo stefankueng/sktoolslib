@@ -30,7 +30,7 @@ enum
 
 COLORREF GDIHelpers::Darker(COLORREF crBase, float fFactor)
 {
-    ASSERT(fFactor < 1.0f && fFactor > 0.0f);
+    ASSERT(fFactor <= 1.0f && fFactor > 0.0f);
 
     fFactor = min(fFactor, 1.0f);
     fFactor = max(fFactor, 0.0f);
