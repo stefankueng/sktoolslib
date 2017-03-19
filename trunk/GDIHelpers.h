@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2016-2017 - Stefan Kueng
 
@@ -33,6 +33,7 @@ public:
     static void             FillSolidRect(HDC hDC, const RECT* rc, COLORREF clr);
     static Gdiplus::ARGB    MakeARGB(IN BYTE a, IN BYTE r, IN BYTE g, IN BYTE b);
 
+    static COLORREF         InterpolateColors(COLORREF c1, COLORREF c2, double fraction);
     static void             RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness);
     static void             RGBtoHSL(COLORREF color, float& h, float& s, float& l);
     static COLORREF         HSLtoRGB(float h, float s, float l);
