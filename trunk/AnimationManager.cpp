@@ -61,7 +61,7 @@ public:
     /// Inherited via IUIAnimationTimerEventHandler
     virtual HRESULT QueryInterface(REFIID riid, void ** ppvObject) override
     {
-        if (ppvObject == NULL)
+        if (ppvObject == nullptr)
             return E_POINTER;
 
         if (riid == IID_IUnknown ||
@@ -72,7 +72,7 @@ public:
             return S_OK;
         }
 
-        *ppvObject = NULL;
+        *ppvObject = nullptr;
         return E_NOINTERFACE;
     }
 
@@ -145,7 +145,7 @@ public:
     /// Inherited via IUIAnimationStoryboardEventHandler
     virtual HRESULT QueryInterface(REFIID riid, void ** ppvObject) override
     {
-        if (ppvObject == NULL)
+        if (ppvObject == nullptr)
             return E_POINTER;
 
         if (riid == IID_IUnknown ||
@@ -156,7 +156,7 @@ public:
             return S_OK;
         }
 
-        *ppvObject = NULL;
+        *ppvObject = nullptr;
         return E_NOINTERFACE;
     }
 
@@ -404,6 +404,8 @@ Animator::Animator()
 
 Animator::~Animator()
 {
-    if (SUCCEEDED(pAnimTmr->IsEnabled()))
-        pAnimTmr->Disable();
+    // release the timer event handler object (CTimerEventHandler)
+    pAnimTmr->SetTimerEventHandler(nullptr);
+    // shut down the animation manager: No methods can be called on any animation object after Shutdown
+    pAnimMgr->Shutdown();
 }
