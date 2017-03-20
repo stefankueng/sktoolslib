@@ -93,10 +93,6 @@ COLORREF GDIHelpers::InterpolateColors(COLORREF c1, COLORREF c2, double fraction
     assert(fraction >= 0.0 && fraction <= 1.0);
     int r1 = (int)GetRValue(c1); int g1 = (int)GetGValue(c1); int b1 = (int)GetBValue(c1);
     int r2 = (int)GetRValue(c2); int g2 = (int)GetGValue(c2); int b2 = (int)GetBValue(c2);
-    if (fraction > 0.99)
-    {
-        int hhh = 0;
-    }
     auto clr = RGB((r2 - r1)*fraction + r1, (g2 - g1)*fraction + g1, (b2 - b1)*fraction + b1);
 
     return clr;
