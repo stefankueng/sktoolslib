@@ -48,6 +48,7 @@ bool CRichStatusBar::Init(HWND hParent, bool drawGrip)
     WNDCLASSEX wcx = { sizeof(WNDCLASSEX) };
 
     wcx.lpfnWndProc = CWindow::stWinMsgHandler;
+    wcx.style = CS_DBLCLKS;
     wcx.hInstance = hResource;
     wcx.lpszClassName = L"RichStatusBar_{226E35DD-FFAC-4D97-A040-B94AF5BE39EC}";
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
