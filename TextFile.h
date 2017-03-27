@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -111,6 +111,8 @@ public:
      * Replaces the file content.
      */
     void            SetFileContent(const std::wstring& content);
+
+    bool            HasBOM() const { return hasBOM; }
 protected:
     /**
      * Tries to find out the encoding of the file (utf8, utf16, ansi)
