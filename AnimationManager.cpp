@@ -374,6 +374,10 @@ Animator::Animator()
     if (FAILED(hr))
         return;
 
+    hr = pAnimMgr->SetDefaultLongestAcceptableDelay(0.0);
+    if (FAILED(hr))
+        return;
+
     // Create the IUIAnimationTimer.
     hr = pAnimTmr.CreateInstance(CLSID_UIAnimationTimer, 0, CLSCTX_INPROC_SERVER);
     if (FAILED(hr))
