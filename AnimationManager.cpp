@@ -360,6 +360,11 @@ HRESULT Animator::RunStoryBoard(IUIAnimationStoryboardPtr storyBoard, std::funct
     return hr;
 }
 
+HRESULT Animator::AbandonAllStoryBoards()
+{
+    return pAnimMgr->AbandonAllStoryboards();
+}
+
 Animator::Animator()
 {
     HRESULT hr;
