@@ -290,7 +290,7 @@ private:
      * time stamp of the last registry lookup, i.e \ref read() call
      */
 
-    DWORD lastRead;
+    ULONGLONG lastRead;
 
     /**
      * \ref read() will be called, if \ref lastRead differs from the
@@ -298,7 +298,7 @@ private:
      * (DWORD)(-1) -> no automatic refresh.
      */
 
-    DWORD lookupInterval;
+    ULONGLONG lookupInterval;
 
     /**
      * Check time stamps etc.
@@ -373,9 +373,9 @@ public:
 template<class T, class Base>
 void CRegTypedBase<T, Base>::HandleAutoRefresh()
 {
-    if (m_read && (lookupInterval != (DWORD)(-1)))
+    if (m_read && (lookupInterval != (ULONGLONG)(-1)))
     {
-        DWORD currentTime = GetTickCount();
+        auto currentTime = GetTickCount64();
         if (   (currentTime < lastRead)
             || (currentTime > lastRead + lookupInterval))
         {
@@ -389,7 +389,7 @@ CRegTypedBase<T, Base>::CRegTypedBase (const T& def)
     : m_value (def)
     , m_defaultvalue (def)
     , lastRead (0)
-    , lookupInterval ((DWORD)-1)
+    , lookupInterval ((ULONGLONG)-1)
 {
 }
 
@@ -436,7 +436,7 @@ void CRegTypedBase<T, Base>::read()
     }
 
     m_read = true;
-    lastRead = GetTickCount();
+    lastRead = GetTickCount64();
 }
 
 template<class T, class Base>
@@ -458,7 +458,7 @@ void CRegTypedBase<T, Base>::write()
     }
     LastError = RegCloseKey(hKey);
 
-    lastRead = GetTickCount();
+    lastRead = GetTickCount64();
 }
 
 template<class T, class Base>
