@@ -81,7 +81,7 @@ public:
      * \param sPath    The path to search in.
      * \param sPattern The filename pattern - default all files.
      */
-    CSimpleFileFind(const std::wstring &sPath, LPCTSTR pPattern = L"*.*");
+    CSimpleFileFind(const std::wstring &sPath, LPCTSTR pPattern = L"*.*", FINDEX_INFO_LEVELS infoLevel = FindExInfoBasic);
     ~CSimpleFileFind();
 
     /**

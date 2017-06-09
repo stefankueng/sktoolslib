@@ -23,7 +23,7 @@
 
 #pragma comment(lib, "shlwapi.lib")
 
-CSimpleFileFind::CSimpleFileFind(const std::wstring &sPath, LPCTSTR pPattern)
+CSimpleFileFind::CSimpleFileFind(const std::wstring &sPath, LPCTSTR pPattern, FINDEX_INFO_LEVELS infoLevel)
     : m_dError(ERROR_SUCCESS)
     , m_bFirst(true)
     , m_sPathPrefix(sPath)
@@ -42,7 +42,7 @@ CSimpleFileFind::CSimpleFileFind(const std::wstring &sPath, LPCTSTR pPattern)
                 }
             }
         }
-        m_hFindFile = ::FindFirstFile(std::wstring(m_sPathPrefix + pPattern).c_str(), &m_FindFileData);
+        m_hFindFile = ::FindFirstFileEx(std::wstring(m_sPathPrefix + pPattern).c_str(), infoLevel, &m_FindFileData, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_LARGE_FETCH);
         m_bFile = FALSE;
     }
     else
