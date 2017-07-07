@@ -259,13 +259,13 @@ bool GDIHelpers::ShortHexStringToCOLORREF(const std::string& s, COLORREF* clr)
 
 bool GDIHelpers::HexStringToCOLORREF(const std::string& s, COLORREF* clr)
 {
-    if (s.length() != 6)
+    if ((s.length() != 6) && (s.length() != 8))
         return false;
     char* ep = nullptr;
     errno = 0;
     unsigned long v = strtoul(s.c_str(), &ep, 16);
     // Must convert all digits of string.
-    if (errno == 0 && ep == &s[6])
+    if (errno == 0 && ((ep == &s[6]) || (ep == &s[8])))
     {
         BYTE r = (v >> 16) & 0xFF;
         BYTE g = (v >> 8) & 0xFF;
