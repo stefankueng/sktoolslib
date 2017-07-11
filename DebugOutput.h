@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2012, 2015, 2017 - Stefan Kueng
 
@@ -21,6 +21,8 @@
 
 #include "Registry.h"
 #include <cassert>
+#include <io.h>
+#include <fcntl.h>
 
 // A little like a release build assert. Always evaluate expr.
 // Does not abort in this variant.
@@ -60,7 +62,7 @@ public:
         m_fi = _fdopen(fd, "w+");
         if (m_fi != NULL)
         {
-            ret = setvbuf(m_fi, NULL, _IONBF, 0);
+            setvbuf(m_fi, NULL, _IONBF, 0);
             return true;
         }
         return false;
@@ -99,10 +101,10 @@ public:
             OutputDebugStringA(" : ");
             if (m_fi)
             {
-                fputs(m_fi, function);
-                fputs(m_fi, ", line ");
-                fputs(m_fi, std::to_string(line).c_str());
-                fputs(m_fi, " : ");
+                fputs(function, m_fi);
+                fputs(", line ", m_fi);
+                fputs(std::to_string(line).c_str(), m_fi);
+                fputs(" : ", m_fi);
             }
             if (msg)
             {
@@ -115,11 +117,11 @@ public:
             {
                 OutputDebugStringA("An unexpected error occurred");
                 if (m_fi)
-                    fputs(m_fi, "An unexpected error occurred");
+                    fputs("An unexpected error occurred", m_fi);
             }
             OutputDebugStringA("\n");
             if (m_fi)
-                fputs(m_fi, "\n");
+                fputs("\n", m_fi);
             // Verification failures are bugs so draw attention to them while debugging.
             assert(false);
         }
@@ -135,10 +137,10 @@ public:
             OutputDebugStringA(" : ");
             if (m_fi)
             {
-                fputs(m_fi, function);
-                fputs(m_fi, ", line ");
-                fputs(m_fi, std::to_string(line).c_str());
-                fputs(m_fi, " : ");
+                fputs(function, m_fi);
+                fputs(", line ", m_fi);
+                fputs(std::to_string(line).c_str(), m_fi);
+                fputs(" : ", m_fi);
             }
 
             if (msg)
@@ -152,11 +154,11 @@ public:
             {
                 OutputDebugStringA("An unexpected error occurred");
                 if (m_fi)
-                    fputs(m_fi, "An unexpected error occurred");
+                    fputs("An unexpected error occurred", m_fi);
             }
             OutputDebugStringA("\n");
             if (m_fi)
-                fputs(m_fi, "\n");
+                fputs("\n", m_fi);
             // Verification failures are bugs so draw attention to them while debugging.
             assert(false);
         }
@@ -187,7 +189,7 @@ private:
         _vsnprintf_s(szBuffer, _countof(szBuffer), pszFormat, args);
         OutputDebugStringA(szBuffer);
         if (m_fi)
-            fputs(m_fi, szBuffer);
+            fputs(szBuffer, m_fi);
     }
 
     // Unicode output helper
@@ -197,7 +199,7 @@ private:
         _vsnwprintf_s(szBuffer, _countof(szBuffer), pszFormat, args);
         OutputDebugStringW(szBuffer);
         if (m_fi)
-            fputs(m_fi, szBuffer);
+            fputws(szBuffer, m_fi);
     }
 
     bool IsActive()
