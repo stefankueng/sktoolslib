@@ -1,4 +1,4 @@
-﻿// sktoolslib - common files for SK tools
+// sktoolslib - common files for SK tools
 
 // Copyright (C) 2012, 2015, 2017 - Stefan Kueng
 
@@ -42,6 +42,29 @@ public:
         return Instance().m_bActive;
     }
 
+    bool SetLogFile(PCWSTR path)
+    {
+        auto handle = CreateFile(path, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (handle == INVALID_HANDLE_VALUE)
+            return false;
+
+        // Associates a C run-time file descriptor with a file HANDLE.
+        auto fd = _open_osfhandle((intptr_t)handle, _O_BINARY | _O_TEXT);
+        if (fd == -1)
+        {
+            CloseHandle(handle);
+            return false;
+        }
+
+        // Associates a stream with a C run-time file descriptor.
+        m_fi = _fdopen(fd, "w+");
+        if (m_fi != NULL)
+        {
+            ret = setvbuf(m_fi, NULL, _IONBF, 0);
+            return true;
+        }
+        return false;
+    }
     // Non Unicode output helper
     void operator()(PCSTR pszFormat, ...)
     {
@@ -74,7 +97,13 @@ public:
             OutputDebugStringA(", line ");
             OutputDebugStringA(std::to_string(line).c_str());
             OutputDebugStringA(" : ");
-
+            if (m_fi)
+            {
+                fputs(m_fi, function);
+                fputs(m_fi, ", line ");
+                fputs(m_fi, std::to_string(line).c_str());
+                fputs(m_fi, " : ");
+            }
             if (msg)
             {
                 va_list ptr;
@@ -83,8 +112,14 @@ public:
                 va_end(ptr);
             }
             else
+            {
                 OutputDebugStringA("An unexpected error occurred");
+                if (m_fi)
+                    fputs(m_fi, "An unexpected error occurred");
+            }
             OutputDebugStringA("\n");
+            if (m_fi)
+                fputs(m_fi, "\n");
             // Verification failures are bugs so draw attention to them while debugging.
             assert(false);
         }
@@ -98,6 +133,13 @@ public:
             OutputDebugStringA(", line ");
             OutputDebugStringA(std::to_string(line).c_str());
             OutputDebugStringA(" : ");
+            if (m_fi)
+            {
+                fputs(m_fi, function);
+                fputs(m_fi, ", line ");
+                fputs(m_fi, std::to_string(line).c_str());
+                fputs(m_fi, " : ");
+            }
 
             if (msg)
             {
@@ -107,8 +149,14 @@ public:
                 va_end(ptr);
             }
             else
+            {
                 OutputDebugStringA("An unexpected error occurred");
+                if (m_fi)
+                    fputs(m_fi, "An unexpected error occurred");
+            }
             OutputDebugStringA("\n");
+            if (m_fi)
+                fputs(m_fi, "\n");
             // Verification failures are bugs so draw attention to them while debugging.
             assert(false);
         }
@@ -116,6 +164,7 @@ public:
 
 private:
     CTraceToOutputDebugString()
+        : m_fi(nullptr)
     {
         m_LastTick = GetTickCount64();
         m_bActive = !!CRegStdDWORD(DEBUGOUTPUTREGPATH, FALSE);
@@ -127,6 +176,7 @@ private:
 
     ULONGLONG   m_LastTick;
     bool        m_bActive;
+    FILE *      m_fi;
     static CTraceToOutputDebugString * m_pInstance;
 
     // Non Unicode output helper
@@ -136,6 +186,8 @@ private:
         char szBuffer[1024];
         _vsnprintf_s(szBuffer, _countof(szBuffer), pszFormat, args);
         OutputDebugStringA(szBuffer);
+        if (m_fi)
+            fputs(m_fi, szBuffer);
     }
 
     // Unicode output helper
@@ -144,6 +196,8 @@ private:
         wchar_t szBuffer[1024];
         _vsnwprintf_s(szBuffer, _countof(szBuffer), pszFormat, args);
         OutputDebugStringW(szBuffer);
+        if (m_fi)
+            fputs(m_fi, szBuffer);
     }
 
     bool IsActive()
