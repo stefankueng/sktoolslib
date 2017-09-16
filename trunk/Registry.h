@@ -1,4 +1,4 @@
-﻿// sktoolslib - common files for SK tools
+// sktoolslib - common files for SK tools
 
 // Copyright (C) 2012, 2017 - Stefan Kueng
 
@@ -1055,28 +1055,20 @@ T& CKeyList<T>::GetAt (int index) const
  */
 
 #ifdef __CSTRINGT_H__
-CRegDWORDCommon<CRegBase>;
 typedef CRegDWORDCommon<CRegBase> CRegDWORD;
-CRegStringCommon<CRegBase>;
 typedef CRegStringCommon<CRegBase> CRegString;
 
 #ifdef _MAP_
-CKeyList<CRegDWORD>;
 typedef CKeyList<CRegDWORD> CRegDWORDList;
-CKeyList<CRegString>;
 typedef CKeyList<CRegString> CRegStringList;
 #endif
 #endif
 
-CRegDWORDCommon<CRegStdBase>;
 typedef CRegDWORDCommon<CRegStdBase> CRegStdDWORD;
-CRegStringCommon<CRegStdBase>;
 typedef CRegStringCommon<CRegStdBase> CRegStdString;
 
 #ifdef _MAP_
-CKeyList<CRegStdDWORD>;
 typedef CKeyList<CRegStdDWORD> CRegStdDWORDList;
-CKeyList<CRegStdString>;
 typedef CKeyList<CRegStdString> CRegStdStringList;
 #endif
 
