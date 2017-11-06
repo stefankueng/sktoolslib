@@ -70,7 +70,7 @@ bool CSimpleFileFind::FindNextFile()
 
     if (m_bFirst) {
         m_bFirst = false;
-        return true;
+        return (m_hFindFile != INVALID_HANDLE_VALUE);
     }
 
     if (!::FindNextFile(m_hFindFile, &m_FindFileData)) {
