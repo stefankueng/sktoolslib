@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2014 - Stefan Kueng
+// Copyright (C) 2012, 2014, 2017 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -230,9 +230,9 @@ void CTextFile::SetFileContent(const std::wstring& content)
             pFileBuf = new (std::nothrow) BYTE[(content.size()+2)*sizeof(wchar_t)];
             if (pFileBuf)
             {
-                memcpy(pFileBuf, _T("\xFE\xFF"), 2*sizeof(wchar_t));
-                memcpy(pFileBuf+4, content.c_str(), content.size()*sizeof(wchar_t));
-                filelen = ((int)content.size()+2)*sizeof(wchar_t);
+                memcpy(pFileBuf, "\xFF\xFE", sizeof(wchar_t));
+                memcpy(pFileBuf+2, content.c_str(), content.size()*sizeof(wchar_t));
+                filelen = ((int)content.size()+1)*sizeof(wchar_t);
             }
         }
         else
