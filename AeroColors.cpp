@@ -19,7 +19,10 @@
 
 #include "stdafx.h"
 #include "AeroColors.h"
-#include <gdiplus.h>
+#pragma warning(push)
+#pragma warning(disable: 4458) // declaration of 'xx' hides class member
+#include <GdiPlus.h>
+#pragma warning(pop)
 #include <dwmapi.h>
 
 #pragma comment(lib, "dwmapi.lib")
