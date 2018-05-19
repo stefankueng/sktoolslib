@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2017 - Stefan Kueng
+// Copyright (C) 2012, 2017-2018 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -105,7 +105,7 @@ public:
      * \return TRUE if a file was found, FALSE on error or
      * end-of-directory.
      */
-    bool FindNextFileNoDots();
+    bool FindNextFileNoDots(DWORD attrToIgnore);
 
     /**
      * Advance to the next file, ignoring all directories.
@@ -127,6 +127,16 @@ public:
     inline DWORD GetError() const
     {
         return m_dError;
+    }
+
+    /**
+     * Get the file/directory attributes.
+     *
+     * \return item attributes.
+     */
+    inline DWORD GetAttributes() const
+    {
+        return m_FindFileData.dwFileAttributes;
     }
 
     /**
@@ -252,6 +262,7 @@ private:
 
     CDirStackEntry * m_seStack;
     bool m_bIsNew;
+    DWORD m_attrToIgnore;
 
     inline void PopStack();
     inline void PushStack(const std::wstring& sDirName);
@@ -287,7 +298,22 @@ public:
      */
     bool NextFile(std::wstring &result, bool* pbIsDirectory, bool recurse = true);
 
+    /**
+     * Get the file info structure.
+     *
+     * \return The WIN32_FIND_DATA structure of the file or directory
+     */
     const WIN32_FIND_DATA * GetFileInfo() {return m_seStack->GetFileFindData();}
+
+    /**
+     * Set a mask of file attributes to ignore. Files or directories that
+     * have any one of those attributes set won't be returned.
+     * Useful if you want to ignore e.g. all system or hidden files: pass
+     * FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN in that case.
+     *
+     * \param attr the file attribute mask
+     */
+    void SetAttributesToIgnore(DWORD attr) { m_attrToIgnore = attr; }
 
    /**
     * Get the last write time of the file

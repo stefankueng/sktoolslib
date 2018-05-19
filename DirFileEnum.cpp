@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2017 - Stefan Kueng
+// Copyright (C) 2012, 2017-2018 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -81,12 +81,12 @@ bool CSimpleFileFind::FindNextFile()
     return true;
 }
 
-bool CSimpleFileFind::FindNextFileNoDots()
+bool CSimpleFileFind::FindNextFileNoDots(DWORD attrToIgnore)
 {
     bool result;
     do {
         result = FindNextFile();
-    } while (result && IsDots());
+    } while (result && (IsDots() || ((GetAttributes() & attrToIgnore) != 0)));
 
     return result;
 }
@@ -148,7 +148,8 @@ inline void CDirFileEnum::PushStack(const std::wstring& sDirName)
 
 CDirFileEnum::CDirFileEnum(const std::wstring& sDirName) :
     m_seStack(nullptr),
-    m_bIsNew(true)
+    m_bIsNew(true),
+    m_attrToIgnore(0)
 {
     PushStack(sDirName);
 }
@@ -166,11 +167,11 @@ bool CDirFileEnum::NextFile(std::wstring &sResult, bool* pbIsDirectory, bool rec
         // Special-case first time - haven't found anything yet,
         // so don't do recurse-into-directory check.
         m_bIsNew = false;
-    } else if (m_seStack && m_seStack->IsDirectory() && recurse) {
+    } else if (m_seStack && m_seStack->IsDirectory() && recurse && ((m_seStack->GetAttributes() & m_attrToIgnore)==0)) {
         PushStack(m_seStack->GetFilePath());
     }
 
-    while (m_seStack && !m_seStack->FindNextFileNoDots()) {
+    while (m_seStack && !m_seStack->FindNextFileNoDots(m_attrToIgnore)) {
         // No more files in this directory, try parent.
         PopStack();
     }
