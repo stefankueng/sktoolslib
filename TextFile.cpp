@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2014, 2017 - Stefan Kueng
+// Copyright (C) 2012, 2014, 2017-2018 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -403,6 +403,7 @@ bool CTextFile::CalculateLines()
     if (textcontent.empty())
         return true;
     linepositions.clear();
+    linepositions.reserve(textcontent.size() / 10);
     size_t pos = 0;
     for (auto it = textcontent.begin(); it != textcontent.end(); ++it)
     {
@@ -439,14 +440,9 @@ bool CTextFile::CalculateLines()
 
 long CTextFile::LineFromPosition(long pos) const
 {
-    long line = 0;
-    for (auto it = linepositions.begin(); it != linepositions.end(); ++it)
-    {
-        line++;
-        if (pos <= long(*it))
-            break;
-    }
-    return line;
+    auto lb = std::upper_bound(linepositions.begin(), linepositions.end(), pos);
+    auto lbLine = lb - linepositions.begin();
+    return long(lbLine + 1);
 }
 
 std::wstring CTextFile::GetLineString(long lineNumber) const
@@ -459,7 +455,7 @@ std::wstring CTextFile::GetLineString(long lineNumber) const
     long startpos = 0;
     if (lineNumber > 1)
         startpos = (long)linepositions[lineNumber-2];
-    size_t endpos = textcontent.find(_T('\n'), startpos+1);
+    size_t endpos = textcontent.find('\n', startpos+1);
     std::wstring line;
     if (endpos != std::wstring::npos)
         line = std::wstring(textcontent.begin()+startpos, textcontent.begin() + endpos);
