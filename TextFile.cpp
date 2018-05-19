@@ -103,7 +103,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     GlobalMemoryStatusEx(&memex);
 
     DWORD bytesread = 0;
-    DWORD bytestoread = min(lint.LowPart, DWORD(memex.ullAvailPhys/100UL));
+    DWORD bytestoread = min(lint.LowPart, DWORD(memex.ullAvailPhys/4UL));
     if (lint.HighPart)
         bytestoread = 500000;   // read 50kb if the file is too big: we only
                                 // need to scan for the file type then.
@@ -403,7 +403,6 @@ bool CTextFile::CalculateLines()
     if (textcontent.empty())
         return true;
     linepositions.clear();
-    linepositions.reserve(textcontent.size() / 10);
     size_t pos = 0;
     for (auto it = textcontent.begin(); it != textcontent.end(); ++it)
     {
@@ -440,9 +439,14 @@ bool CTextFile::CalculateLines()
 
 long CTextFile::LineFromPosition(long pos) const
 {
-    auto lb = std::upper_bound(linepositions.begin(), linepositions.end(), pos);
-    auto lbLine = lb - linepositions.begin();
-    return long(lbLine + 1);
+    long line = 0;
+    for (auto it = linepositions.begin(); it != linepositions.end(); ++it)
+    {
+        line++;
+        if (pos <= long(*it))
+            break;
+    }
+    return line;
 }
 
 std::wstring CTextFile::GetLineString(long lineNumber) const
@@ -455,7 +459,7 @@ std::wstring CTextFile::GetLineString(long lineNumber) const
     long startpos = 0;
     if (lineNumber > 1)
         startpos = (long)linepositions[lineNumber-2];
-    size_t endpos = textcontent.find('\n', startpos+1);
+    size_t endpos = textcontent.find(_T('\n'), startpos+1);
     std::wstring line;
     if (endpos != std::wstring::npos)
         line = std::wstring(textcontent.begin()+startpos, textcontent.begin() + endpos);
