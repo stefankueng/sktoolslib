@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2017 - Stefan Kueng
+// Copyright (C) 2012, 2017-2018 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -1076,6 +1076,6 @@ typedef CKeyList<CRegStdString> CRegStdStringList;
 // function is added.
 inline void CRegStdCompilerWarningDummyFunction()
 {
-    std::wstring(CRegStdString(_T("TEST"))).empty();
+    std::wstring(CRegStdString(_T("TEST"))).clear();
     CRegStdDWORD(_T("TEST"));
 }

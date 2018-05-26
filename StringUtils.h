@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2017 - Stefan Kueng
+// Copyright (C) 2012-2018 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -258,41 +258,35 @@ template<typename T> std::string to_bit_string(T number, bool trim_significant_c
 /// use it as the second/third argument when creating a container, e.g.:
 /// std::map< std::string, std::vector<std::string>, ci_less > myMap;
 /// std::vector<std::string, ci_less> myVector;
-struct ci_less : std::binary_function<std::string, std::string, bool>
+struct ci_less
 {
     // case-independent (ci) compare_less binary function
-    struct nocase_compare : public std::binary_function<unsigned char, unsigned char, bool>
+    struct nocase_compare
     {
-        bool operator() (const unsigned char& c1, const unsigned char& c2) const
-        {
+        bool operator() (const unsigned char& c1, const unsigned char& c2) const {
             return tolower(c1) < tolower(c2);
         }
     };
-    bool operator() (const std::string & s1, const std::string & s2) const
-    {
-        return std::lexicographical_compare
-            (s1.begin(), s1.end(),   // source range
-             s2.begin(), s2.end(),   // dest range
-             nocase_compare());  // comparison
+    bool operator() (const std::string & s1, const std::string & s2) const {
+        return std::lexicographical_compare(s1.begin(), s1.end(),   // source range
+                                            s2.begin(), s2.end(),   // dest range
+                                            nocase_compare());      // comparison
     }
 };
 
-struct ci_lessW : std::binary_function<std::wstring, std::wstring, bool>
+struct ci_lessW
 {
     // case-independent (ci) compare_less binary function
-    struct nocase_compare : public std::binary_function<wchar_t, wchar_t, bool>
+    struct nocase_compare
     {
-        bool operator() (const wchar_t& c1, const wchar_t& c2) const
-        {
+        bool operator() (const wchar_t& c1, const wchar_t& c2) const {
             return towlower(c1) < towlower(c2);
         }
     };
-    bool operator() (const std::wstring & s1, const std::wstring & s2) const
-    {
-        return std::lexicographical_compare
-            (s1.begin(), s1.end(),   // source range
-             s2.begin(), s2.end(),   // dest range
-             nocase_compare());  // comparison
+    bool operator() (const std::wstring & s1, const std::wstring & s2) const {
+        return std::lexicographical_compare(s1.begin(), s1.end(),   // source range
+                                            s2.begin(), s2.end(),   // dest range
+                                            nocase_compare());      // comparison
     }
 };
 
@@ -306,13 +300,13 @@ public:
 
     // trim from start
     static inline std::string &ltrim(std::string &s) {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<wint_t, int>(iswspace))));
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](wint_t c) {return !iswspace(c); }));
         return s;
     }
 
     // trim from end
     static inline std::string &rtrim(std::string &s) {
-        s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<wint_t, int>(iswspace))).base(), s.end());
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](wint_t c) {return !iswspace(c); }).base(), s.end());
         return s;
     }
 
@@ -323,13 +317,13 @@ public:
 
     // trim from start
     static inline std::wstring &ltrim(std::wstring &s) {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<wint_t, int>(iswspace))));
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](wint_t c) {return !iswspace(c); }));
         return s;
     }
 
     // trim from end
     static inline std::wstring &rtrim(std::wstring &s) {
-        s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<wint_t, int>(iswspace))).base(), s.end());
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](wint_t c) {return !iswspace(c); }).base(), s.end());
         return s;
     }
 

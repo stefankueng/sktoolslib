@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2013, 2017 - Stefan Kueng
+// Copyright (C) 2013, 2017-2018 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -108,7 +108,7 @@ bool CLanguage::LoadFile( const std::wstring& path )
                     msgid = std::wstring(msgid.substr(7, msgid.size() - 8));
 
                     std::wstring s = msgid;
-                    s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+                    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](wint_t c) {return !iswspace(c); }));
                     type = 1;
                 }
                 if (wcsncmp(I->c_str(), L"msgstr", 6)==0)
