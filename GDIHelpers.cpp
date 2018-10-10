@@ -106,30 +106,35 @@ void GDIHelpers::RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brigh
     BYTE minRGB = min(min(r, g), b);
     BYTE maxRGB = max(max(r, g), b);
     BYTE delta = maxRGB - minRGB;
-    double l = double(maxRGB);
+    double l = maxRGB;
     double s = 0.0;
     double h = 0.0;
+    if (maxRGB == 0)
+    {
+        hue = 0;
+        saturation = 0;
+        brightness = 0;
+        return;
+    }
     if (maxRGB)
         s = (255.0 * delta) / maxRGB;
 
-    if (s != 0.0)
+    if (BYTE(s) != 0)
     {
         if (r == maxRGB)
-            h = double(g - b) / delta;
+            h = 0 + 43 * double(g - b) / delta;
         else if (g == maxRGB)
-            h = 2.0 + double(b - r) / delta;
+            h = 85 +  43 * double(b - r) / delta;
         else if (b == maxRGB)
-            h = 4.0 + double(r - g) / delta;
+            h = 171 + 43 * double(r - g) / delta;
     }
     else
-        h = -1.0;
-    h = h * 60.0;
-    if (h < 0.0)
-        h = h + 360.0;
+        h = 0.0;
 
     hue = BYTE(h);
-    saturation = BYTE(s * 100.0 / 255.0);
-    brightness = BYTE(l * 100.0 / 255.0);
+    saturation = BYTE(s);
+    brightness = BYTE(l);
+
 }
 
 void GDIHelpers::RGBtoHSL(COLORREF color, float& h, float& s, float& l)
