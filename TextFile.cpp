@@ -23,7 +23,8 @@
 #include "maxpath.h"
 #include <memory>
 
-CTextFile::CTextFile(void) : pFileBuf(NULL)
+CTextFile::CTextFile(void)
+    : pFileBuf(nullptr)
     , filelen(0)
     , hasBOM(false)
     , encoding(AUTOTYPE)
@@ -32,20 +33,19 @@ CTextFile::CTextFile(void) : pFileBuf(NULL)
 
 CTextFile::~CTextFile(void)
 {
-    if (pFileBuf)
-        delete [] pFileBuf;
+    pFileBuf = nullptr;
 }
 
 bool CTextFile::Save(LPCTSTR path)
 {
-    if (pFileBuf == NULL)
+    if (pFileBuf == nullptr)
         return false;
     HANDLE hFile = CreateFile(path, GENERIC_WRITE, FILE_SHARE_READ,
         NULL, CREATE_ALWAYS, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (hFile == INVALID_HANDLE_VALUE)
         return false;
     DWORD byteswritten;
-    if (!WriteFile(hFile, pFileBuf, filelen, &byteswritten, NULL))
+    if (!WriteFile(hFile, pFileBuf.get(), filelen, &byteswritten, NULL))
     {
         CloseHandle(hFile);
         return false;
@@ -59,23 +59,21 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     encoding = AUTOTYPE;
     type = AUTOTYPE;
     LARGE_INTEGER lint;
-    if (pFileBuf)
-        delete [] pFileBuf;
-    pFileBuf = NULL;
-    auto pathbuf = std::make_unique<TCHAR[]>(MAX_PATH_NEW);
+    pFileBuf = nullptr;
+    auto pathbuf = std::make_unique<wchar_t[]>(MAX_PATH_NEW);
     HANDLE hFile = INVALID_HANDLE_VALUE;
     int retrycounter = 0;
 
     if ((_tcslen(path) > 2 ) && (path[0] == '\\') && (path[1] == '\\'))
     {
         // UNC path
-        _tcscpy_s(pathbuf.get(), MAX_PATH_NEW, _T("\\\\?\\UNC"));
+        _tcscpy_s(pathbuf.get(), MAX_PATH_NEW, L"\\\\?\\UNC");
         _tcscat_s(pathbuf.get(), MAX_PATH_NEW, &path[1]);
     }
     else
     {
         // 'normal' path
-        _tcscpy_s(pathbuf.get(), MAX_PATH_NEW, _T("\\\\?\\"));
+        _tcscpy_s(pathbuf.get(), MAX_PATH_NEW, L"\\\\?\\");
         _tcscat_s(pathbuf.get(), MAX_PATH_NEW, path);
     }
 
@@ -114,45 +112,61 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     // to convert first to do a proper search with.
     if (bytestoread < lint.LowPart)
     {
-        auto tempfilebuf = std::make_unique<BYTE[]>(bytestoread+1);
-        if (!ReadFile(hFile, tempfilebuf.get(), bytestoread, &bytesread, NULL))
+        try
         {
-            CloseHandle(hFile);
-            return false;
-        }
-        encoding = CheckUnicodeType(tempfilebuf.get(), bytesread);
-        type = encoding;
-        if (lint.HighPart)
-        {
-            CloseHandle(hFile);
-            return false;
-        }
-
-        switch(encoding)
-        {
-        case BINARY:
-        case UTF8:
-        case ANSI:
-            CloseHandle(hFile);
-            return false;
-            break;
-        default:
-            pFileBuf = new (std::nothrow) BYTE[lint.LowPart];
-            for (unsigned long bc = 0; bc < bytesread; ++bc)
+            auto tempfilebuf = std::make_unique<BYTE[]>(bytestoread + 1);
+            if (!ReadFile(hFile, tempfilebuf.get(), bytestoread, &bytesread, NULL))
             {
-                pFileBuf[bc] = tempfilebuf[bc];
+                CloseHandle(hFile);
+                return false;
             }
-            break;
+            encoding = CheckUnicodeType(tempfilebuf.get(), bytesread);
+            type = encoding;
+            if (lint.HighPart)
+            {
+                CloseHandle(hFile);
+                return false;
+            }
+
+            switch (encoding)
+            {
+            case BINARY:
+            case UTF8:
+            case ANSI:
+                CloseHandle(hFile);
+                return false;
+                break;
+            default:
+                pFileBuf = std::make_unique<BYTE[]>(lint.LowPart);
+                if (pFileBuf)
+                {
+                    for (unsigned long bc = 0; bc < bytesread; ++bc)
+                    {
+                        pFileBuf[bc] = tempfilebuf[bc];
+                    }
+                }
+                break;
+            }
+        }
+        catch (const std::exception&)
+        {
+            return false;
         }
     }
     else
     {
-        pFileBuf = new (std::nothrow) BYTE[lint.LowPart];
+        try
+        {
+            pFileBuf = std::make_unique<BYTE[]>(lint.LowPart);
+        }
+        catch (const std::exception&)
+        {
+            return false;
+        }
     }
-    if ((pFileBuf == NULL) || (!ReadFile(hFile, pFileBuf, lint.LowPart, &bytesread, NULL)))
+    if ((pFileBuf == nullptr) || (!ReadFile(hFile, pFileBuf.get(), lint.LowPart, &bytesread, NULL)))
     {
-        delete [] pFileBuf;
-        pFileBuf = NULL;
+        pFileBuf = nullptr;
         CloseHandle(hFile);
         return false;
     }
@@ -163,52 +177,67 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
     // kind of text file we have here.
     if (encoding == AUTOTYPE)
     {
-        encoding = CheckUnicodeType(pFileBuf, bytesread);
+        encoding = CheckUnicodeType(pFileBuf.get(), bytesread);
         if ((bUTF8) && (encoding != BINARY))
             encoding = UTF8;
     }
 
     if (encoding == UNICODE_LE)
     {
-        if ((bytesread > 1) && (*(unsigned char*)pFileBuf == 0xFF))
+        try
         {
-            // remove the BOM
-            textcontent = std::wstring(((wchar_t*)pFileBuf+1), (bytesread/sizeof(wchar_t))-1);
-            hasBOM = true;
-        }
-        else
-            textcontent = std::wstring((wchar_t*)pFileBuf, bytesread/sizeof(wchar_t));
-    }
-    else if ((encoding == UTF8) || ((encoding == BINARY) && (bUTF8)))
-    {
-        int ret = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pFileBuf, bytesread, NULL, 0);
-        wchar_t * pWideBuf = new (std::nothrow) wchar_t[ret+1];
-        if (pWideBuf == NULL)
-            return false;
-        int ret2 = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pFileBuf, bytesread, pWideBuf, ret+1);
-        if (ret2 == ret)
-        {
-            if ((ret > 1) && (*pWideBuf == 0xFEFF))
+            if ((bytesread > 1) && (*(unsigned char*)pFileBuf.get() == 0xFF))
             {
                 // remove the BOM
-                textcontent = std::wstring(pWideBuf+1, ret-1);
+                textcontent.assign(((wchar_t*)pFileBuf.get() + 1), (bytesread / sizeof(wchar_t)) - 1);
                 hasBOM = true;
             }
             else
-                textcontent = std::wstring(pWideBuf, ret);
+                textcontent.assign((wchar_t*)pFileBuf.get(), bytesread / sizeof(wchar_t));
         }
-        delete [] pWideBuf;
+        catch (const std::exception&)
+        {
+            return false;
+        }
+    }
+    else if ((encoding == UTF8) || ((encoding == BINARY) && (bUTF8)))
+    {
+        try
+        {
+            int ret = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pFileBuf.get(), bytesread, NULL, 0);
+            auto pWideBuf = std::make_unique<wchar_t[]>(ret + 1);
+            int ret2 = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pFileBuf.get(), bytesread, pWideBuf.get(), ret + 1);
+            if (ret2 == ret)
+            {
+                if ((ret > 1) && (*pWideBuf.get() == 0xFEFF))
+                {
+                    // remove the BOM
+                    textcontent.assign(pWideBuf.get() + 1, ret - 1);
+                    hasBOM = true;
+                }
+                else
+                    textcontent.assign(pWideBuf.get(), ret);
+            }
+        }
+        catch (const std::exception&)
+        {
+            return false;
+        }
     }
     else //if (encoding == ANSI)
     {
-        int ret = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, (LPCSTR)pFileBuf, bytesread, NULL, 0);
-        wchar_t * pWideBuf = new (std::nothrow) wchar_t[ret+1];
-        if (pWideBuf == NULL)
+        try
+        {
+            int ret = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, (LPCSTR)pFileBuf.get(), bytesread, NULL, 0);
+            auto pWideBuf = std::make_unique<wchar_t[]>(ret + 1);
+            int ret2 = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, (LPCSTR)pFileBuf.get(), bytesread, pWideBuf.get(), ret + 1);
+            if (ret2 == ret)
+                textcontent.assign(pWideBuf.get(), ret);
+        }
+        catch (const std::exception&)
+        {
             return false;
-        int ret2 = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, (LPCSTR)pFileBuf, bytesread, pWideBuf, ret+1);
-        if (ret2 == ret)
-            textcontent = std::wstring(pWideBuf, ret);
-        delete [] pWideBuf;
+        }
     }
     type = encoding;
     if (type == BINARY)
@@ -218,96 +247,95 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType& type, bool bUTF8)
 
 void CTextFile::SetFileContent(const std::wstring& content)
 {
-    if (pFileBuf)
-        delete [] pFileBuf;
-    pFileBuf = NULL;
+    pFileBuf = nullptr;
     filelen = 0;
 
-    if (encoding == UNICODE_LE)
+    try
     {
-        if (hasBOM)
+        if (encoding == UNICODE_LE)
         {
-            pFileBuf = new (std::nothrow) BYTE[(content.size()+2)*sizeof(wchar_t)];
-            if (pFileBuf)
+            if (hasBOM)
             {
-                memcpy(pFileBuf, "\xFF\xFE", sizeof(wchar_t));
-                memcpy(pFileBuf+2, content.c_str(), content.size()*sizeof(wchar_t));
-                filelen = ((int)content.size()+1)*sizeof(wchar_t);
+                pFileBuf = std::make_unique<BYTE[]>((content.size() + 2) * sizeof(wchar_t));
+                if (pFileBuf)
+                {
+                    memcpy(pFileBuf.get(), "\xFF\xFE", sizeof(wchar_t));
+                    memcpy(pFileBuf.get() + 2, content.c_str(), content.size() * sizeof(wchar_t));
+                    filelen = ((int)content.size() + 1) * sizeof(wchar_t);
+                }
+            }
+            else
+            {
+                pFileBuf = std::make_unique<BYTE[]>(content.size() * sizeof(wchar_t));
+                if (pFileBuf)
+                {
+                    memcpy(pFileBuf.get(), content.c_str(), content.size() * sizeof(wchar_t));
+                    filelen = (int)content.size() * sizeof(wchar_t);
+                }
             }
         }
-        else
+        else if (encoding == UTF8)
         {
-            pFileBuf = new (std::nothrow) BYTE[content.size()*sizeof(wchar_t)];
-            if (pFileBuf)
+            if (hasBOM)
             {
-                memcpy(pFileBuf, content.c_str(), content.size()*sizeof(wchar_t));
-                filelen = (int)content.size()*sizeof(wchar_t);
+                int ret = WideCharToMultiByte(CP_UTF8, 0, content.c_str(), -1, NULL, 0, NULL, NULL);
+                pFileBuf = std::make_unique<BYTE[]>(ret + 3);
+                if (pFileBuf)
+                {
+                    memcpy(pFileBuf.get(), "\xEF\xBB\xBF", 3);
+                    int ret2 = WideCharToMultiByte(CP_UTF8, 0, content.c_str(), -1, (LPSTR)pFileBuf.get() + 3, ret, NULL, NULL);
+                    filelen = ret2 + 2;
+                    if (ret2 != ret)
+                    {
+                        pFileBuf = nullptr;
+                        filelen = 0;
+                    }
+                }
+            }
+            else
+            {
+                int ret = WideCharToMultiByte(CP_UTF8, 0, content.c_str(), -1, NULL, 0, NULL, NULL);
+                pFileBuf = std::make_unique<BYTE[]>(ret);
+                if (pFileBuf)
+                {
+                    int ret2 = WideCharToMultiByte(CP_UTF8, 0, content.c_str(), -1, (LPSTR)pFileBuf.get(), ret, NULL, NULL);
+                    filelen = ret2 - 1;
+                    if (ret2 != ret)
+                    {
+                        pFileBuf = nullptr;
+                        filelen = 0;
+                    }
+                }
             }
         }
-    }
-    else if (encoding == UTF8)
-    {
-        if (hasBOM)
+        else if ((encoding == ANSI) || (encoding == BINARY))
         {
-            int ret = WideCharToMultiByte(CP_UTF8, 0, content.c_str(), -1, NULL, 0, NULL, NULL);
-            pFileBuf = new (std::nothrow) BYTE[ret+3];
+            int ret = WideCharToMultiByte(CP_ACP, 0, content.c_str(), (int)content.size() + 1, NULL, 0, NULL, NULL);
+            pFileBuf = std::make_unique<BYTE[]>(ret);
             if (pFileBuf)
             {
-                memcpy(pFileBuf, "\xEF\xBB\xBF", 3);
-                int ret2 = WideCharToMultiByte(CP_UTF8, 0, content.c_str(), -1, (LPSTR)pFileBuf+3, ret, NULL, NULL);
-                filelen = ret2+2;
+                int ret2 = WideCharToMultiByte(CP_ACP, 0, content.c_str(), (int)content.size() + 1, (LPSTR)pFileBuf.get(), ret, NULL, NULL);
+                filelen = ret2 - 1;
                 if (ret2 != ret)
                 {
-                    delete [] pFileBuf;
-                    pFileBuf = NULL;
+                    pFileBuf = nullptr;
                     filelen = 0;
                 }
             }
         }
-        else
-        {
-            int ret = WideCharToMultiByte(CP_UTF8, 0, content.c_str(), -1, NULL, 0, NULL, NULL);
-            pFileBuf = new (std::nothrow) BYTE[ret];
-            if (pFileBuf)
-            {
-                int ret2 = WideCharToMultiByte(CP_UTF8, 0, content.c_str(), -1, (LPSTR)pFileBuf, ret, NULL, NULL);
-                filelen = ret2-1;
-                if (ret2 != ret)
-                {
-                    delete [] pFileBuf;
-                    pFileBuf = NULL;
-                    filelen = 0;
-                }
-            }
-        }
     }
-    else if ((encoding == ANSI) || (encoding == BINARY))
+    catch (const std::exception&)
     {
-        int ret = WideCharToMultiByte(CP_ACP, 0, content.c_str(), (int)content.size()+1, NULL, 0, NULL, NULL);
-        pFileBuf = new (std::nothrow) BYTE[ret];
-        if (pFileBuf)
-        {
-            int ret2 = WideCharToMultiByte(CP_ACP, 0, content.c_str(), (int)content.size()+1, (LPSTR)pFileBuf, ret, NULL, NULL);
-            filelen = ret2-1;
-            if (ret2 != ret)
-            {
-                delete [] pFileBuf;
-                pFileBuf = NULL;
-                filelen = 0;
-            }
-        }
     }
     if (pFileBuf)
         textcontent = content;
     else
-        textcontent = _T("");
+        textcontent = L"";
 }
 
-bool CTextFile::ContentsModified(BYTE * pBuf, DWORD newLen)
+bool CTextFile::ContentsModified(std::unique_ptr<BYTE[]> pBuf, DWORD newLen)
 {
-    if (pFileBuf)
-        delete [] pFileBuf;
-    pFileBuf = pBuf;
+    pFileBuf = std::move(pBuf);
     filelen = newLen;
     return true;
 }

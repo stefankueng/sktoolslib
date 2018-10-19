@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2017 - Stefan Kueng
+// Copyright (C) 2012, 2017-2018 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -58,7 +58,7 @@ public:
      * \param newLen length of the new file content in bytes
      * \note the old buffer is automatically freed.
      */
-    bool            ContentsModified(BYTE * pBuf, DWORD newLen);
+    bool            ContentsModified(std::unique_ptr<BYTE[]> pBuf, DWORD newLen);
 
     /**
      * Returns the line number from a given character position inside the file.
@@ -80,7 +80,7 @@ public:
      * Returns a pointer to the file contents. Call GetFileLength() to get
      * the size in number of bytes of this buffer.
      */
-    LPVOID          GetFileContent() {return pFileBuf;}
+    LPVOID          GetFileContent() {return pFileBuf.get();}
 
     /**
      * Returns the size of the file in bytes
@@ -125,7 +125,7 @@ protected:
     bool            CalculateLines();
 
 private:
-    BYTE *              pFileBuf;
+    std::unique_ptr<BYTE[]> pFileBuf;
     DWORD               filelen;
     std::wstring        textcontent;
     std::vector<size_t> linepositions;
