@@ -112,7 +112,7 @@ public:
     void SetFileContent(const std::wstring& content);
 
     bool HasBOM() const { return hasBOM; }
-§
+
 protected:
     /**
      * Tries to find out the encoding of the file (utf8, utf16, ansi)
