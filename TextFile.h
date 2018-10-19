@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-
 /**
  * handles text files.
  */
@@ -44,12 +43,12 @@ public:
     /**
      * Loads a file from the specified \c path.
      */
-    bool            Load(LPCTSTR path, UnicodeType& type, bool bUTF8);
+    bool Load(LPCTSTR path, UnicodeType& type, bool bUTF8);
 
     /**
      * Saves the file contents to disk at \c path.
      */
-    bool            Save(LPCTSTR path);
+    bool Save(LPCTSTR path);
 
     /**
      * modifies the contents of a file.
@@ -58,78 +57,79 @@ public:
      * \param newLen length of the new file content in bytes
      * \note the old buffer is automatically freed.
      */
-    bool            ContentsModified(std::unique_ptr<BYTE[]> pBuf, DWORD newLen);
+    bool ContentsModified(std::unique_ptr<BYTE[]> pBuf, DWORD newLen);
 
     /**
      * Returns the line number from a given character position inside the file.
      */
-    long            LineFromPosition(long pos) const;
+    long LineFromPosition(long pos) const;
 
     /**
      * Returns the line from a given line number
      */
-    std::wstring    GetLineString(long lineNumber) const;
+    std::wstring GetLineString(long lineNumber) const;
 
     /**
      * Returns the file content as a text string.
      * \note the text string can not be modified and is to be treated read-only.
      */
-    const std::wstring&  GetFileString() const {return textcontent;}
+    const std::wstring& GetFileString() const { return textcontent; }
 
     /**
      * Returns a pointer to the file contents. Call GetFileLength() to get
      * the size in number of bytes of this buffer.
      */
-    LPVOID          GetFileContent() {return pFileBuf.get();}
+    LPVOID GetFileContent() { return pFileBuf.get(); }
 
     /**
      * Returns the size of the file in bytes
      */
-    long            GetFileLength() const {return filelen;}
+    long GetFileLength() const { return filelen; }
 
     /**
      * Returns the encoding of the file
      */
-    UnicodeType     GetEncoding() const {return encoding;}
+    UnicodeType GetEncoding() const { return encoding; }
 
     /**
      * Returns the filename
      */
-    const std::wstring&  GetFileName() const {return filename;}
+    const std::wstring& GetFileName() const { return filename; }
 
     /**
      * Returns the filename without the extension (if any)
      */
-    std::wstring    GetFileNameWithoutExtension();
+    std::wstring GetFileNameWithoutExtension();
 
     /**
      * Returns the filename extension (if any)
      */
-    std::wstring    GetFileNameExtension();
+    std::wstring GetFileNameExtension();
 
     /**
      * Replaces the file content.
      */
-    void            SetFileContent(const std::wstring& content);
+    void SetFileContent(const std::wstring& content);
 
-    bool            HasBOM() const { return hasBOM; }
+    bool HasBOM() const { return hasBOM; }
+§
 protected:
     /**
      * Tries to find out the encoding of the file (utf8, utf16, ansi)
      */
-    UnicodeType     CheckUnicodeType(BYTE * pBuffer, int cb);
+    UnicodeType CheckUnicodeType(BYTE* pBuffer, int cb);
     /**
      * Fills an array with line information to make it faster later
      * to get the line from a char position.
      */
-    bool            CalculateLines();
+    bool CalculateLines();
 
 private:
     std::unique_ptr<BYTE[]> pFileBuf;
-    DWORD               filelen;
-    std::wstring        textcontent;
-    std::vector<size_t> linepositions;
-    UnicodeType         encoding;
-    std::wstring        filename;
-    bool                hasBOM;
+    DWORD                   filelen;
+    std::wstring            textcontent;
+    std::vector<size_t>     linepositions;
+    UnicodeType             encoding;
+    std::wstring            filename;
+    bool                    hasBOM;
 };
