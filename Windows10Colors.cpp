@@ -85,7 +85,7 @@ Win10Colors::~Win10Colors()
     if (winrt)
         FreeLibrary(winrt);
     if (winrt_string)
-        FreeLibrary(winrt);
+        FreeLibrary(winrt_string);
 }
 
 HRESULT Win10Colors::GetAccentColor(AccentColor& color)
