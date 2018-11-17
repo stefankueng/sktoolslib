@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2017 Stefan Kueng
+// Copyright (C) 2017-2018 Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -76,7 +76,7 @@ bool CRichStatusBar::Init(HWND hParent, bool drawGrip)
             DrawText(hdc, L"W", 1, &fr, DT_SINGLELINE | DT_CALCRECT);
             ReleaseDC(*this, hdc);
             m_height = fr.bottom - fr.top;
-            m_height += 4;
+            m_height += int(4.0f * m_dpiScale);
             m_height = int(m_height*m_dpiScale);
 
             // create the tooltip window
@@ -173,21 +173,23 @@ void CRichStatusBar::DrawSizeGrip(HDC hdc, LPCRECT lpRect)
     POINT pt;
     INT i;
 
-    pt.x = lpRect->right - 1;
-    pt.y = lpRect->bottom - 1;
+    const auto onedpi = int(1.0f*m_dpiScale);
+    const auto twodpi = int(2.0f*m_dpiScale);
+    pt.x = lpRect->right - onedpi;
+    pt.y = lpRect->bottom - onedpi;
 
     hPenFace = CreatePen(PS_SOLID, 1, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
     hOldPen = (HPEN)SelectObject(hdc, hPenFace);
-    MoveToEx(hdc, pt.x - 12, pt.y, nullptr);
+    MoveToEx(hdc, pt.x - int(12.0f * m_dpiScale), pt.y, nullptr);
     LineTo(hdc, pt.x, pt.y);
-    LineTo(hdc, pt.x, pt.y - 13);
+    LineTo(hdc, pt.x, pt.y - int(13.0f * m_dpiScale));
 
     pt.x--;
     pt.y--;
 
     hPenShadow = CreatePen(PS_SOLID, 1, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DSHADOW)) : GetSysColor(COLOR_3DSHADOW));
     SelectObject(hdc, hPenShadow);
-    for (i = 1; i < 11; i += 4)
+    for (i = 1; i < int(11.0f * m_dpiScale); i += 4)
     {
         MoveToEx(hdc, pt.x - i, pt.y, nullptr);
         LineTo(hdc, pt.x + 1, pt.y - i - 1);
@@ -198,7 +200,7 @@ void CRichStatusBar::DrawSizeGrip(HDC hdc, LPCRECT lpRect)
 
     hPenHighlight = CreatePen(PS_SOLID, 1, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DHIGHLIGHT)) : GetSysColor(COLOR_3DHIGHLIGHT));
     SelectObject(hdc, hPenHighlight);
-    for (i = 3; i < 13; i += 4)
+    for (i = 3; i < int(13.0f * m_dpiScale); i += 4)
     {
         MoveToEx(hdc, pt.x - i, pt.y, nullptr);
         LineTo(hdc, pt.x + 1, pt.y - i - 1);
@@ -234,6 +236,8 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             SetTextColor(hMyMemDC, foreColor);
             SetBkColor(hMyMemDC, backColor);
 
+            const auto onedpi = int(1.0f*m_dpiScale);
+            const auto twodpi = int(2.0f*m_dpiScale);
 
             RECT partRect = rect;
             int right = 0;
@@ -254,7 +258,7 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 LineTo(hMyMemDC, partRect.left, partRect.top);
                 SelectObject(hMyMemDC, oldpen);
                 DeleteObject(pen);
-                InflateRect(&partRect, -1, -1);
+                InflateRect(&partRect, -onedpi, -onedpi);
                 auto fraction = Animator::GetValue(m_AnimVars[i]);
                 auto animForeClr = RGB((GetRValue(penColor) - GetRValue(backColor))*fraction + GetRValue(backColor),
                                        (GetGValue(penColor) - GetGValue(backColor))*fraction + GetGValue(backColor),
@@ -269,22 +273,22 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 LineTo(hMyMemDC, partRect.left, partRect.top);
                 SelectObject(hMyMemDC, oldpen);
                 DeleteObject(pen);
-                InflateRect(&partRect, -1, -1);
+                InflateRect(&partRect, -onedpi, -onedpi);
                 //DrawEdge(hMyMemDC, &partRect, i == m_hoverPart ? EDGE_ETCHED : BDR_SUNKENOUTER, BF_RECT | BF_MONO | BF_SOFT | BF_ADJUST);
                 int x = 0;
                 if (part.icon && !m_partwidths[i].collapsed)
                 {
                     RECT temprect = partRect;
-                    InflateRect(&temprect, -2, -2);
+                    InflateRect(&temprect, -twodpi, -twodpi);
                     auto cy = temprect.bottom - temprect.top;
                     DrawIconEx(hMyMemDC, temprect.left, temprect.top, part.icon, cy, cy, 0, 0, DI_NORMAL);
-                    x = 2 + cy;
+                    x = twodpi + cy;
                 }
                 partRect.left += x;
                 RECT temprect = partRect;
                 if (!m_partwidths[i].collapsed || !part.collapsedIcon)
                 {
-                    InflateRect(&temprect, -(border_width - 2), 0);
+                    InflateRect(&temprect, -(border_width - twodpi), 0);
                     auto text = m_partwidths[i].shortened && !part.shortText.empty() ? part.shortText : part.text;
                     UINT format = DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER;
                     if (part.align == 1)
@@ -295,10 +299,10 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
                 }
                 else
                 {
-                    InflateRect(&temprect, -2, -2);
+                    InflateRect(&temprect, -twodpi, -twodpi);
                     auto cy = temprect.bottom - temprect.top;
                     DrawIconEx(hMyMemDC, temprect.left, temprect.top, part.collapsedIcon, cy, cy, 0, 0, DI_NORMAL);
-                    x = 2 + cy;
+                    x = twodpi + cy;
                 }
             }
 
@@ -443,8 +447,9 @@ void CRichStatusBar::CalcRequestedWidths(int index)
         w.defaultWidth += icon_width;
         w.shortWidth += icon_width;
     }
-    w.shortWidth += (2 * border_width);
-    w.defaultWidth += (2 * border_width);
+    const auto twodpi = int(2.0f*m_dpiScale);
+    w.shortWidth += (twodpi * border_width);
+    w.defaultWidth += (twodpi * border_width);
     // add padding
     if (part.width < 0)
         w.defaultWidth -= part.width;
@@ -749,13 +754,14 @@ void CRichStatusBar::CalcWidths()
     int startx = 0;
     ti.rect.top = rect.top;
     ti.rect.bottom = rect.bottom;
+    const auto twodpi = int(2.0f*m_dpiScale);
     for (decltype(m_parts.size()) i = 0; i < m_parts.size(); ++i)
     {
         ti.uId = i + 1;
         ti.rect.left = startx;
         ti.rect.right = startx + m_partwidths[i].calculatedWidth;
         startx = ti.rect.right;
-        InflateRect(&ti.rect, -2, 0);
+        InflateRect(&ti.rect, -twodpi, 0);
         ti.lpszText = const_cast<wchar_t*>(m_parts[i].tooltip.c_str());
         if (ti.lpszText[0])
         {
