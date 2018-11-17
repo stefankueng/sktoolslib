@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013, 2015-2017 - Stefan Kueng
+// Copyright (C) 2012-2013, 2015-2018 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -150,8 +150,7 @@ bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = nullp
     }
 
     HDC hdc = GetDC(*this);
-    m_dpiScaleX = GetDeviceCaps(hdc, LOGPIXELSX) / 96.0f;
-    m_dpiScaleY = GetDeviceCaps(hdc, LOGPIXELSY) / 96.0f;
+    m_dpiScale = GetDeviceCaps(hdc, LOGPIXELSX) / 96.0f;
     ReleaseDC(*this, hdc);
 
     return (m_hwnd != nullptr);

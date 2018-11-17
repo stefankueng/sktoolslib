@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013, 2017 - Stefan Kueng
+// Copyright (C) 2012-2013, 2017-2018 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -82,8 +82,7 @@ protected:
     bool bWindowRestored;
     bool bRegisterWindowCalled;
     WNDPROC prevWndProc;
-    float m_dpiScaleX;
-    float m_dpiScaleY;
+    float m_dpiScale;
 
     //constructor
     CWindow(HINSTANCE hInst, CONST WNDCLASSEX* wcx = nullptr)
@@ -94,8 +93,7 @@ protected:
         , bWindowRestored(false)
         , bRegisterWindowCalled(false)
         , prevWndProc(nullptr)
-        , m_dpiScaleX(1.0)
-        , m_dpiScaleY(1.0)
+        , m_dpiScale(1.0)
     {
         hResource = hInst;
         if (wcx != nullptr)
