@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2017 - Stefan Kueng
+// Copyright (C) 2012-2017, 2019 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -219,12 +219,6 @@ std::wstring CStringUtils::ToHexWString( BYTE* pSrc, int nSrcLen )
 {
     std::string s = ToHexString(pSrc, nSrcLen);
     return std::wstring(s.begin(), s.end());
-}
-
-bool CStringUtils::FromHexString( const std::wstring& src, BYTE* pDest )
-{
-    std::string s = std::string(src.begin(), src.end());
-    return FromHexString(s, pDest);
 }
 
 std::unique_ptr<char[]> CStringUtils::Decrypt(const char * text)
