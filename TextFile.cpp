@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2014, 2017-2018 - Stefan Kueng
+// Copyright (C) 2012, 2014, 2017-2019 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -489,7 +489,8 @@ std::wstring CTextFile::GetLineString(long lineNumber) const
     long startpos = 0;
     if (lineNumber > 1)
         startpos = (long)linepositions[lineNumber - 2];
-    size_t       endpos = textcontent.find('\n', startpos + 1);
+    std::wstring endchars(L"\n\0", 2);
+    size_t       endpos = textcontent.find_first_of(endchars, startpos + 1);
     std::wstring line;
     if (endpos != std::wstring::npos)
         line = std::wstring(textcontent.begin() + startpos, textcontent.begin() + endpos);
