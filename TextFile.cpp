@@ -474,7 +474,7 @@ bool CTextFile::CalculateLines()
 
 long CTextFile::LineFromPosition(long pos) const
 {
-    auto lb     = std::upper_bound(linepositions.begin(), linepositions.end(), pos);
+    auto lb     = std::lower_bound(linepositions.begin(), linepositions.end(), pos);
     auto lbLine = lb - linepositions.begin();
     return long(lbLine + 1);
 }
