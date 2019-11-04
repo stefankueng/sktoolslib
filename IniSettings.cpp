@@ -107,7 +107,9 @@ void CIniSettings::RestoreWindowPos( LPCWSTR windowname, HWND hWnd, UINT showCmd
     {
         if (wpl.showCmd == SW_HIDE)
             wpl.showCmd = SW_SHOWDEFAULT;
-        if ((wpl.showCmd == SW_MINIMIZE) || (wpl.showCmd == SW_SHOWMINNOACTIVE))
+        else if ((wpl.showCmd == SW_SHOWMINIMIZED) && (wpl.flags & WPF_RESTORETOMAXIMIZED))
+            wpl.showCmd = SW_SHOWMAXIMIZED;
+        else if ((wpl.showCmd == SW_SHOWMINIMIZED) || (wpl.showCmd == SW_MINIMIZE) || (wpl.showCmd == SW_SHOWMINNOACTIVE))
             wpl.showCmd = SW_RESTORE;
         if (showCmd)
             wpl.showCmd = showCmd;
