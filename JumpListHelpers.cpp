@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2018 - Stefan Kueng
+// Copyright (C) 2018, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -158,7 +158,7 @@ HRESULT DeleteJumpList(LPCTSTR appID)
     return hr;
 }
 
-HRESULT SetRelaunchCommand(HWND hWnd, LPCWSTR appID, LPCWSTR commandLine, LPCWSTR dispName)
+HRESULT SetRelaunchCommand(HWND hWnd, LPCWSTR appID, LPCWSTR commandLine, LPCWSTR dispName, LPCWSTR icon)
 {
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
     // hWnd must be a top-level window
@@ -169,7 +169,7 @@ HRESULT SetRelaunchCommand(HWND hWnd, LPCWSTR appID, LPCWSTR commandLine, LPCWST
     auto                   hRes = SHGetPropertyStoreForWindow(hWnd, IID_PPV_ARGS(&pps));
     if (SUCCEEDED(hRes))
     {
-        PROPVARIANT pvId, pvRelaunchCmd, pvDispName;
+        PROPVARIANT pvId, pvRelaunchCmd, pvDispName, pvIcon;
 
         hRes = InitPropVariantFromString(appID, &pvId);
         if (SUCCEEDED(hRes))
@@ -187,6 +187,14 @@ HRESULT SetRelaunchCommand(HWND hWnd, LPCWSTR appID, LPCWSTR commandLine, LPCWST
                         if (SUCCEEDED(hRes))
                         {
                             hRes = pps->SetValue(PKEY_AppUserModel_RelaunchDisplayNameResource, pvDispName);
+                            if (icon)
+                            {
+                                hRes = InitPropVariantFromString(icon, &pvIcon);
+                                if (SUCCEEDED(hRes))
+                                {
+                                    hRes = pps->SetValue(PKEY_AppUserModel_RelaunchIconResource, pvIcon);
+                                }
+                            }
                             hRes = pps->Commit();
                             hRes = PropVariantClear(&pvDispName);
                         }

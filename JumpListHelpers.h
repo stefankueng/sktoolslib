@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2018 - Stefan Kueng
+// Copyright (C) 2018, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -36,5 +36,5 @@ bool IsItemInArray(IShellItem *psi, IObjectArray *poaRemoved);
 HRESULT DeleteJumpList(LPCTSTR appID);
 /// sets the relaunch command for the specified window.
 /// use this to specify command line parameters for the default jump list command which starts the pinned application
-HRESULT SetRelaunchCommand(HWND hWnd, LPCWSTR appID, LPCWSTR commandLine, LPCWSTR dispName);
+HRESULT SetRelaunchCommand(HWND hWnd, LPCWSTR appID, LPCWSTR commandLine, LPCWSTR dispName, LPCWSTR icon = nullptr);
 
