@@ -21,6 +21,7 @@
 #include "StringUtils.h"
 #include "PathUtils.h"
 #include <vector>
+#include <Shlobj.h>
 
 DarkModeHelper& DarkModeHelper::Instance()
 {
@@ -37,6 +38,8 @@ void DarkModeHelper::AllowDarkModeForApp(BOOL allow)
 {
     if (m_pAllowDarkModeForApp)
         m_pAllowDarkModeForApp(allow ? 1 : 0);
+    if (m_pSetPreferredAppMode)
+        m_pSetPreferredAppMode(allow ? AllowDark : Default);
 }
 
 void DarkModeHelper::AllowDarkModeForWindow(HWND hwnd, BOOL allow)
@@ -86,11 +89,18 @@ BOOL DarkModeHelper::GetIsImmersiveColorUsingHighContrast(IMMERSIVE_HC_CACHE_MOD
     return FALSE;
 }
 
-//void DarkModeHelper::FlushMenuThemes()
-//{
-//    if (m_pFlushMenuThemes)
-//        m_pFlushMenuThemes();
-//}
+void DarkModeHelper::FlushMenuThemes()
+{
+    if (m_pFlushMenuThemes)
+        m_pFlushMenuThemes();
+}
+
+BOOL DarkModeHelper::SetWindowCompositionAttribute(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA* data)
+{
+    if (m_pSetWindowCompositionAttribute)
+        return m_pSetWindowCompositionAttribute(hWnd, data);
+    return FALSE;
+}
 
 DarkModeHelper::DarkModeHelper()
 {
@@ -101,6 +111,7 @@ DarkModeHelper::DarkModeHelper()
 
     m_bCanHaveDarkMode = false;
     PWSTR sysPath      = nullptr;
+    long  micro        = 0;
     if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_System, 0, nullptr, &sysPath)))
     {
         std::wstring dllPath = sysPath;
@@ -113,7 +124,7 @@ DarkModeHelper::DarkModeHelper()
         {
             auto major = std::stol(tokens[0]);
             auto minor = std::stol(tokens[1]);
-            auto micro = std::stol(tokens[2]);
+            micro      = std::stol(tokens[2]);
             //auto build = std::stol(tokens[3]);
 
             // the windows 10 update 1809 has the version
@@ -140,7 +151,10 @@ DarkModeHelper::DarkModeHelper()
         // Let's just hope they change their minds and document these functions one day...
 
         // first try with the names, just in case MS decides to properly export these functions
-        m_pAllowDarkModeForApp                  = (AllowDarkModeForAppFPN)GetProcAddress(m_hUxthemeLib, "AllowDarkModeForApp");
+        if (micro < 18362)
+            m_pAllowDarkModeForApp = (AllowDarkModeForAppFPN)GetProcAddress(m_hUxthemeLib, "AllowDarkModeForApp");
+        else
+            m_pSetPreferredAppMode = (SetPreferredAppModeFPN)GetProcAddress(m_hUxthemeLib, "SetPreferredAppMode");
         m_pAllowDarkModeForWindow               = (AllowDarkModeForWindowFPN)GetProcAddress(m_hUxthemeLib, "AllowDarkModeForWindow");
         m_pShouldAppsUseDarkMode                = (ShouldAppsUseDarkModeFPN)GetProcAddress(m_hUxthemeLib, "ShouldAppsUseDarkMode");
         m_pIsDarkModeAllowedForWindow           = (IsDarkModeAllowedForWindowFPN)GetProcAddress(m_hUxthemeLib, "IsDarkModeAllowedForWindow");
@@ -148,9 +162,12 @@ DarkModeHelper::DarkModeHelper()
         m_pShouldSystemUseDarkMode              = (ShouldSystemUseDarkModeFPN)GetProcAddress(m_hUxthemeLib, "ShouldSystemUseDarkMode");
         m_pRefreshImmersiveColorPolicyState     = (RefreshImmersiveColorPolicyStateFN)GetProcAddress(m_hUxthemeLib, "RefreshImmersiveColorPolicyState");
         m_pGetIsImmersiveColorUsingHighContrast = (GetIsImmersiveColorUsingHighContrastFN)GetProcAddress(m_hUxthemeLib, "GetIsImmersiveColorUsingHighContrast");
-        //m_pFlushMenuThemes = (FlushMenuThemesFN)GetProcAddress(m_hUxthemeLib, "FlushMenuThemes");
-        if (m_pAllowDarkModeForApp == nullptr)
+        m_pFlushMenuThemes                      = (FlushMenuThemesFN)GetProcAddress(m_hUxthemeLib, "FlushMenuThemes");
+        m_pSetWindowCompositionAttribute        = (SetWindowCompositionAttributeFPN)GetProcAddress(GetModuleHandleW(L"user32.dll"), "SetWindowCompositionAttribute");
+        if (m_pAllowDarkModeForApp == nullptr && micro < 18362)
             m_pAllowDarkModeForApp = (AllowDarkModeForAppFPN)GetProcAddress(m_hUxthemeLib, MAKEINTRESOURCEA(135));
+        if (m_pSetPreferredAppMode == nullptr && micro >= 18362)
+            m_pSetPreferredAppMode = (SetPreferredAppModeFPN)GetProcAddress(m_hUxthemeLib, MAKEINTRESOURCEA(135));
         if (m_pAllowDarkModeForWindow == nullptr)
             m_pAllowDarkModeForWindow = (AllowDarkModeForWindowFPN)GetProcAddress(m_hUxthemeLib, MAKEINTRESOURCEA(133));
         if (m_pShouldAppsUseDarkMode == nullptr)
@@ -165,8 +182,8 @@ DarkModeHelper::DarkModeHelper()
             m_pRefreshImmersiveColorPolicyState = (RefreshImmersiveColorPolicyStateFN)GetProcAddress(m_hUxthemeLib, MAKEINTRESOURCEA(104));
         if (m_pGetIsImmersiveColorUsingHighContrast == nullptr)
             m_pGetIsImmersiveColorUsingHighContrast = (GetIsImmersiveColorUsingHighContrastFN)GetProcAddress(m_hUxthemeLib, MAKEINTRESOURCEA(106));
-        //if (m_pFlushMenuThemes == nullptr)
-        //    m_pFlushMenuThemes = (FlushMenuThemesFN)GetProcAddress(m_hUxthemeLib, MAKEINTRESOURCEA(136));
+        if (m_pFlushMenuThemes == nullptr)
+            m_pFlushMenuThemes = (FlushMenuThemesFN)GetProcAddress(m_hUxthemeLib, MAKEINTRESOURCEA(136));
     }
 }
 
