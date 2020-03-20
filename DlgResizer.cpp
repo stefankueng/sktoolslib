@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013, 2016 - Stefan Kueng
+// Copyright (C) 2012-2013, 2016, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,6 +29,7 @@
 CDlgResizer::CDlgResizer(void)
     : m_hDlg(nullptr)
     , m_wndGrip(nullptr)
+    , m_useSizeGrip(true)
 {
     m_controls.clear();
     m_dlgRect = {};
@@ -183,6 +184,11 @@ void CDlgResizer::DoResize(int width, int height)
         ComboBox_SetEditSel(m_controls[index].hWnd, startSel, endSel);
     }
     UpdateGripPos();
+}
+
+void CDlgResizer::ShowSizeGrip(bool bShow)
+{
+    ::ShowWindow(m_wndGrip, (bShow && m_useSizeGrip) ? SW_SHOW : SW_HIDE);
 }
 
 void CDlgResizer::UpdateGripPos()
