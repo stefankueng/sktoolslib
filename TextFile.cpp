@@ -210,7 +210,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType &type, bool bUTF8)
             return false;
         }
     }
-    if (encoding == UNICODE_BE)
+    else if (encoding == UNICODE_BE)
     {
         // make in place WORD BYTEs swap
         UINT64* p_qw = (UINT64*)pFileBuf.get();
