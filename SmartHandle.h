@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2015, 2017 - Stefan Kueng
+// Copyright (C) 2012, 2015, 2017, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,9 +16,25 @@
 // along with this program; if not, write to the Free Software Foundation,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
-
 #pragma once
+#include <Uxtheme.h>
 
+template <typename type>
+struct CDefaultHandleNull
+{
+    static constexpr type DefaultHandle()
+    {
+        return nullptr;
+    }
+};
+
+struct CDefaultHandleInvalid
+{
+    static constexpr HANDLE DefaultHandle()
+    {
+        return INVALID_HANDLE_VALUE;
+    }
+};
 
 /**
  * \ingroup Utils
@@ -26,13 +42,13 @@
  */
 template <typename HandleType,
     template <class> class CloseFunction,
-    HandleType NULL_VALUE = nullptr>
-class CSmartHandle : public CloseFunction<HandleType>
+    typename NullType = CDefaultHandleNull<HandleType>>
+class CSmartHandle
 {
 public:
     CSmartHandle()
+    : m_Handle(NullType::DefaultHandle())
     {
-        m_Handle = NULL_VALUE;
     }
 
     // disable any copies of handles.
@@ -56,14 +72,7 @@ public:
 
     CSmartHandle& operator=(CSmartHandle && h)
     {
-        if (m_Handle != (HandleType)h)
-        {
-            CleanUp();
-            m_Handle = h.Detach();
-        }
-        else
-            h.Detach();
-
+        *this = h.Detach();
         return *this;
     }
 
@@ -85,15 +94,13 @@ public:
 
     HandleType Detach()
     {
-        HandleType p;
-
-        p = m_Handle;
-        m_Handle = NULL_VALUE;
+        HandleType p = m_Handle;
+        m_Handle = NullType::DefaultHandle();
 
         return p;
     }
 
-    operator HandleType()
+    operator HandleType() const
     {
         return m_Handle;
     }
@@ -103,19 +110,19 @@ public:
         return &m_Handle;
     }
 
-    operator bool()
+    operator bool() const
     {
         return IsValid();
     }
 
-    bool IsValid()
+    bool IsValid() const
     {
-        return m_Handle != NULL_VALUE;
+        return m_Handle != NullType::DefaultHandle();
     }
 
-    HandleType Duplicate()
+    HandleType Duplicate() const
     {
-        HandleType hDup = NULL_VALUE;
+        HandleType hDup = NullType::DefaultHandle();
         if (DuplicateHandle(GetCurrentProcess(),
                             (HANDLE)m_Handle,
                             GetCurrentProcess(),
@@ -126,7 +133,7 @@ public:
         {
             return hDup;
         }
-        return NULL_VALUE;
+        return NullType::DefaultHandle();
     }
 
     ~CSmartHandle()
@@ -138,10 +145,10 @@ public:
 protected:
     bool CleanUp()
     {
-        if (m_Handle != NULL_VALUE)
+        if (m_Handle != NullType::DefaultHandle())
         {
-            bool b = Close(m_Handle);
-            m_Handle = NULL_VALUE;
+            const bool b = CloseFunction<HandleType>::Close(m_Handle);
+            m_Handle = NullType::DefaultHandle();
             return b;
         }
         return false;
@@ -151,21 +158,12 @@ protected:
     HandleType m_Handle;
 };
 
-class CEmptyClass
-{
-};
-
 template <typename T>
 struct CCloseHandle
 {
-    bool Close(T handle)
+    static bool Close(T handle)
     {
         return !!::CloseHandle(handle);
-    }
-
-protected:
-    ~CCloseHandle()
-    {
     }
 };
 
@@ -174,14 +172,9 @@ protected:
 template <typename T>
 struct CCloseRegKey
 {
-    bool Close(T handle)
+    static bool Close(T handle)
     {
         return RegCloseKey(handle) == ERROR_SUCCESS;
-    }
-
-protected:
-    ~CCloseRegKey()
-    {
     }
 };
 
@@ -189,14 +182,9 @@ protected:
 template <typename T>
 struct CCloseLibrary
 {
-    bool Close(T handle)
+    static bool Close(T handle)
     {
         return !!::FreeLibrary(handle);
-    }
-
-protected:
-    ~CCloseLibrary()
-    {
     }
 };
 
@@ -204,39 +192,48 @@ protected:
 template <typename T>
 struct CCloseViewOfFile
 {
-    bool Close(T handle)
+    static bool Close(T handle)
     {
         return !!::UnmapViewOfFile(handle);
-    }
-
-protected:
-    ~CCloseViewOfFile()
-    {
     }
 };
 
 template <typename T>
 struct CCloseFindFile
 {
-    bool Close(T handle)
+    static bool Close(T handle)
     {
         return !!::FindClose(handle);
     }
+};
 
-protected:
-    ~CCloseFindFile()
+template <typename T>
+struct CCloseThemeData
+{
+    static bool Close(T hTheme)
     {
+        return !!::CloseThemeData(hTheme);
     }
 };
 
+template <typename T>
+struct CCloseIcon
+{
+    static bool Close(T handle)
+    {
+        return !!DestroyIcon(handle);
+    }
+};
 
 // Client code (definitions of standard Windows handles).
 typedef CSmartHandle<HANDLE,  CCloseHandle>                                         CAutoGeneralHandle;
 typedef CSmartHandle<HKEY,    CCloseRegKey>                                         CAutoRegKey;
 typedef CSmartHandle<PVOID,   CCloseViewOfFile>                                     CAutoViewOfFile;
 typedef CSmartHandle<HMODULE, CCloseLibrary>                                        CAutoLibrary;
-typedef CSmartHandle<HANDLE,  CCloseHandle, INVALID_HANDLE_VALUE>                   CAutoFile;
-typedef CSmartHandle<HANDLE,  CCloseFindFile, INVALID_HANDLE_VALUE>                 CAutoFindFile;
+typedef CSmartHandle<HANDLE,  CCloseHandle, CDefaultHandleInvalid>                  CAutoFile;
+typedef CSmartHandle<HANDLE,  CCloseFindFile, CDefaultHandleInvalid>                CAutoFindFile;
+typedef CSmartHandle<HTHEME, CCloseThemeData>                                       CAutoThemeData;
+typedef CSmartHandle<HICON,  CCloseIcon>                                            CAutoIcon;
 
 /*
 void CompilerTests()
@@ -247,7 +244,7 @@ void CompilerTests()
         CAutoFile hFile = h;                    // C2280
         CAutoFile hFile2 = std::move(h);        // OK
         // OK, uses move semantics
-        CAutoFile hFile3 = CreateFile(L"c:\\test.txt", GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+        CAutoFile hFile3 = CreateFile(L"c:\\test.txt", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         CAutoFile hFile4 = hFile3;              // C2280
         CAutoFile hFile5 = std::move(hFile3);   // OK
     }
