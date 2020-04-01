@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2014, 2017-2019 - Stefan Kueng
+// Copyright (C) 2012, 2014, 2017-2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,6 +22,16 @@
 #include "PathUtils.h"
 #include "maxpath.h"
 #include <memory>
+
+static wchar_t inline WideCharSwap(wchar_t nValue)
+{
+    return (((nValue >> 8)) | (nValue << 8));
+}
+
+static UINT64 inline WordSwapBytes(UINT64 nValue)
+{
+    return ((nValue & 0xff00ff00ff00ff) << 8) | ((nValue >> 8) & 0xff00ff00ff00ff); // swap BYTESs in WORDs
+}
 
 CTextFile::CTextFile(void)
     : pFileBuf(nullptr)
@@ -200,6 +210,35 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType &type, bool bUTF8)
             return false;
         }
     }
+    if (encoding == UNICODE_BE)
+    {
+        // make in place WORD BYTEs swap
+        UINT64* p_qw = (UINT64*)pFileBuf.get();
+        int nQwords = bytesread / 8;
+        for (int nQword = 0; nQword < nQwords; nQword++)
+            p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
+
+        wchar_t* p_w = (wchar_t*)p_qw;
+        int nWords = bytesread / 2;
+        for (int nWord = nQwords * 4; nWord < nWords; nWord++)
+            p_w[nWord] = WideCharSwap(p_w[nWord]);
+
+        try
+        {
+            if ((bytesread > 1) && (*(unsigned char*)pFileBuf.get() == 0xFF))
+            {
+                // remove the BOM
+                textcontent.assign(((wchar_t*)pFileBuf.get() + 1), (bytesread / sizeof(wchar_t)) - 1);
+                hasBOM = true;
+            }
+            else
+                textcontent.assign((wchar_t*)pFileBuf.get(), bytesread / sizeof(wchar_t));
+        }
+        catch (const std::exception&)
+        {
+            return false;
+        }
+    }
     else if ((encoding == UTF8) || ((encoding == BINARY) && (bUTF8)))
     {
         try
@@ -273,6 +312,38 @@ void CTextFile::SetFileContent(const std::wstring &content)
                     filelen = (int)content.size() * sizeof(wchar_t);
                 }
             }
+        }
+        else if (encoding == UNICODE_BE)
+        {
+            if (hasBOM)
+            {
+                pFileBuf = std::make_unique<BYTE[]>((content.size() + 2) * sizeof(wchar_t));
+                if (pFileBuf)
+                {
+                    memcpy(pFileBuf.get(), "\xFF\xFE", sizeof(wchar_t));
+                    memcpy(pFileBuf.get() + 2, content.c_str(), content.size() * sizeof(wchar_t));
+                    filelen = ((int)content.size() + 1) * sizeof(wchar_t);
+                }
+            }
+            else
+            {
+                pFileBuf = std::make_unique<BYTE[]>(content.size() * sizeof(wchar_t));
+                if (pFileBuf)
+                {
+                    memcpy(pFileBuf.get(), content.c_str(), content.size() * sizeof(wchar_t));
+                    filelen = (int)content.size() * sizeof(wchar_t);
+                }
+            }
+            // make in place WORD BYTEs swap
+            UINT64* p_qw = (UINT64*)pFileBuf.get();
+            int nQwords = filelen / 8;
+            for (int nQword = 0; nQword < nQwords; nQword++)
+                p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
+
+            wchar_t* p_w = (wchar_t*)p_qw;
+            int nWords = filelen / 2;
+            for (int nWord = nQwords * 4; nWord < nWords; nWord++)
+                p_w[nWord] = WideCharSwap(p_w[nWord]);
         }
         else if (encoding == UTF8)
         {
@@ -361,11 +432,13 @@ CTextFile::UnicodeType CTextFile::CheckUnicodeType(BYTE *pBuffer, int cb)
     }
     if (nDblNull > 2) // arbitrary value: allow two double null chars to account for 'broken' text files
         return BINARY;
-    if ((nNull > 3) && ((cb % 2) == 0)) // arbitrary value: allow three null chars to account for 'broken' text files
-        return UNICODE_LE;
     pVal16 = (UINT16 *)pBuffer;
     pVal8  = (UINT8 *)(pVal16 + 1);
     if (*pVal16 == 0xFEFF)
+        return UNICODE_LE;
+    if (*pVal16 == 0xFFFE)
+        return UNICODE_BE;
+    if ((nNull > 3) && ((cb % 2) == 0)) // arbitrary value: allow three null chars to account for 'broken' text files
         return UNICODE_LE;
     if (cb < 3)
         return ANSI;

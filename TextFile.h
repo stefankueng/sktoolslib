@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2017-2019 - Stefan Kueng
+// Copyright (C) 2012, 2017-2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -38,6 +38,7 @@ public:
         BINARY,
         ANSI,
         UNICODE_LE,
+        UNICODE_BE,
         UTF8
     };
 
