@@ -64,7 +64,7 @@ bool CTextFile::Save(LPCTSTR path)
     return true;
 }
 
-bool CTextFile::Load(LPCTSTR path, UnicodeType &type, bool bUTF8)
+bool CTextFile::Load(LPCTSTR path, UnicodeType &type, bool bUTF8, volatile LONG* bCancelled)
 {
     encoding = AUTOTYPE;
     type     = AUTOTYPE;
@@ -281,7 +281,7 @@ bool CTextFile::Load(LPCTSTR path, UnicodeType &type, bool bUTF8)
     type = encoding;
     if (type == BINARY)
         return true;
-    return CalculateLines();
+    return CalculateLines(bCancelled);
 }
 
 void CTextFile::SetFileContent(const std::wstring &content)
@@ -502,7 +502,7 @@ CTextFile::UnicodeType CTextFile::CheckUnicodeType(BYTE *pBuffer, int cb)
     return ANSI;
 }
 
-bool CTextFile::CalculateLines()
+bool CTextFile::CalculateLines(volatile LONG * bCancelled)
 {
     // fill an array with starting positions for every line in the loaded file
     if (pFileBuf == NULL)
@@ -512,7 +512,7 @@ bool CTextFile::CalculateLines()
     linepositions.clear();
     linepositions.reserve(textcontent.size() / 10);
     size_t pos = 0;
-    for (auto it = textcontent.begin(); it != textcontent.end(); ++it)
+    for (auto it = textcontent.begin(); it != textcontent.end() && ((bCancelled == nullptr) || !InterlockedExchangeAdd(bCancelled, 0)); ++it)
     {
         if (*it == '\r')
         {

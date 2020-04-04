@@ -45,7 +45,7 @@ public:
     /**
      * Loads a file from the specified \c path.
      */
-    bool Load(LPCTSTR path, UnicodeType& type, bool bUTF8);
+    bool Load(LPCTSTR path, UnicodeType& type, bool bUTF8, volatile LONG* bCancelled);
 
     /**
      * Saves the file contents to disk at \c path.
@@ -124,7 +124,7 @@ protected:
      * Fills an array with line information to make it faster later
      * to get the line from a char position.
      */
-    bool CalculateLines();
+    bool CalculateLines(volatile LONG* bCancelled);
 
 private:
     std::unique_ptr<BYTE[]> pFileBuf;
