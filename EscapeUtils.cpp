@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2013, 2017 - Stefan Kueng
+// Copyright (C) 2013, 2017, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,7 +22,9 @@
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
 
+#if defined(_M_IX86) || defined(_M_X64)
 #include <emmintrin.h>
+#endif
 
 static BOOL sse2supported = ::IsProcessorFeaturePresent( PF_XMMI64_INSTRUCTIONS_AVAILABLE );
 
@@ -103,6 +105,7 @@ bool CEscapeUtils::ContainsEscapedChars( const char * psz, size_t length )
     // -> afford some minor overhead to handle the main part very fast
 
     const char* end = psz + length;
+#if defined(_M_IX86) || defined(_M_X64)
     if (sse2supported)
     {
         __m128i mask = _mm_set_epi8 ( '%', '%', '%', '%', '%', '%', '%', '%'
@@ -121,6 +124,7 @@ bool CEscapeUtils::ContainsEscapedChars( const char * psz, size_t length )
                 return true;
         };
     }
+#endif
 
     // return odd bytes at the end of the string
 
