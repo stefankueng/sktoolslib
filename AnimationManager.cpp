@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <cassert>
 
 /// Object to handle the timer callback.
 class CTimerEventHandler : public IUIAnimationTimerEventHandler
