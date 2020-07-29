@@ -35,7 +35,7 @@ INT_PTR CDialog::DoModal(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND 
 {
     m_bPseudoModal = false;
     hResource = hInstance;
-    return DialogBoxIndirect(hInstance, pDlgTemplate, hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
+    return DialogBoxIndirectParam(hInstance, pDlgTemplate, hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
 }
 
 INT_PTR CDialog::DoModal(HINSTANCE hInstance, int resID, HWND hWndParent, UINT idAccel)
@@ -124,7 +124,7 @@ void CDialog::ShowModeless(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWN
     if (m_hwnd == nullptr)
     {
         hResource = hInstance;
-        m_hwnd = CreateDialogIndirect(hInstance, pDlgTemplate, hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
+        m_hwnd = CreateDialogIndirectParam(hInstance, pDlgTemplate, hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
     }
     ShowWindow(m_hwnd, SW_SHOW);
     SetFocus(m_hwnd);
