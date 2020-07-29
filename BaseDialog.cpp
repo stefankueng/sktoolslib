@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013, 2015-2017 - Stefan Kueng
+// Copyright (C) 2012-2013, 2015-2017, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,6 +29,13 @@ INT_PTR CDialog::DoModal(HINSTANCE hInstance, int resID, HWND hWndParent)
     m_bPseudoModal = false;
     hResource = hInstance;
     return DialogBoxParam(hInstance, MAKEINTRESOURCE(resID), hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
+}
+
+INT_PTR CDialog::DoModal(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND hWndParent)
+{
+    m_bPseudoModal = false;
+    hResource = hInstance;
+    return DialogBoxIndirect(hInstance, pDlgTemplate, hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
 }
 
 INT_PTR CDialog::DoModal(HINSTANCE hInstance, int resID, HWND hWndParent, UINT idAccel)
@@ -107,6 +114,17 @@ void CDialog::ShowModeless( HINSTANCE hInstance, int resID, HWND hWndParent )
     {
         hResource = hInstance;
         m_hwnd = CreateDialogParam(hInstance, MAKEINTRESOURCE(resID), hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
+    }
+    ShowWindow(m_hwnd, SW_SHOW);
+    SetFocus(m_hwnd);
+}
+
+void CDialog::ShowModeless(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND hWndParent)
+{
+    if (m_hwnd == nullptr)
+    {
+        hResource = hInstance;
+        m_hwnd = CreateDialogIndirect(hInstance, pDlgTemplate, hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
     }
     ShowWindow(m_hwnd, SW_SHOW);
     SetFocus(m_hwnd);

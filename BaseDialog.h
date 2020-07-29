@@ -43,8 +43,10 @@ public:
         m_margins = {};
     }
     INT_PTR         DoModal(HINSTANCE hInstance, int resID, HWND hWndParent);
+    INT_PTR         DoModal(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND hWndParent);
     INT_PTR         DoModal(HINSTANCE hInstance, int resID, HWND hWndParent, UINT idAccel);
     void            ShowModeless(HINSTANCE hInstance, int resID, HWND hWndParent);
+    void            ShowModeless(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND hWndParent);
     static BOOL     IsDialogMessage(LPMSG lpMsg);
     HWND            Create(HINSTANCE hInstance, int resID, HWND hWndParent);
     BOOL            EndDialog(HWND hDlg, INT_PTR nResult);
