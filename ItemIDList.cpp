@@ -1,6 +1,6 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -107,6 +107,7 @@ tstring ItemIDList::toString()
             return ret;
         }
         hr = StrRetToStr (&name, item_, &szDisplayName);
+        CoTaskMemFree(name.pOleStr);
         if (!SUCCEEDED(hr))
             return ret;
     }
