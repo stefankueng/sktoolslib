@@ -100,7 +100,6 @@ LRESULT CALLBACK CWindowD2D::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, 
             break;
         case WM_ERASEBKGND:
             return TRUE;
-        case WM_MOVE:
         case WM_SIZE:
             Resize((unsigned)lParam & 0xFFFF, (unsigned)lParam >> 16);
             [[fallthrough]];
