@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "RichStatusBar.h"
 #include "GDIHelpers.h"
+#include "DPIAware.h"
 #include <deque>
 
 constexpr int border_width = 8;
@@ -76,8 +77,8 @@ bool CRichStatusBar::Init(HWND hParent, bool drawGrip)
             DrawText(hdc, L"W", 1, &fr, DT_SINGLELINE | DT_CALCRECT);
             ReleaseDC(*this, hdc);
             m_height = fr.bottom - fr.top;
-            m_height += int(4.0f * m_dpiScale);
-            m_height = int(m_height*m_dpiScale);
+            m_height += CDPIAware::Instance().Scale(*this, 4);
+            m_height = CDPIAware::Instance().Scale(*this, m_height);
 
             // create the tooltip window
             m_tooltip = CreateWindowEx(0, TOOLTIPS_CLASS, nullptr,
@@ -173,23 +174,23 @@ void CRichStatusBar::DrawSizeGrip(HDC hdc, LPCRECT lpRect)
     POINT pt;
     INT i;
 
-    const auto onedpi = int(1.0f*m_dpiScale);
-    const auto twodpi = int(2.0f*m_dpiScale);
+    const auto onedpi = CDPIAware::Instance().Scale(*this, 1);
+    const auto twodpi = CDPIAware::Instance().Scale(*this, 2);
     pt.x = lpRect->right - onedpi;
     pt.y = lpRect->bottom - onedpi;
 
     hPenFace = CreatePen(PS_SOLID, 1, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DFACE)) : GetSysColor(COLOR_3DFACE));
     hOldPen = (HPEN)SelectObject(hdc, hPenFace);
-    MoveToEx(hdc, pt.x - int(12.0f * m_dpiScale), pt.y, nullptr);
+    MoveToEx(hdc, pt.x - CDPIAware::Instance().Scale(*this, 12), pt.y, nullptr);
     LineTo(hdc, pt.x, pt.y);
-    LineTo(hdc, pt.x, pt.y - int(13.0f * m_dpiScale));
+    LineTo(hdc, pt.x, pt.y - CDPIAware::Instance().Scale(*this, 13));
 
     pt.x--;
     pt.y--;
 
     hPenShadow = CreatePen(PS_SOLID, 1, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DSHADOW)) : GetSysColor(COLOR_3DSHADOW));
     SelectObject(hdc, hPenShadow);
-    for (i = 1; i < int(11.0f * m_dpiScale); i += 4)
+    for (i = 1; i < CDPIAware::Instance().Scale(*this, 11); i += 4)
     {
         MoveToEx(hdc, pt.x - i, pt.y, nullptr);
         LineTo(hdc, pt.x + 1, pt.y - i - 1);
@@ -200,7 +201,7 @@ void CRichStatusBar::DrawSizeGrip(HDC hdc, LPCRECT lpRect)
 
     hPenHighlight = CreatePen(PS_SOLID, 1, m_ThemeColorFunc ? m_ThemeColorFunc(GetSysColor(COLOR_3DHIGHLIGHT)) : GetSysColor(COLOR_3DHIGHLIGHT));
     SelectObject(hdc, hPenHighlight);
-    for (i = 3; i < int(13.0f * m_dpiScale); i += 4)
+    for (i = 3; i < CDPIAware::Instance().Scale(*this, 13); i += 4)
     {
         MoveToEx(hdc, pt.x - i, pt.y, nullptr);
         LineTo(hdc, pt.x + 1, pt.y - i - 1);
@@ -236,8 +237,8 @@ LRESULT CRichStatusBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             SetTextColor(hMyMemDC, foreColor);
             SetBkColor(hMyMemDC, backColor);
 
-            const auto onedpi = int(1.0f*m_dpiScale);
-            const auto twodpi = int(2.0f*m_dpiScale);
+            const auto onedpi = CDPIAware::Instance().Scale(*this, 1);
+            const auto twodpi = CDPIAware::Instance().Scale(*this, 2);
 
             RECT partRect = rect;
             int right = 0;
@@ -427,7 +428,7 @@ void CRichStatusBar::CalcRequestedWidths(int index)
     w.fixed = part.fixedWidth;
 
     if (part.shortWidth > 0)
-        w.shortWidth = int(part.shortWidth*m_dpiScale);
+        w.shortWidth = CDPIAware::Instance().Scale(*this, part.shortWidth);
     else
     {
         RECT rc = rect;
@@ -435,7 +436,7 @@ void CRichStatusBar::CalcRequestedWidths(int index)
         w.shortWidth = rc.right - rc.left;
     }
     if (part.width > 0)
-        w.defaultWidth = int(part.width*m_dpiScale);
+        w.defaultWidth = CDPIAware::Instance().Scale(*this, part.width);
     else
     {
         RECT rc = rect;
@@ -447,7 +448,7 @@ void CRichStatusBar::CalcRequestedWidths(int index)
         w.defaultWidth += icon_width;
         w.shortWidth += icon_width;
     }
-    const auto twodpi = int(2.0f*m_dpiScale);
+    const auto twodpi = CDPIAware::Instance().Scale(*this, 2);
     w.shortWidth += (twodpi * border_width);
     w.defaultWidth += (twodpi * border_width);
     // add padding
@@ -754,7 +755,7 @@ void CRichStatusBar::CalcWidths()
     int startx = 0;
     ti.rect.top = rect.top;
     ti.rect.bottom = rect.bottom;
-    const auto twodpi = int(2.0f*m_dpiScale);
+    const auto twodpi = CDPIAware::Instance().Scale(*this, 2);
     for (decltype(m_parts.size()) i = 0; i < m_parts.size(); ++i)
     {
         ti.uId = i + 1;
