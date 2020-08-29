@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013, 2015-2018 - Stefan Kueng
+// Copyright (C) 2012-2013, 2015-2018, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -148,10 +148,6 @@ bool CWindow::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent /* = nullp
         prevWndProc = (WNDPROC)GetWindowLongPtr(m_hwnd, GWLP_WNDPROC);
         ::SetWindowLongPtr(m_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(stWinMsgHandler));
     }
-
-    HDC hdc = GetDC(*this);
-    m_dpiScale = GetDeviceCaps(hdc, LOGPIXELSX) / 96.0f;
-    ReleaseDC(*this, hdc);
 
     return (m_hwnd != nullptr);
 }
