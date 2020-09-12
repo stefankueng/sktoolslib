@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
-#include <wchar.h>
 #include <math.h>
 
 #include <d2d1.h>
@@ -58,7 +57,7 @@ class CWindowD2D : public CWindow
 public:
     virtual bool Create() override;
     virtual bool Create(DWORD dwStyles, HWND hParent = nullptr, RECT* rect = nullptr) override;
-    virtual bool CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent = nullptr, RECT* rect = nullptr, LPCTSTR classname = nullptr, HMENU hMenu = nullptr) override;
+    virtual bool CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent = nullptr, RECT* rect = nullptr, LPCWSTR classname = nullptr, HMENU hMenu = nullptr) override;
 
 protected:
     //constructor

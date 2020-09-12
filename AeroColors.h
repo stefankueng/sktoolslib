@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -28,9 +28,9 @@ public:
     ~CAeroColors(void);
 
     std::wstring AdjustColorsFromWallpaper();
-    void SetRandomColor();
+    void         SetRandomColor();
 
 private:
     std::wstring oldWallpaperPath;
-    FILETIME oldWallPaperDate;
+    FILETIME     oldWallPaperDate;
 };

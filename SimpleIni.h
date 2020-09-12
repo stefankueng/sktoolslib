@@ -155,7 +155,7 @@
 //  4702 "unreachable code" as the MS STL header causes it in release mode.
 //  Again, the code causing the warning will be cleaned up by the compiler.
 #ifdef _MSC_VER
-# pragma warning (disable: 4127 4702)
+#    pragma warning(disable : 4127 4702)
 #endif
 
 #include <string>
@@ -163,33 +163,34 @@
 #include <list>
 #include <assert.h>
 
-enum SI_Error {
-    SI_OK       =  0,   //!< No error
-    SI_UPDATED  =  1,   //!< An existing value was updated
-    SI_INSERTED =  2,   //!< A new value was inserted
+enum SI_Error
+{
+    SI_OK       = 0, //!< No error
+    SI_UPDATED  = 1, //!< An existing value was updated
+    SI_INSERTED = 2, //!< A new value was inserted
 
     // note: test for any error with (retval < 0)
-    SI_FAIL     = -1,   //!< Generic failure
-    SI_NOMEM    = -2,   //!< Out of memory error
-    SI_FILE     = -3,   //!< File error (see errno for detail error)
+    SI_FAIL  = -1, //!< Generic failure
+    SI_NOMEM = -2, //!< Out of memory error
+    SI_FILE  = -3, //!< File error (see errno for detail error)
 };
 
-#define SI_BOM_UTF8     "\xEF\xBB\xBF"
+#define SI_BOM_UTF8 "\xEF\xBB\xBF"
 
 #ifdef _WIN32
-# define SI_NEWLINE_A   "\r\n"
-# define SI_NEWLINE_W   L"\r\n"
+#    define SI_NEWLINE_A "\r\n"
+#    define SI_NEWLINE_W L"\r\n"
 #else // !_WIN32
-# define SI_NEWLINE_A   "\n"
-# define SI_NEWLINE_W   L"\n"
+#    define SI_NEWLINE_A "\n"
+#    define SI_NEWLINE_W L"\n"
 #endif // _WIN32
 
 #if defined(_WIN32) || defined(SI_CONVERT_ICU)
-# define SI_HAS_WIDE_LOADFILE
+#    define SI_HAS_WIDE_LOADFILE
 #endif
 
 #if defined(SI_CONVERT_ICU)
-# include <unicode/ustring.h>
+#    include <unicode/ustring.h>
 #endif
 
 // ---------------------------------------------------------------------------
@@ -214,15 +215,15 @@ enum SI_Error {
  * is a different size to char/wchar_t you may need to supply new helper
  * classes for SI_STRLESS and SI_CONVERTER.
  */
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 class CSimpleIniTempl
 {
 public:
     /** map keys to values */
-    typedef std::multimap<const SI_CHAR *,const SI_CHAR *,SI_STRLESS> TKeyVal;
+    typedef std::multimap<const SI_CHAR *, const SI_CHAR *, SI_STRLESS> TKeyVal;
 
     /** map sections to key/value map */
-    typedef std::map<const SI_CHAR *,TKeyVal,SI_STRLESS> TSection;
+    typedef std::map<const SI_CHAR *, TKeyVal, SI_STRLESS> TSection;
 
     /** set of dependent string pointers. Note that these pointers are
      * dependent on memory owned by CSimpleIni. */
@@ -230,59 +231,80 @@ public:
 
     /** interface definition for the OutputWriter object to pass to Save()
      * in order to output the INI file data. */
-    class OutputWriter {
+    class OutputWriter
+    {
     public:
-        OutputWriter() { }
-        virtual ~OutputWriter() { }
-        virtual void Write(const char * a_pBuf) = 0;
+        OutputWriter() {}
+        virtual ~OutputWriter() {}
+        virtual void Write(const char *a_pBuf) = 0;
     };
 
     /** OutputWriter class to write the INI data to a file */
-    class FileWriter : public OutputWriter {
-        FILE * m_file;
+    class FileWriter : public OutputWriter
+    {
+        FILE *m_file;
+
     public:
-        FileWriter(FILE * a_file) : m_file(a_file) { }
-        void Write(const char * a_pBuf) {
+        FileWriter(FILE *a_file)
+            : m_file(a_file)
+        {
+        }
+        void Write(const char *a_pBuf)
+        {
             fputs(a_pBuf, m_file);
         }
     };
 
     /** OutputWriter class to write the INI data to a string */
-    class StringWriter : public OutputWriter {
-        std::string & m_string;
+    class StringWriter : public OutputWriter
+    {
+        std::string &m_string;
+
     public:
-        StringWriter(std::string & a_string) : m_string(a_string) { }
-        void Write(const char * a_pBuf) {
+        StringWriter(std::string &a_string)
+            : m_string(a_string)
+        {
+        }
+        void Write(const char *a_pBuf)
+        {
             m_string.append(a_pBuf);
         }
     };
 
     /** Characterset conversion utility class to convert strings to the
      * same format as is used for the storage. */
-    class Converter : private SI_CONVERTER {
+    class Converter : private SI_CONVERTER
+    {
     public:
-        Converter(bool a_bStoreIsUtf8) : SI_CONVERTER(a_bStoreIsUtf8) {
+        Converter(bool a_bStoreIsUtf8)
+            : SI_CONVERTER(a_bStoreIsUtf8)
+        {
             m_scratch.resize(1024);
         }
-        Converter(const Converter & rhs) { operator=(rhs); }
-        Converter & operator=(const Converter & rhs) {
+        Converter(const Converter &rhs) { operator=(rhs); }
+        Converter &operator=(const Converter &rhs)
+        {
             m_scratch = rhs.m_scratch;
             return *this;
         }
-        bool ConvertToStore(const SI_CHAR * a_pszString) {
+        bool ConvertToStore(const SI_CHAR *a_pszString)
+        {
             size_t uLen = SizeToStore(a_pszString);
-            if (uLen == (size_t)(-1)) {
+            if (uLen == (size_t)(-1))
+            {
                 return false;
             }
-            while (uLen > m_scratch.size()) {
+            while (uLen > m_scratch.size())
+            {
                 m_scratch.resize(m_scratch.size() * 2);
             }
             return SI_CONVERTER::ConvertToStore(
                 a_pszString,
-                const_cast<char*>(m_scratch.data()),
+                const_cast<char *>(m_scratch.data()),
                 m_scratch.size());
         }
-        const char * Data() { return m_scratch.data(); }
+        const char *Data() { return m_scratch.data(); }
+
     private:
         std::string m_scratch;
     };
@@ -320,8 +342,10 @@ public:
      * SI_CHAR == char then all of the char* parameters take and return UTF-8
      * encoded data regardless of the system locale.
      */
-    void SetUnicode(bool a_bIsUtf8 = true) {
-        if (!m_pData) m_bStoreIsUtf8 = a_bIsUtf8;
+    void SetUnicode(bool a_bIsUtf8 = true)
+    {
+        if (!m_pData)
+            m_bStoreIsUtf8 = a_bIsUtf8;
     }
 
     /**
@@ -344,7 +368,8 @@ public:
      * the value for "test" will only be "value2". This value may be changed
      * at any time.
      */
-    void SetMultiKey(bool a_bAllowMultiKey = true) {
+    void SetMultiKey(bool a_bAllowMultiKey = true)
+    {
         m_bAllowMultiKey = a_bAllowMultiKey;
     }
 
@@ -359,7 +384,8 @@ public:
      * returned as is instead of loading the data. This value may be changed
      * at any time.
      */
-    void SetMultiLine(bool a_bAllowMultiLine = true) {
+    void SetMultiLine(bool a_bAllowMultiLine = true)
+    {
         m_bAllowMultiLine = a_bAllowMultiLine;
     }
 
@@ -377,7 +403,7 @@ public:
      *
      * @return SI_Error     See error definitions
      */
-    SI_Error LoadFile(const char * a_pszFile);
+    SI_Error LoadFile(const char *a_pszFile);
 
 #ifdef SI_HAS_WIDE_LOADFILE
     /**
@@ -390,7 +416,7 @@ public:
      *
      * @return SI_Error     See error definitions
      */
-    SI_Error LoadFile(const wchar_t * a_pwszFile);
+    SI_Error LoadFile(const wchar_t *a_pwszFile);
 #endif // _WIN32
 
     /**
@@ -402,8 +428,8 @@ public:
      * @return SI_Error     See error definitions
      */
     SI_Error LoadFile(
-        const char *    a_pData,
-        size_t          a_uDataLen);
+        const char *a_pData,
+        size_t      a_uDataLen);
 
     /**
      * Save the INI data. The data will be written to the output device
@@ -424,7 +450,7 @@ public:
      * To add a BOM to UTF-8 data, write it out manually at the very beginning
      * like is done in SaveFile when a_bUseBOM is true.
      */
-    SI_Error Save(OutputWriter & a_oOutput) const;
+    SI_Error Save(OutputWriter &a_oOutput) const;
 
     /**
      * Save the INI data to a file. See Save() for details. Do not set
@@ -436,9 +462,11 @@ public:
      * @param a_bUseBOM     Prepend the UTF-8 BOM if the output stream is
      *                      in UTF-8 format.
      */
-    SI_Error SaveFile(FILE * a_pFile, bool a_bUseBOM = false) const {
+    SI_Error SaveFile(FILE *a_pFile, bool a_bUseBOM = false) const
+    {
         FileWriter writer(a_pFile);
-        if (m_bStoreIsUtf8 && a_bUseBOM) {
+        if (m_bStoreIsUtf8 && a_bUseBOM)
+        {
             writer.Write(SI_BOM_UTF8);
         }
         return Save(writer);
@@ -449,7 +477,8 @@ public:
      *
      * @param a_sBuffer     String to have the INI data appended to.
      */
-    SI_Error SaveString(std::string & a_sBuffer) const {
+    SI_Error SaveString(std::string &a_sBuffer) const
+    {
         StringWriter writer(a_sBuffer);
         return Save(writer);
     }
@@ -472,11 +501,11 @@ public:
      * @return a_pDefault       Key was not found in the section
      * @return other            Value of the key
      */
-    const SI_CHAR * GetValue(
-        const SI_CHAR * a_pSection,
-        const SI_CHAR * a_pKey,
-        const SI_CHAR * a_pDefault = 0,
-        bool *          a_pHasMultiple = 0) const;
+    const SI_CHAR *GetValue(
+        const SI_CHAR *a_pSection,
+        const SI_CHAR *a_pKey,
+        const SI_CHAR *a_pDefault     = 0,
+        bool *         a_pHasMultiple = 0) const;
 
     /**
      * Retrieve all values for a specific key. This method can be used when
@@ -496,9 +525,9 @@ public:
      * @return other            Value of the key
      */
     bool GetAllValues(
-        const SI_CHAR * a_pSection,
-        const SI_CHAR * a_pKey,
-        TNamesDepend &  a_values) const;
+        const SI_CHAR *a_pSection,
+        const SI_CHAR *a_pKey,
+        TNamesDepend & a_values) const;
 
     /**
      * Add or update a section or value. This will always insert
@@ -515,9 +544,9 @@ public:
      * @return SI_INSERTED  Value was inserted
      */
     SI_Error SetValue(
-        const SI_CHAR * a_pSection,
-        const SI_CHAR * a_pKey,
-        const SI_CHAR * a_pValue)
+        const SI_CHAR *a_pSection,
+        const SI_CHAR *a_pKey,
+        const SI_CHAR *a_pValue)
     {
         return AddEntry(a_pSection, a_pKey, a_pValue, true);
     }
@@ -542,9 +571,9 @@ public:
      * @return false            Key or section was not found.
      */
     bool Delete(
-        const SI_CHAR * a_pSection,
-        const SI_CHAR * a_pKey,
-        bool            a_bRemoveEmpty = false);
+        const SI_CHAR *a_pSection,
+        const SI_CHAR *a_pKey,
+        bool           a_bRemoveEmpty = false);
 
     /**
      * Query the number of keys in a specific section. Note that if multiple
@@ -557,7 +586,7 @@ public:
      * @return >=0              Number of keys in the section
      */
     int GetSectionSize(
-        const SI_CHAR * a_pSection ) const;
+        const SI_CHAR *a_pSection) const;
 
     /**
      * Retrieve all key and value pairs for a section. The data is returned
@@ -575,8 +604,8 @@ public:
      * @return boolean          Was a section matching the supplied
      *                          name found.
      */
-    const TKeyVal * GetSection(
-        const SI_CHAR * a_pSection) const;
+    const TKeyVal *GetSection(
+        const SI_CHAR *a_pSection) const;
 
     /**
      * Retrieve all section names. The list is returned as an STL vector of
@@ -592,7 +621,7 @@ public:
      *                          names. See note above!
      */
     void GetAllSections(
-        TNamesDepend & a_names ) const;
+        TNamesDepend &a_names) const;
 
     /**
      * Retrieve all unique key names in a section. The collation order of the
@@ -608,8 +637,8 @@ public:
      *                          names. See note above!
      */
     void GetAllKeys(
-        const SI_CHAR * a_pSection,
-        TNamesDepend &  a_names ) const;
+        const SI_CHAR *a_pSection,
+        TNamesDepend & a_names) const;
 
     /**
      * Return a conversion object to convert text to the same encoding
@@ -617,57 +646,61 @@ public:
      * Use this to prepare the strings that you wish to append or prepend
      * to the output INI data.
      */
-    Converter GetConverter() const {
+    Converter GetConverter() const
+    {
         return Converter(m_bStoreIsUtf8);
     }
 
 private:
     /** Load the file from a file pointer. */
-    SI_Error LoadFile(FILE * a_fpFile);
+    SI_Error LoadFile(FILE *a_fpFile);
 
     /** Parse the data looking for the next valid entry. The memory pointed to
      * by a_pData is modified by inserting NULL characters. The pointer is
      * updated to the current location in the block of text. */
     bool FindEntry(
-        SI_CHAR *&  a_pData,
-        const SI_CHAR *&  a_pSection,
-        const SI_CHAR *&  a_pKey,
-        const SI_CHAR *&  a_pVal ) const;
+        SI_CHAR *&      a_pData,
+        const SI_CHAR *&a_pSection,
+        const SI_CHAR *&a_pKey,
+        const SI_CHAR *&a_pVal) const;
 
     /** Add the section/key/value to our data. Strings will be copied only
      * if a_bCopyStrings is set to true, otherwise the pointers will be
      * used as is. */
     SI_Error AddEntry(
-        const SI_CHAR * a_pSection,
-        const SI_CHAR * a_pKey,
-        const SI_CHAR * a_pValue,
-        bool            a_bCopyStrings);
+        const SI_CHAR *a_pSection,
+        const SI_CHAR *a_pKey,
+        const SI_CHAR *a_pValue,
+        bool           a_bCopyStrings);
 
     /** Is the supplied character a whitespace character? */
-    inline bool IsSpace(SI_CHAR ch) const {
+    inline bool IsSpace(SI_CHAR ch) const
+    {
         return (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n');
     }
 
     /** Does the supplied character start a comment line? */
-    inline bool IsComment(SI_CHAR ch) const {
+    inline bool IsComment(SI_CHAR ch) const
+    {
         return (ch == ';' || ch == '#');
     }
 
     /** Make a copy of the supplied string, replacing the original pointer. */
-    SI_Error CopyString(const SI_CHAR *& a_pString);
+    SI_Error CopyString(const SI_CHAR *&a_pString);
 
     /** Delete a string from the copied strings buffer if necessary. */
-    void DeleteString(const SI_CHAR * a_pString);
+    void DeleteString(const SI_CHAR *a_pString);
 
     /** Internal use of our string comparison function */
-    bool IsEqual(const SI_CHAR * a_pLeft, const SI_CHAR * a_pRight) const {
+    bool IsEqual(const SI_CHAR *a_pLeft, const SI_CHAR *a_pRight) const
+    {
         static const SI_STRLESS strless = SI_STRLESS();
         return !strless(a_pLeft, a_pRight) && !strless(a_pRight, a_pLeft);
     }
 
-    bool IsMultiLineTag(const SI_CHAR * a_pData) const;
-    bool IsMultiLineData(const SI_CHAR * a_pData) const;
-    bool FindMultiLine(SI_CHAR *& a_pData, const SI_CHAR *& a_pVal) const;
+    bool IsMultiLineTag(const SI_CHAR *a_pData) const;
+    bool IsMultiLineData(const SI_CHAR *a_pData) const;
+    bool FindMultiLine(SI_CHAR *&a_pData, const SI_CHAR *&a_pVal) const;
     bool IsNewLineChar(SI_CHAR a_c) const;
 
 private:
@@ -676,7 +709,7 @@ private:
      * interesting string entries. All of the string pointers to sections,
      * keys and values point into this block of memory.
      */
-    SI_CHAR * m_pData;
+    SI_CHAR *m_pData;
 
     /** Length of the data that we have stored. Used when deleting strings
      * to determine if the string is stored here or in the allocated string
@@ -707,51 +740,55 @@ private:
 //                                  IMPLEMENTATION
 // ---------------------------------------------------------------------------
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::CSimpleIniTempl(
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::CSimpleIniTempl(
     bool a_bIsUtf8, bool a_bAllowMultiKey, bool a_bAllowMultiLine)
-  : m_pData(0),
-    m_uDataLen(0),
-    m_bStoreIsUtf8(a_bIsUtf8),
-    m_bAllowMultiKey(a_bAllowMultiKey),
-    m_bAllowMultiLine(a_bAllowMultiLine)
-{ }
+    : m_pData(0)
+    , m_uDataLen(0)
+    , m_bStoreIsUtf8(a_bIsUtf8)
+    , m_bAllowMultiKey(a_bAllowMultiKey)
+    , m_bAllowMultiLine(a_bAllowMultiLine)
+{
+}
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::~CSimpleIniTempl()
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::~CSimpleIniTempl()
 {
     Reset();
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-void
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::Reset()
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+void CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::Reset()
 {
     // remove all data
     delete[] m_pData;
-    m_pData = 0;
+    m_pData    = 0;
     m_uDataLen = 0;
-    if (!m_data.empty()) {
+    if (!m_data.empty())
+    {
         m_data.erase(m_data.begin(), m_data.end());
     }
 
     // remove all strings
-    if (!m_strings.empty()) {
+    if (!m_strings.empty())
+    {
         typename TNamesDepend::iterator i = m_strings.begin();
-        for (; i != m_strings.end(); ++i) {
-            delete[] const_cast<SI_CHAR*>(*i);
+        for (; i != m_strings.end(); ++i)
+        {
+            delete[] const_cast<SI_CHAR *>(*i);
         }
         m_strings.erase(m_strings.begin(), m_strings.end());
     }
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 SI_Error
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::LoadFile(
-    const char *    a_pszFile)
+    CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::LoadFile(
+        const char *a_pszFile)
 {
-    FILE * fp = fopen(a_pszFile, "rb");
-    if (!fp) {
+    FILE *fp = fopen(a_pszFile, "rb");
+    if (!fp)
+    {
         return SI_FILE;
     }
     SI_Error rc = LoadFile(fp);
@@ -760,49 +797,54 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::LoadFile(
 }
 
 #ifdef SI_HAS_WIDE_LOADFILE
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 SI_Error
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::LoadFile(
-    const wchar_t * a_pwszFile)
+    CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::LoadFile(
+        const wchar_t *a_pwszFile)
 {
-#ifdef _WIN32
-    FILE * fp;
+#    ifdef _WIN32
+    FILE *  fp;
     errno_t err = _wfopen_s(&fp, a_pwszFile, L"rb");
-    if ((err!=0)||(!fp)) {
+    if ((err != 0) || (!fp))
+    {
         return SI_FILE;
     }
     SI_Error rc = LoadFile(fp);
     fclose(fp);
     return rc;
-#else // SI_CONVERT_ICU
+#    else // SI_CONVERT_ICU
     char szFile[256];
     u_austrncpy(szFile, a_pwszFile, sizeof(szFile));
     return LoadFile(szFile);
-#endif
+#    endif
 }
 #endif // _WIN32
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 SI_Error
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::LoadFile(
-    FILE *  a_fpFile)
+    CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::LoadFile(
+        FILE *a_fpFile)
 {
     // load the raw file data
     int retval = fseek(a_fpFile, 0, SEEK_END);
-    if (retval != 0) {
+    if (retval != 0)
+    {
         return SI_FILE;
     }
     long lSize = ftell(a_fpFile);
-    if (lSize < 0) {
+    if (lSize < 0)
+    {
         return SI_FILE;
     }
-    char * pData = new char[lSize];
-    if (!pData) {
+    char *pData = new char[lSize];
+    if (!pData)
+    {
         return SI_NOMEM;
     }
     fseek(a_fpFile, 0, SEEK_SET);
     size_t uRead = fread(pData, sizeof(char), lSize, a_fpFile);
-    if (uRead != (size_t) lSize) {
+    if (uRead != (size_t)lSize)
+    {
         delete[] pData;
         return SI_FILE;
     }
@@ -813,128 +855,147 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::LoadFile(
     return rc;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 SI_Error
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::LoadFile(
-    const char *    a_pData,
-    size_t          a_uDataLen)
+    CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::LoadFile(
+        const char *a_pData,
+        size_t      a_uDataLen)
 {
     SI_CONVERTER converter(m_bStoreIsUtf8);
 
     // consume the UTF-8 BOM if it exists
-    if (m_bStoreIsUtf8 && a_uDataLen >= 3) {
-        if (memcmp(a_pData, SI_BOM_UTF8, 3) == 0) {
-            a_pData    += 3;
+    if (m_bStoreIsUtf8 && a_uDataLen >= 3)
+    {
+        if (memcmp(a_pData, SI_BOM_UTF8, 3) == 0)
+        {
+            a_pData += 3;
             a_uDataLen -= 3;
         }
     }
 
     // determine the length of the converted data
     size_t uLen = converter.SizeFromStore(a_pData, a_uDataLen);
-    if (uLen == (size_t)(-1)) {
+    if (uLen == (size_t)(-1))
+    {
         return SI_FAIL;
     }
 
     // allocate memory for the data, ensure that there is a NULL
     // terminator wherever the converted data ends
-    SI_CHAR * pData = new SI_CHAR[uLen+1];
-    if (!pData) {
+    SI_CHAR *pData = new SI_CHAR[uLen + 1];
+    if (!pData)
+    {
         return SI_NOMEM;
     }
-    memset(pData, 0, sizeof(SI_CHAR)*(uLen+1));
+    memset(pData, 0, sizeof(SI_CHAR) * (uLen + 1));
 
     // convert the data
-    if (!converter.ConvertFromStore(a_pData, a_uDataLen, pData, uLen)) {
+    if (!converter.ConvertFromStore(a_pData, a_uDataLen, pData, uLen))
+    {
         delete[] pData;
         return SI_FAIL;
     }
 
     // parse it
-    const static SI_CHAR empty = 0;
-    SI_CHAR * pWork = pData;
-    const SI_CHAR * pSection = &empty;
-    const SI_CHAR * pKey = 0;
-    const SI_CHAR * pVal = 0;
+    const static SI_CHAR empty    = 0;
+    SI_CHAR *            pWork    = pData;
+    const SI_CHAR *      pSection = &empty;
+    const SI_CHAR *      pKey     = 0;
+    const SI_CHAR *      pVal     = 0;
 
     // add every entry in the file to the data table. We copy the strings if
     // we are loading data into this class when we already have stored some
     // because we only store a single block.
     SI_Error rc;
-    bool bCopyStrings = (m_pData != 0);
-    while (FindEntry(pWork, pSection, pKey, pVal)) {
+    bool     bCopyStrings = (m_pData != 0);
+    while (FindEntry(pWork, pSection, pKey, pVal))
+    {
         rc = AddEntry(pSection, pKey, pVal, bCopyStrings);
-        if (rc < 0) return rc;
+        if (rc < 0)
+            return rc;
     }
 
     // store these strings if we didn't copy them
-    if (bCopyStrings) {
+    if (bCopyStrings)
+    {
         delete[] pData;
     }
-    else {
-        m_pData = pData;
-        m_uDataLen = uLen+1;
+    else
+    {
+        m_pData    = pData;
+        m_uDataLen = uLen + 1;
     }
 
     return SI_OK;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-bool
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::FindEntry(
-    SI_CHAR *&        a_pData,
-    const SI_CHAR *&  a_pSection,
-    const SI_CHAR *&  a_pKey,
-    const SI_CHAR *&  a_pVal ) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::FindEntry(
+    SI_CHAR *&      a_pData,
+    const SI_CHAR *&a_pSection,
+    const SI_CHAR *&a_pKey,
+    const SI_CHAR *&a_pVal) const
 {
-    SI_CHAR * pTrail;
-    while (*a_pData) {
+    SI_CHAR *pTrail;
+    while (*a_pData)
+    {
         // skip spaces and empty lines
-        while (*a_pData && IsSpace(*a_pData)) {
+        while (*a_pData && IsSpace(*a_pData))
+        {
             ++a_pData;
         }
-        if (!*a_pData) {
+        if (!*a_pData)
+        {
             break;
         }
 
         // skip comment lines
-        if (IsComment(*a_pData)) {
-            while (*a_pData && !IsNewLineChar(*a_pData)) {
+        if (IsComment(*a_pData))
+        {
+            while (*a_pData && !IsNewLineChar(*a_pData))
+            {
                 ++a_pData;
             }
             continue;
         }
 
         // process section names
-        if (*a_pData == '[') {
+        if (*a_pData == '[')
+        {
             // skip leading spaces
             ++a_pData;
-            while (*a_pData && IsSpace(*a_pData)) {
+            while (*a_pData && IsSpace(*a_pData))
+            {
                 ++a_pData;
             }
 
             // find the end of the section name (it may contain spaces)
             // and convert it to lowercase as necessary
             a_pSection = a_pData;
-            while (*a_pData && *a_pData != ']' && !IsNewLineChar(*a_pData)) {
+            while (*a_pData && *a_pData != ']' && !IsNewLineChar(*a_pData))
+            {
                 ++a_pData;
             }
 
             // if it's an invalid line, just skip it
-            if (*a_pData != ']') {
+            if (*a_pData != ']')
+            {
                 continue;
             }
 
             // remove trailing spaces from the section
             pTrail = a_pData - 1;
-            while (pTrail >= a_pSection && IsSpace(*pTrail)) {
+            while (pTrail >= a_pSection && IsSpace(*pTrail))
+            {
                 --pTrail;
             }
             ++pTrail;
             *pTrail = 0;
 
             // skip to the end of the line
-            ++a_pData;  // safe as checked that it == ']' above
-            while (*a_pData && !IsNewLineChar(*a_pData)) {
+            ++a_pData; // safe as checked that it == ']' above
+            while (*a_pData && !IsNewLineChar(*a_pData))
+            {
                 ++a_pData;
             }
 
@@ -946,18 +1007,22 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::FindEntry(
         // find the end of the key name (it may contain spaces)
         // and convert it to lowercase as necessary
         a_pKey = a_pData;
-        while (*a_pData && *a_pData != '=' && !IsNewLineChar(*a_pData)) {
+        while (*a_pData && *a_pData != '=' && !IsNewLineChar(*a_pData))
+        {
             ++a_pData;
         }
 
         // if it's an invalid line, just skip it
-        if (*a_pData != '=') {
+        if (*a_pData != '=')
+        {
             continue;
         }
 
         // empty keys are invalid
-        if (a_pKey == a_pData) {
-            while (*a_pData && !IsNewLineChar(*a_pData)) {
+        if (a_pKey == a_pData)
+        {
+            while (*a_pData && !IsNewLineChar(*a_pData))
+            {
                 ++a_pData;
             }
             continue;
@@ -965,37 +1030,43 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::FindEntry(
 
         // remove trailing spaces from the key
         pTrail = a_pData - 1;
-        while (pTrail >= a_pKey && IsSpace(*pTrail)) {
+        while (pTrail >= a_pKey && IsSpace(*pTrail))
+        {
             --pTrail;
         }
         ++pTrail;
         *pTrail = 0;
 
         // skip leading whitespace on the value
-        ++a_pData;  // safe as checked that it == '=' above
-        while (*a_pData && !IsNewLineChar(*a_pData) && IsSpace(*a_pData)) {
+        ++a_pData; // safe as checked that it == '=' above
+        while (*a_pData && !IsNewLineChar(*a_pData) && IsSpace(*a_pData))
+        {
             ++a_pData;
         }
 
         // find the end of the value which is the end of this line
         a_pVal = a_pData;
-        while (*a_pData && !IsNewLineChar(*a_pData)) {
+        while (*a_pData && !IsNewLineChar(*a_pData))
+        {
             ++a_pData;
         }
 
         // remove trailing spaces from the value
         pTrail = a_pData - 1;
-        if (*a_pData) { // prepare for the next round
+        if (*a_pData)
+        { // prepare for the next round
             ++a_pData;
         }
-        while (pTrail >= a_pVal && IsSpace(*pTrail)) {
+        while (pTrail >= a_pVal && IsSpace(*pTrail))
+        {
             --pTrail;
         }
         ++pTrail;
         *pTrail = 0;
 
         // check for multi-line entries
-        if (m_bAllowMultiLine && IsMultiLineTag(a_pVal)) {
+        if (m_bAllowMultiLine && IsMultiLineTag(a_pVal))
+        {
             return FindMultiLine(a_pData, a_pVal);
         }
 
@@ -1006,24 +1077,23 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::FindEntry(
     return false;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-bool
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::IsMultiLineTag(
-    const SI_CHAR * a_pVal
-    ) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::IsMultiLineTag(
+    const SI_CHAR *a_pVal) const
 {
     // check for the "<<<" prefix for a multi-line entry
-    if (*a_pVal++ != '<') return false;
-    if (*a_pVal++ != '<') return false;
-    if (*a_pVal++ != '<') return false;
+    if (*a_pVal++ != '<')
+        return false;
+    if (*a_pVal++ != '<')
+        return false;
+    if (*a_pVal++ != '<')
+        return false;
     return true;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-bool
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::IsMultiLineData(
-    const SI_CHAR * a_pData
-    ) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::IsMultiLineData(
+    const SI_CHAR *a_pData) const
 {
     // data is multi-line if it has any of the following features:
     //  * whitespace prefix
@@ -1031,210 +1101,241 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::IsMultiLineData(
     //  * whitespace suffix
 
     // empty string
-    if (!*a_pData) {
+    if (!*a_pData)
+    {
         return false;
     }
 
     // check for prefix
-    if (IsSpace(*a_pData)) {
+    if (IsSpace(*a_pData))
+    {
         return true;
     }
 
     // embedded newlines
-    while (*a_pData) {
-        if (IsNewLineChar(*a_pData)) {
+    while (*a_pData)
+    {
+        if (IsNewLineChar(*a_pData))
+        {
             return true;
         }
     }
 
     // check for suffix
-    if (IsSpace(*--a_pData)) {
+    if (IsSpace(*--a_pData))
+    {
         return true;
     }
 
     return false;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-bool
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::IsNewLineChar(
-    SI_CHAR a_c ) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::IsNewLineChar(
+    SI_CHAR a_c) const
 {
     return a_c == '\n' || a_c == '\r';
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-bool
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::FindMultiLine(
-    SI_CHAR *&        a_pData,
-    const SI_CHAR *& a_pVal
-    ) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::FindMultiLine(
+    SI_CHAR *&      a_pData,
+    const SI_CHAR *&a_pVal) const
 {
     // skip the "<<<" to get the tag that will end the multiline
-    const SI_CHAR * pTagName = a_pVal + 3;
-    a_pVal = a_pData; // real value starts on next line
+    const SI_CHAR *pTagName = a_pVal + 3;
+    a_pVal                  = a_pData; // real value starts on next line
 
     // find the end tag. This tag must start in column 1 and be
     // followed by a newline. No whitespace removal is done while
     // searching for this tag.
     SI_CHAR *pLine;
-    SI_CHAR cRememberThis;
-    for(;;) {
+    SI_CHAR  cRememberThis;
+    for (;;)
+    {
         // find the beginning and end of this line
-        while (IsNewLineChar(*a_pData)) ++a_pData;
+        while (IsNewLineChar(*a_pData))
+            ++a_pData;
         pLine = a_pData;
-        while (*a_pData && !IsNewLineChar(*a_pData)) ++a_pData;
+        while (*a_pData && !IsNewLineChar(*a_pData))
+            ++a_pData;
 
         // end the line with a NULL
         cRememberThis = *a_pData;
-        *a_pData = 0;
+        *a_pData      = 0;
 
         // see if we have found the tag
-        if (IsEqual(pLine, pTagName)) {
+        if (IsEqual(pLine, pTagName))
+        {
             // null terminate the data before the newline of the previous line.
             // If you want a new line at the end of the line then add an empty
             // line before the tag.
             --pLine;
-            if (*(pLine-1) == '\r') {
+            if (*(pLine - 1) == '\r')
+            {
                 // handle Windows style newlines. This handles Unix newline files
                 // on Windows and Windows style newlines on Unix. \n\r
                 --pLine;
             }
             *pLine = 0;
 
-            if (cRememberThis) {
+            if (cRememberThis)
+            {
                 ++a_pData;
             }
             return true;
         }
 
         // otherwise put the char back and continue checking
-        if (!cRememberThis) {
+        if (!cRememberThis)
+        {
             return false;
         }
         *a_pData++ = cRememberThis;
     }
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 SI_Error
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::CopyString(
-    const SI_CHAR *& a_pString)
+    CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::CopyString(
+        const SI_CHAR *&a_pString)
 {
     size_t uLen = 0;
-    if (sizeof(SI_CHAR) == sizeof(char)) {
+    if (sizeof(SI_CHAR) == sizeof(char))
+    {
         uLen = strlen((const char *)a_pString);
     }
-    else if (sizeof(SI_CHAR) == sizeof(wchar_t)) {
+    else if (sizeof(SI_CHAR) == sizeof(wchar_t))
+    {
         uLen = wcslen((const wchar_t *)a_pString);
     }
-    else {
-        for ( ; a_pString[uLen]; ++uLen) /*loop*/ ;
+    else
+    {
+        for (; a_pString[uLen]; ++uLen) /*loop*/
+            ;
     }
     ++uLen; // NULL character
-    SI_CHAR * pCopy = new SI_CHAR[uLen];
-    if (!pCopy) {
+    SI_CHAR *pCopy = new SI_CHAR[uLen];
+    if (!pCopy)
+    {
         return SI_NOMEM;
     }
-    memcpy(pCopy, a_pString, sizeof(SI_CHAR)*uLen);
+    memcpy(pCopy, a_pString, sizeof(SI_CHAR) * uLen);
     m_strings.push_back(pCopy);
     a_pString = pCopy;
     return SI_OK;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 SI_Error
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::AddEntry(
-    const SI_CHAR * a_pSection,
-    const SI_CHAR * a_pKey,
-    const SI_CHAR * a_pValue,
-    bool            a_bCopyStrings)
+    CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::AddEntry(
+        const SI_CHAR *a_pSection,
+        const SI_CHAR *a_pKey,
+        const SI_CHAR *a_pValue,
+        bool           a_bCopyStrings)
 {
     SI_Error rc;
-    bool bInserted = false;
+    bool     bInserted = false;
 
     // check for existence of the section first if we need string copies
     typename TSection::iterator iSection = m_data.end();
-    if (a_bCopyStrings) {
+    if (a_bCopyStrings)
+    {
         iSection = m_data.find(a_pSection);
-        if (iSection == m_data.end()) {
+        if (iSection == m_data.end())
+        {
             // if the section doesn't exist then we need a copy as the
             // string needs to last beyond the end of this function
             // because we will be inserting the section next
             rc = CopyString(a_pSection);
-            if (rc < 0) return rc;
+            if (rc < 0)
+                return rc;
         }
     }
 
     // create the section entry
-    if (iSection == m_data.end()) {
-        std::pair<typename TSection::iterator,bool> i =
+    if (iSection == m_data.end())
+    {
+        std::pair<typename TSection::iterator, bool> i =
             m_data.insert(
-                typename TSection::value_type( a_pSection, TKeyVal() ) );
-        iSection = i.first;
+                typename TSection::value_type(a_pSection, TKeyVal()));
+        iSection  = i.first;
         bInserted = true;
     }
-    if (!a_pKey || !a_pValue) {
+    if (!a_pKey || !a_pValue)
+    {
         // section only entries are specified with pKey and pVal as NULL
         return bInserted ? SI_INSERTED : SI_UPDATED;
     }
 
     // check for existence of the key
-    TKeyVal & keyval = iSection->second;
-    typename TKeyVal::iterator iKey = keyval.find(a_pKey);
+    TKeyVal &                  keyval = iSection->second;
+    typename TKeyVal::iterator iKey   = keyval.find(a_pKey);
 
     // make string copies if necessary
-    if (a_bCopyStrings) {
-        if (m_bAllowMultiKey || iKey == keyval.end()) {
+    if (a_bCopyStrings)
+    {
+        if (m_bAllowMultiKey || iKey == keyval.end())
+        {
             // if the key doesn't exist then we need a copy as the
             // string needs to last beyond the end of this function
             // because we will be inserting the key next
             rc = CopyString(a_pKey);
-            if (rc < 0) return rc;
+            if (rc < 0)
+                return rc;
         }
 
         // we always need a copy of the value
         rc = CopyString(a_pValue);
-        if (rc < 0) return rc;
+        if (rc < 0)
+            return rc;
     }
 
     // create the key entry
-    if (iKey == keyval.end() || m_bAllowMultiKey) {
-        iKey = keyval.insert(typename TKeyVal::value_type(a_pKey, (const SI_CHAR *)0));
+    if (iKey == keyval.end() || m_bAllowMultiKey)
+    {
+        iKey      = keyval.insert(typename TKeyVal::value_type(a_pKey, (const SI_CHAR *)0));
         bInserted = true;
     }
     iKey->second = a_pValue;
     return bInserted ? SI_INSERTED : SI_UPDATED;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 const SI_CHAR *
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetValue(
-    const SI_CHAR * a_pSection,
-    const SI_CHAR * a_pKey,
-    const SI_CHAR * a_pDefault,
-    bool *          a_pHasMultiple) const
+    CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::GetValue(
+        const SI_CHAR *a_pSection,
+        const SI_CHAR *a_pKey,
+        const SI_CHAR *a_pDefault,
+        bool *         a_pHasMultiple) const
 {
-    if (a_pHasMultiple) {
+    if (a_pHasMultiple)
+    {
         *a_pHasMultiple = false;
     }
-    if (!a_pSection || !a_pKey) {
+    if (!a_pSection || !a_pKey)
+    {
         return a_pDefault;
     }
     typename TSection::const_iterator iSection = m_data.find(a_pSection);
-    if (iSection == m_data.end()) {
+    if (iSection == m_data.end())
+    {
         return a_pDefault;
     }
     typename TKeyVal::const_iterator iKeyVal = iSection->second.find(a_pKey);
-    if (iKeyVal == iSection->second.end()) {
+    if (iKeyVal == iSection->second.end())
+    {
         return a_pDefault;
     }
 
     // check for multiple entries with the same key
-    if (m_bAllowMultiKey && a_pHasMultiple) {
+    if (m_bAllowMultiKey && a_pHasMultiple)
+    {
         typename TKeyVal::const_iterator iTemp = iKeyVal;
-        if (++iTemp != iSection->second.end()) {
-            if (IsEqual(a_pKey, iTemp->first)) {
+        if (++iTemp != iSection->second.end())
+        {
+            if (IsEqual(a_pKey, iTemp->first))
+            {
                 *a_pHasMultiple = true;
             }
         }
@@ -1243,30 +1344,34 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetValue(
     return iKeyVal->second;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-bool
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetAllValues(
-    const SI_CHAR * a_pSection,
-    const SI_CHAR * a_pKey,
-    TNamesDepend &  a_values) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::GetAllValues(
+    const SI_CHAR *a_pSection,
+    const SI_CHAR *a_pKey,
+    TNamesDepend & a_values) const
 {
-    if (!a_pSection || !a_pKey) {
+    if (!a_pSection || !a_pKey)
+    {
         return false;
     }
     typename TSection::const_iterator iSection = m_data.find(a_pSection);
-    if (iSection == m_data.end()) {
+    if (iSection == m_data.end())
+    {
         return false;
     }
     typename TKeyVal::const_iterator iKeyVal = iSection->second.find(a_pKey);
-    if (iKeyVal == iSection->second.end()) {
+    if (iKeyVal == iSection->second.end())
+    {
         return false;
     }
 
     // insert all values for this key
     a_values.push_back(iKeyVal->second);
-    if (m_bAllowMultiKey) {
+    if (m_bAllowMultiKey)
+    {
         ++iKeyVal;
-        while (iKeyVal != iSection->second.end() && IsEqual(a_pKey, iKeyVal->first)) {
+        while (iKeyVal != iSection->second.end() && IsEqual(a_pKey, iKeyVal->first))
+        {
             a_values.push_back(iKeyVal->second);
             ++iKeyVal;
         }
@@ -1274,33 +1379,37 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetAllValues(
     return true;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-int
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetSectionSize(
-    const SI_CHAR * a_pSection ) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+int CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::GetSectionSize(
+    const SI_CHAR *a_pSection) const
 {
-    if (!a_pSection) {
+    if (!a_pSection)
+    {
         return -1;
     }
 
     typename TSection::const_iterator iSection = m_data.find(a_pSection);
-    if (iSection == m_data.end()) {
+    if (iSection == m_data.end())
+    {
         return -1;
     }
-    const TKeyVal & section = iSection->second;
+    const TKeyVal &section = iSection->second;
 
     // if multi-key isn't permitted then the section size is
     // the number of keys that we have.
-    if (!m_bAllowMultiKey || section.empty()) {
-        return (int) section.size();
+    if (!m_bAllowMultiKey || section.empty())
+    {
+        return (int)section.size();
     }
 
     // otherwise we need to count them
-    int nCount = 0;
-    const SI_CHAR * pLastKey = 0;
-    typename TKeyVal::const_iterator iKeyVal = section.begin();
-    for (int n = 0; iKeyVal != section.end(); ++iKeyVal, ++n) {
-        if (!pLastKey || !IsEqual(pLastKey, iKeyVal->first)) {
+    int                              nCount   = 0;
+    const SI_CHAR *                  pLastKey = 0;
+    typename TKeyVal::const_iterator iKeyVal  = section.begin();
+    for (int n = 0; iKeyVal != section.end(); ++iKeyVal, ++n)
+    {
+        if (!pLastKey || !IsEqual(pLastKey, iKeyVal->first))
+        {
             ++nCount;
             pLastKey = iKeyVal->first;
         }
@@ -1308,74 +1417,83 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetSectionSize(
     return nCount;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-const typename CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::TKeyVal *
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetSection(
-    const SI_CHAR * a_pSection) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+const typename CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::TKeyVal *
+    CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::GetSection(
+        const SI_CHAR *a_pSection) const
 {
-    if (a_pSection) {
+    if (a_pSection)
+    {
         typename TSection::const_iterator i = m_data.find(a_pSection);
-        if (i != m_data.end()) {
+        if (i != m_data.end())
+        {
             return &(i->second);
         }
     }
     return 0;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-void
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetAllSections(
-    TNamesDepend & a_names ) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+void CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::GetAllSections(
+    TNamesDepend &a_names) const
 {
     typename TSection::const_iterator i = m_data.begin();
-    for (int n = 0; i != m_data.end(); ++i, ++n ) {
+    for (int n = 0; i != m_data.end(); ++i, ++n)
+    {
         a_names.push_back(i->first);
     }
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-void
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetAllKeys(
-    const SI_CHAR * a_pSection,
-    TNamesDepend &  a_names ) const
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+void CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::GetAllKeys(
+    const SI_CHAR *a_pSection,
+    TNamesDepend & a_names) const
 {
-    if (!a_pSection) {
+    if (!a_pSection)
+    {
         return;
     }
 
     typename TSection::const_iterator iSection = m_data.find(a_pSection);
-    if (iSection == m_data.end()) {
+    if (iSection == m_data.end())
+    {
         return;
     }
 
-    const TKeyVal & section = iSection->second;
-    const SI_CHAR * pLastKey = 0;
-    typename TKeyVal::const_iterator iKeyVal = section.begin();
-    for (int n = 0; iKeyVal != section.end(); ++iKeyVal, ++n ) {
-        if (!pLastKey || !IsEqual(pLastKey, iKeyVal->first)) {
+    const TKeyVal &                  section  = iSection->second;
+    const SI_CHAR *                  pLastKey = 0;
+    typename TKeyVal::const_iterator iKeyVal  = section.begin();
+    for (int n = 0; iKeyVal != section.end(); ++iKeyVal, ++n)
+    {
+        if (!pLastKey || !IsEqual(pLastKey, iKeyVal->first))
+        {
             a_names.push_back(iKeyVal->first);
             pLastKey = iKeyVal->first;
         }
     }
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 SI_Error
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::Save(
-    OutputWriter & a_oOutput) const
+    CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::Save(
+        OutputWriter &a_oOutput) const
 {
     Converter convert(m_bStoreIsUtf8);
 
     // iterate through our sections and output the data
-    bool bFirstLine = true;
-    typename TSection::const_iterator iSection = m_data.begin();
-    for ( ; iSection != m_data.end(); ++iSection ) {
+    bool                              bFirstLine = true;
+    typename TSection::const_iterator iSection   = m_data.begin();
+    for (; iSection != m_data.end(); ++iSection)
+    {
         // write the section (unless there is no section name)
-        if (iSection->first[0]) {
-            if (!convert.ConvertToStore(iSection->first)) {
+        if (iSection->first[0])
+        {
+            if (!convert.ConvertToStore(iSection->first))
+            {
                 return SI_FAIL;
             }
-            if (!bFirstLine) {
+            if (!bFirstLine)
+            {
                 a_oOutput.Write(SI_NEWLINE_A);
             }
             a_oOutput.Write("[");
@@ -1386,24 +1504,29 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::Save(
 
         // write all keys and values
         typename TKeyVal::const_iterator iKeyVal = iSection->second.begin();
-        for ( ; iKeyVal != iSection->second.end(); ++iKeyVal) {
+        for (; iKeyVal != iSection->second.end(); ++iKeyVal)
+        {
             // write the key
-            if (!convert.ConvertToStore(iKeyVal->first)) {
+            if (!convert.ConvertToStore(iKeyVal->first))
+            {
                 return SI_FAIL;
             }
             a_oOutput.Write(convert.Data());
 
             // write the value
-            if (!convert.ConvertToStore(iKeyVal->second)) {
+            if (!convert.ConvertToStore(iKeyVal->second))
+            {
                 return SI_FAIL;
             }
             a_oOutput.Write("=");
-            if (m_bAllowMultiLine && IsMultiLineData(iKeyVal->second)) {
+            if (m_bAllowMultiLine && IsMultiLineData(iKeyVal->second))
+            {
                 a_oOutput.Write("<<<SI-END-OF-MULTILINE-TEXT" SI_NEWLINE_A);
                 a_oOutput.Write(convert.Data());
                 a_oOutput.Write(SI_NEWLINE_A "SI-END-OF-MULTILINE-TEXT");
             }
-            else {
+            else
+            {
                 a_oOutput.Write(convert.Data());
             }
             a_oOutput.Write(SI_NEWLINE_A);
@@ -1415,53 +1538,58 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::Save(
     return SI_OK;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-bool
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::Delete(
-    const SI_CHAR * a_pSection,
-    const SI_CHAR * a_pKey,
-    bool            a_bRemoveEmpty)
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::Delete(
+    const SI_CHAR *a_pSection,
+    const SI_CHAR *a_pKey,
+    bool           a_bRemoveEmpty)
 {
-    if (!a_pSection) {
+    if (!a_pSection)
+    {
         return false;
     }
 
     typename TSection::iterator iSection = m_data.find(a_pSection);
-    if (iSection == m_data.end()) {
+    if (iSection == m_data.end())
+    {
         return false;
     }
 
     // remove a single key if we have a keyname
-    if (a_pKey) {
+    if (a_pKey)
+    {
         typename TKeyVal::iterator iKeyVal = iSection->second.find(a_pKey);
-        if (iKeyVal == iSection->second.end()) {
+        if (iKeyVal == iSection->second.end())
+        {
             return false;
         }
 
         // remove any copied strings and then the key
         typename TKeyVal::iterator iDelete;
-        do {
+        do
+        {
             iDelete = iKeyVal++;
 
             DeleteString(iDelete->first);
             DeleteString(iDelete->second);
             iSection->second.erase(iDelete);
-        }
-        while (iKeyVal != iSection->second.end()
-            && IsEqual(a_pKey, iKeyVal->first));
+        } while (iKeyVal != iSection->second.end() && IsEqual(a_pKey, iKeyVal->first));
 
         // done now if the section is not empty or we are not pruning away
         // the empty sections. Otherwise let it fall through into the section
         // deletion code
-        if (!a_bRemoveEmpty || !iSection->second.empty()) {
+        if (!a_bRemoveEmpty || !iSection->second.empty())
+        {
             return true;
         }
     }
-    else {
+    else
+    {
         // delete all copied strings from this section. The actual
         // entries will be removed when the section is removed.
         typename TKeyVal::iterator iKeyVal = iSection->second.begin();
-        for ( ; iKeyVal != iSection->second.end(); ++iKeyVal) {
+        for (; iKeyVal != iSection->second.end(); ++iKeyVal)
+        {
             DeleteString(iKeyVal->first);
             DeleteString(iKeyVal->second);
         }
@@ -1474,19 +1602,21 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::Delete(
     return true;
 }
 
-template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-void
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::DeleteString(
-    const SI_CHAR * a_pString )
+template <class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+void CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::DeleteString(
+    const SI_CHAR *a_pString)
 {
     // strings may exist either inside the data block, or they will be
     // individually allocated and stored in m_strings. We only physically
     // delete those stored in m_strings.
-    if (a_pString < m_pData || a_pString >= m_pData + m_uDataLen) {
+    if (a_pString < m_pData || a_pString >= m_pData + m_uDataLen)
+    {
         typename TNamesDepend::iterator i = m_strings.begin();
-        for (;i != m_strings.end(); ++i) {
-            if (a_pString == *i) {
-                delete[] const_cast<SI_CHAR*>(*i);
+        for (; i != m_strings.end(); ++i)
+        {
+            if (a_pString == *i)
+            {
+                delete[] const_cast<SI_CHAR *>(*i);
                 m_strings.erase(i);
                 break;
             }
@@ -1509,11 +1639,11 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::DeleteString(
 //  SI_CONVERT_WIN32        Use the Win32 API functions for conversion.
 
 #if !defined(SI_CONVERT_GENERIC) && !defined(SI_CONVERT_WIN32) && !defined(SI_CONVERT_ICU)
-# ifdef _WIN32
-#  define SI_CONVERT_WIN32
-# else
-#  define SI_CONVERT_GENERIC
-# endif
+#    ifdef _WIN32
+#        define SI_CONVERT_WIN32
+#    else
+#        define SI_CONVERT_GENERIC
+#    endif
 #endif
 
 /**
@@ -1521,13 +1651,17 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::DeleteString(
  * ordered ASCII case-sensitive text for all possible sizes and types of
  * SI_CHAR.
  */
-template<class SI_CHAR>
-struct SI_GenericCase {
-    bool operator()(const SI_CHAR * pLeft, const SI_CHAR * pRight) const {
+template <class SI_CHAR>
+struct SI_GenericCase
+{
+    bool operator()(const SI_CHAR *pLeft, const SI_CHAR *pRight) const
+    {
         long cmp;
-        for ( ;*pLeft && *pRight; ++pLeft, ++pRight) {
-            cmp = (long) *pLeft - (long) *pRight;
-            if (cmp != 0) {
+        for (; *pLeft && *pRight; ++pLeft, ++pRight)
+        {
+            cmp = (long)*pLeft - (long)*pRight;
+            if (cmp != 0)
+            {
                 return cmp < 0;
             }
         }
@@ -1541,16 +1675,21 @@ struct SI_GenericCase {
  * and types of SI_CHAR. It is not safe for MBCS text comparison where
  * ASCII A-Z characters are used in the encoding of multi-byte characters.
  */
-template<class SI_CHAR>
-struct SI_GenericNoCase {
-    inline SI_CHAR locase(SI_CHAR ch) const {
+template <class SI_CHAR>
+struct SI_GenericNoCase
+{
+    inline SI_CHAR locase(SI_CHAR ch) const
+    {
         return (ch < 'A' || ch > 'Z') ? ch : (ch - 'A' + 'a');
     }
-    bool operator()(const SI_CHAR * pLeft, const SI_CHAR * pRight) const {
+    bool operator()(const SI_CHAR *pLeft, const SI_CHAR *pRight) const
+    {
         long cmp;
-        for ( ;*pLeft && *pRight; ++pLeft, ++pRight) {
-            cmp = (long) locase(*pLeft) - (long) locase(*pRight);
-            if (cmp != 0) {
+        for (; *pLeft && *pRight; ++pLeft, ++pRight)
+        {
+            cmp = (long)locase(*pLeft) - (long)locase(*pRight);
+            if (cmp != 0)
+            {
                 return cmp < 0;
             }
         }
@@ -1561,17 +1700,24 @@ struct SI_GenericNoCase {
 /**
  * Null conversion class for MBCS/UTF-8 to char (or equivalent).
  */
-template<class SI_CHAR>
-class SI_ConvertA {
+template <class SI_CHAR>
+class SI_ConvertA
+{
     bool m_bStoreIsUtf8;
+
 protected:
-    SI_ConvertA() { }
+    SI_ConvertA() {}
+
 public:
-    SI_ConvertA(bool a_bStoreIsUtf8) : m_bStoreIsUtf8(a_bStoreIsUtf8) { }
+    SI_ConvertA(bool a_bStoreIsUtf8)
+        : m_bStoreIsUtf8(a_bStoreIsUtf8)
+    {
+    }
 
     /* copy and assignment */
-    SI_ConvertA(const SI_ConvertA & rhs) { operator=(rhs); }
-    SI_ConvertA & operator=(const SI_ConvertA & rhs) {
+    SI_ConvertA(const SI_ConvertA &rhs) { operator=(rhs); }
+    SI_ConvertA &operator=(const SI_ConvertA &rhs)
+    {
         m_bStoreIsUtf8 = rhs.m_bStoreIsUtf8;
         return *this;
     }
@@ -1590,10 +1736,10 @@ public:
      * @return              -1 cast to size_t on a conversion error.
      */
     size_t SizeFromStore(
-        const char *    /*a_pInputData*/,
-        size_t          a_uInputDataLen)
+        const char * /*a_pInputData*/,
+        size_t a_uInputDataLen)
     {
-        assert(a_uInputDataLen != (size_t) -1);
+        assert(a_uInputDataLen != (size_t)-1);
 
         // ASCII/MBCS/UTF-8 needs no conversion
         return a_uInputDataLen;
@@ -1613,13 +1759,14 @@ public:
      *                      converted.
      */
     bool ConvertFromStore(
-        const char *    a_pInputData,
-        size_t          a_uInputDataLen,
-        SI_CHAR *       a_pOutputData,
-        size_t          a_uOutputDataSize)
+        const char *a_pInputData,
+        size_t      a_uInputDataLen,
+        SI_CHAR *   a_pOutputData,
+        size_t      a_uOutputDataSize)
     {
         // ASCII/MBCS/UTF-8 needs no conversion
-        if (a_uInputDataLen > a_uOutputDataSize) {
+        if (a_uInputDataLen > a_uOutputDataSize)
+        {
             return false;
         }
         memcpy(a_pOutputData, a_pInputData, a_uInputDataLen);
@@ -1637,7 +1784,7 @@ public:
      * @return              -1 cast to size_t on a conversion error.
      */
     size_t SizeToStore(
-        const SI_CHAR * a_pInputData)
+        const SI_CHAR *a_pInputData)
     {
         // ASCII/MBCS/UTF-8 needs no conversion
         return strlen((const char *)a_pInputData) + 1;
@@ -1657,13 +1804,14 @@ public:
      *                      converted.
      */
     bool ConvertToStore(
-        const SI_CHAR * a_pInputData,
-        char *          a_pOutputData,
-        size_t          a_uOutputDataSize)
+        const SI_CHAR *a_pInputData,
+        char *         a_pOutputData,
+        size_t         a_uOutputDataSize)
     {
         // calc input string length (SI_CHAR type and size independent)
         size_t uInputLen = strlen((const char *)a_pInputData) + 1;
-        if (uInputLen > a_uOutputDataSize) {
+        if (uInputLen > a_uOutputDataSize)
+        {
             return false;
         }
 
@@ -1673,33 +1821,38 @@ public:
     }
 };
 
-
 // ---------------------------------------------------------------------------
 //                              SI_CONVERT_GENERIC
 // ---------------------------------------------------------------------------
 #ifdef SI_CONVERT_GENERIC
 
-#define SI_Case     SI_GenericCase
-#define SI_NoCase   SI_GenericNoCase
+#    define SI_Case   SI_GenericCase
+#    define SI_NoCase SI_GenericNoCase
 
-#include <wchar.h>
-#include "ConvertUTF.h"
+#    include "ConvertUTF.h"
 
 /**
  * Converts UTF-8 to a wchar_t (or equivalent) using the Unicode reference
  * library functions. This can be used on all platforms.
  */
-template<class SI_CHAR>
-class SI_ConvertW {
+template <class SI_CHAR>
+class SI_ConvertW
+{
     bool m_bStoreIsUtf8;
+
 protected:
-    SI_ConvertW() { }
+    SI_ConvertW() {}
+
 public:
-    SI_ConvertW(bool a_bStoreIsUtf8) : m_bStoreIsUtf8(a_bStoreIsUtf8) { }
+    SI_ConvertW(bool a_bStoreIsUtf8)
+        : m_bStoreIsUtf8(a_bStoreIsUtf8)
+    {
+    }
 
     /* copy and assignment */
-    SI_ConvertW(const SI_ConvertW & rhs) { operator=(rhs); }
-    SI_ConvertW & operator=(const SI_ConvertW & rhs) {
+    SI_ConvertW(const SI_ConvertW &rhs) { operator=(rhs); }
+    SI_ConvertW &operator=(const SI_ConvertW &rhs)
+    {
         m_bStoreIsUtf8 = rhs.m_bStoreIsUtf8;
         return *this;
     }
@@ -1718,18 +1871,20 @@ public:
      * @return              -1 cast to size_t on a conversion error.
      */
     size_t SizeFromStore(
-        const char *    a_pInputData,
-        size_t          a_uInputDataLen)
+        const char *a_pInputData,
+        size_t      a_uInputDataLen)
     {
-        assert(a_uInputDataLen != (size_t) -1);
+        assert(a_uInputDataLen != (size_t)-1);
 
-        if (m_bStoreIsUtf8) {
+        if (m_bStoreIsUtf8)
+        {
             // worst case scenario for UTF-8 to wchar_t is 1 char -> 1 wchar_t
             // so we just return the same number of characters required as for
             // the source text.
             return a_uInputDataLen;
         }
-        else {
+        else
+        {
             return mbstowcs(NULL, a_pInputData, a_uInputDataLen);
         }
     }
@@ -1748,38 +1903,42 @@ public:
      *                      converted.
      */
     bool ConvertFromStore(
-        const char *    a_pInputData,
-        size_t          a_uInputDataLen,
-        SI_CHAR *       a_pOutputData,
-        size_t          a_uOutputDataSize)
+        const char *a_pInputData,
+        size_t      a_uInputDataLen,
+        SI_CHAR *   a_pOutputData,
+        size_t      a_uOutputDataSize)
     {
-        if (m_bStoreIsUtf8) {
+        if (m_bStoreIsUtf8)
+        {
             // This uses the Unicode reference implementation to do the
             // conversion from UTF-8 to wchar_t. The required files are
             // ConvertUTF.h and ConvertUTF.c which should be included in
             // the distribution but are publically available from unicode.org
             // at http://www.unicode.org/Public/PROGRAMS/CVTUTF/
             ConversionResult retval;
-            const UTF8 * pUtf8 = (const UTF8 *) a_pInputData;
-            if (sizeof(wchar_t) == sizeof(UTF32)) {
-                UTF32 * pUtf32 = (UTF32 *) a_pOutputData;
-                retval = ConvertUTF8toUTF32(
+            const UTF8 *     pUtf8 = (const UTF8 *)a_pInputData;
+            if (sizeof(wchar_t) == sizeof(UTF32))
+            {
+                UTF32 *pUtf32 = (UTF32 *)a_pOutputData;
+                retval        = ConvertUTF8toUTF32(
                     &pUtf8, pUtf8 + a_uInputDataLen,
                     &pUtf32, pUtf32 + a_uOutputDataSize,
                     lenientConversion);
             }
-            else if (sizeof(wchar_t) == sizeof(UTF16)) {
-                UTF16 * pUtf16 = (UTF16 *) a_pOutputData;
-                retval = ConvertUTF8toUTF16(
+            else if (sizeof(wchar_t) == sizeof(UTF16))
+            {
+                UTF16 *pUtf16 = (UTF16 *)a_pOutputData;
+                retval        = ConvertUTF8toUTF16(
                     &pUtf8, pUtf8 + a_uInputDataLen,
                     &pUtf16, pUtf16 + a_uOutputDataSize,
                     lenientConversion);
             }
             return retval == conversionOK;
         }
-        else {
+        else
+        {
             size_t retval = mbstowcs(a_pOutputData,
-                a_pInputData, a_uOutputDataSize);
+                                     a_pInputData, a_uOutputDataSize);
             return retval != (size_t)(-1);
         }
     }
@@ -1795,19 +1954,23 @@ public:
      * @return              -1 cast to size_t on a conversion error.
      */
     size_t SizeToStore(
-        const SI_CHAR * a_pInputData)
+        const SI_CHAR *a_pInputData)
     {
-        if (m_bStoreIsUtf8) {
+        if (m_bStoreIsUtf8)
+        {
             // worst case scenario for wchar_t to UTF-8 is 1 wchar_t -> 6 char
             size_t uLen = 0;
-            while (a_pInputData[uLen]) {
+            while (a_pInputData[uLen])
+            {
                 ++uLen;
             }
             return (6 * uLen) + 1;
         }
-        else {
+        else
+        {
             size_t uLen = wcstombs(nullptr, a_pInputData, 0);
-            if (uLen == (size_t)(-1)) {
+            if (uLen == (size_t)(-1))
+            {
                 return uLen;
             }
             return uLen + 1; // include NULL terminator
@@ -1828,14 +1991,16 @@ public:
      *                      converted.
      */
     bool ConvertToStore(
-        const SI_CHAR * a_pInputData,
-        char *          a_pOutputData,
-        size_t          a_uOutputDataSize)
+        const SI_CHAR *a_pInputData,
+        char *         a_pOutputData,
+        size_t         a_uOutputDataSize)
     {
-        if (m_bStoreIsUtf8) {
+        if (m_bStoreIsUtf8)
+        {
             // calc input string length (SI_CHAR type and size independent)
             size_t uInputLen = 0;
-            while (a_pInputData[uInputLen]) {
+            while (a_pInputData[uInputLen])
+            {
                 ++uInputLen;
             }
             ++uInputLen; // include the NULL char
@@ -1846,66 +2011,82 @@ public:
             // the distribution but are publically available from unicode.org
             // at http://www.unicode.org/Public/PROGRAMS/CVTUTF/
             ConversionResult retval;
-            UTF8 * pUtf8 = (UTF8 *) a_pOutputData;
-            if (sizeof(wchar_t) == sizeof(UTF32)) {
-                const UTF32 * pUtf32 = (const UTF32 *) a_pInputData;
-                retval = ConvertUTF32toUTF8(
+            UTF8 *           pUtf8 = (UTF8 *)a_pOutputData;
+            if (sizeof(wchar_t) == sizeof(UTF32))
+            {
+                const UTF32 *pUtf32 = (const UTF32 *)a_pInputData;
+                retval              = ConvertUTF32toUTF8(
                     &pUtf32, pUtf32 + uInputLen + 1,
                     &pUtf8, pUtf8 + a_uOutputDataSize,
                     lenientConversion);
             }
-            else if (sizeof(wchar_t) == sizeof(UTF16)) {
-                const UTF16 * pUtf16 = (const UTF16 *) a_pInputData;
-                retval = ConvertUTF16toUTF8(
+            else if (sizeof(wchar_t) == sizeof(UTF16))
+            {
+                const UTF16 *pUtf16 = (const UTF16 *)a_pInputData;
+                retval              = ConvertUTF16toUTF8(
                     &pUtf16, pUtf16 + uInputLen + 1,
                     &pUtf8, pUtf8 + a_uOutputDataSize,
                     lenientConversion);
             }
             return retval == conversionOK;
         }
-        else {
+        else
+        {
             size_t retval = wcstombs(a_pOutputData,
-                a_pInputData, a_uOutputDataSize);
-            return retval != (size_t) -1;
+                                     a_pInputData, a_uOutputDataSize);
+            return retval != (size_t)-1;
         }
     }
 };
 
 #endif // SI_CONVERT_GENERIC
 
-
 // ---------------------------------------------------------------------------
 //                              SI_CONVERT_ICU
 // ---------------------------------------------------------------------------
 #ifdef SI_CONVERT_ICU
 
-#define SI_Case     SI_GenericCase
-#define SI_NoCase   SI_GenericNoCase
+#    define SI_Case   SI_GenericCase
+#    define SI_NoCase SI_GenericNoCase
 
-#include <unicode/ucnv.h>
+#    include <unicode/ucnv.h>
 
 /**
  * Converts MBCS/UTF-8 to UChar using ICU. This can be used on all platforms.
  */
-template<class SI_CHAR>
-class SI_ConvertW {
-    const char * m_pEncoding;
-    UConverter * m_pConverter;
+template <class SI_CHAR>
+class SI_ConvertW
+{
+    const char *m_pEncoding;
+    UConverter *m_pConverter;
+
 protected:
-    SI_ConvertW() : m_pEncoding(nullptr), m_pConverter(nullptr) { }
+    SI_ConvertW()
+        : m_pEncoding(nullptr)
+        , m_pConverter(nullptr)
+    {
+    }
+
 public:
-    SI_ConvertW(bool a_bStoreIsUtf8) : m_pConverter(nullptr) {
+    SI_ConvertW(bool a_bStoreIsUtf8)
+        : m_pConverter(nullptr)
+    {
         m_pEncoding = a_bStoreIsUtf8 ? "UTF-8" : nullptr;
     }
 
     /* copy and assignment */
-    SI_ConvertW(const SI_ConvertW & rhs) { operator=(rhs); }
-    SI_ConvertW & operator=(const SI_ConvertW & rhs) {
-        m_pEncoding = rhs.m_pEncoding;
+    SI_ConvertW(const SI_ConvertW &rhs) { operator=(rhs); }
+    SI_ConvertW &operator=(const SI_ConvertW &rhs)
+    {
+        m_pEncoding  = rhs.m_pEncoding;
         m_pConverter = nullptr;
         return *this;
     }
-    ~SI_ConvertW() { if (m_pConverter) ucnv_close(m_pConverter); }
+    ~SI_ConvertW()
+    {
+        if (m_pConverter)
+            ucnv_close(m_pConverter);
+    }
 
     /** Calculate the number of UChar required for converting the input
      * from the storage format. The storage format is always UTF-8 or MBCS.
@@ -1921,30 +2102,33 @@ public:
      * @return              -1 cast to size_t on a conversion error.
      */
     size_t SizeFromStore(
-        const char *    a_pInputData,
-        size_t          a_uInputDataLen)
+        const char *a_pInputData,
+        size_t      a_uInputDataLen)
     {
-        assert(a_uInputDataLen != (size_t) -1);
+        assert(a_uInputDataLen != (size_t)-1);
 
         UErrorCode nError;
 
-        if (!m_pConverter) {
-            nError = U_ZERO_ERROR;
+        if (!m_pConverter)
+        {
+            nError       = U_ZERO_ERROR;
             m_pConverter = ucnv_open(m_pEncoding, &nError);
-            if (U_FAILURE(nError)) {
-                return (size_t) -1;
+            if (U_FAILURE(nError))
+            {
+                return (size_t)-1;
             }
         }
 
         nError = U_ZERO_ERROR;
         ucnv_resetToUnicode(m_pConverter);
         int32_t nLen = ucnv_toUChars(m_pConverter, NULL, 0,
-            a_pInputData, (int32_t) a_uInputDataLen, &nError);
-        if (nError != U_BUFFER_OVERFLOW_ERROR) {
-            return (size_t) -1;
+                                     a_pInputData, (int32_t)a_uInputDataLen, &nError);
+        if (nError != U_BUFFER_OVERFLOW_ERROR)
+        {
+            return (size_t)-1;
         }
 
-        return (size_t) nLen;
+        return (size_t)nLen;
     }
 
     /** Convert the input string from the storage format to UChar.
@@ -1961,17 +2145,19 @@ public:
      *                      converted.
      */
     bool ConvertFromStore(
-        const char *    a_pInputData,
-        size_t          a_uInputDataLen,
-        UChar *         a_pOutputData,
-        size_t          a_uOutputDataSize)
+        const char *a_pInputData,
+        size_t      a_uInputDataLen,
+        UChar *     a_pOutputData,
+        size_t      a_uOutputDataSize)
     {
         UErrorCode nError;
 
-        if (!m_pConverter) {
-            nError = U_ZERO_ERROR;
+        if (!m_pConverter)
+        {
+            nError       = U_ZERO_ERROR;
             m_pConverter = ucnv_open(m_pEncoding, &nError);
-            if (U_FAILURE(nError)) {
+            if (U_FAILURE(nError))
+            {
                 return false;
             }
         }
@@ -1979,9 +2165,10 @@ public:
         nError = U_ZERO_ERROR;
         ucnv_resetToUnicode(m_pConverter);
         ucnv_toUChars(m_pConverter,
-            a_pOutputData, (int32_t) a_uOutputDataSize,
-            a_pInputData, (int32_t) a_uInputDataLen, &nError);
-        if (U_FAILURE(nError)) {
+                      a_pOutputData, (int32_t)a_uOutputDataSize,
+                      a_pInputData, (int32_t)a_uInputDataLen, &nError);
+        if (U_FAILURE(nError))
+        {
             return false;
         }
 
@@ -1999,27 +2186,30 @@ public:
      * @return              -1 cast to size_t on a conversion error.
      */
     size_t SizeToStore(
-        const UChar * a_pInputData)
+        const UChar *a_pInputData)
     {
         UErrorCode nError;
 
-        if (!m_pConverter) {
-            nError = U_ZERO_ERROR;
+        if (!m_pConverter)
+        {
+            nError       = U_ZERO_ERROR;
             m_pConverter = ucnv_open(m_pEncoding, &nError);
-            if (U_FAILURE(nError)) {
-                return (size_t) -1;
+            if (U_FAILURE(nError))
+            {
+                return (size_t)-1;
             }
         }
 
         nError = U_ZERO_ERROR;
         ucnv_resetFromUnicode(m_pConverter);
         int32_t nLen = ucnv_fromUChars(m_pConverter, NULL, 0,
-            a_pInputData, -1, &nError);
-        if (nError != U_BUFFER_OVERFLOW_ERROR) {
-            return (size_t) -1;
+                                       a_pInputData, -1, &nError);
+        if (nError != U_BUFFER_OVERFLOW_ERROR)
+        {
+            return (size_t)-1;
         }
 
-        return (size_t) nLen + 1;
+        return (size_t)nLen + 1;
     }
 
     /** Convert the input string to the storage format of this data.
@@ -2036,16 +2226,18 @@ public:
      *                      converted.
      */
     bool ConvertToStore(
-        const UChar *   a_pInputData,
-        char *          a_pOutputData,
-        size_t          a_uOutputDataSize)
+        const UChar *a_pInputData,
+        char *       a_pOutputData,
+        size_t       a_uOutputDataSize)
     {
         UErrorCode nError;
 
-        if (!m_pConverter) {
-            nError = U_ZERO_ERROR;
+        if (!m_pConverter)
+        {
+            nError       = U_ZERO_ERROR;
             m_pConverter = ucnv_open(m_pEncoding, &nError);
-            if (U_FAILURE(nError)) {
+            if (U_FAILURE(nError))
+            {
                 return false;
             }
         }
@@ -2053,9 +2245,10 @@ public:
         nError = U_ZERO_ERROR;
         ucnv_resetFromUnicode(m_pConverter);
         ucnv_fromUChars(m_pConverter,
-            a_pOutputData, (int32_t) a_uOutputDataSize,
-            a_pInputData, -1, &nError);
-        if (U_FAILURE(nError)) {
+                        a_pOutputData, (int32_t)a_uOutputDataSize,
+                        a_pInputData, -1, &nError);
+        if (U_FAILURE(nError))
+        {
             return false;
         }
 
@@ -2065,25 +2258,24 @@ public:
 
 #endif // SI_CONVERT_ICU
 
-
 // ---------------------------------------------------------------------------
 //                              SI_CONVERT_WIN32
 // ---------------------------------------------------------------------------
 #ifdef SI_CONVERT_WIN32
 
-#define SI_Case     SI_GenericCase
+#    define SI_Case SI_GenericCase
 
 // Windows CE doesn't have errno or MBCS libraries
-#ifdef _WIN32_WCE
-# ifndef SI_NO_MBCS
-#  define SI_NO_MBCS
-# endif
-#endif
+#    ifdef _WIN32_WCE
+#        ifndef SI_NO_MBCS
+#            define SI_NO_MBCS
+#        endif
+#    endif
 
-#include <windows.h>
-#ifdef SI_NO_MBCS
-# define SI_NoCase   SI_GenericNoCase
-#else // !SI_NO_MBCS
+#    include <windows.h>
+#    ifdef SI_NO_MBCS
+#        define SI_NoCase SI_GenericNoCase
+#    else // !SI_NO_MBCS
 /**
  * Case-insensitive comparison class using Win32 MBCS functions. This class
  * returns a case-insensitive semi-collation order for MBCS text. It may not
@@ -2092,22 +2284,26 @@ public:
  * SI_CHAR == char and SetUnicode(true), then you need to use the generic
  * SI_NoCase class instead.
  */
-#include <mbstring.h>
-template<class SI_CHAR>
-struct SI_NoCase {
-    bool operator()(const SI_CHAR * pLeft, const SI_CHAR * pRight) const {
-        if (sizeof(SI_CHAR) == sizeof(char)) {
+#        include <mbstring.h>
+template <class SI_CHAR>
+struct SI_NoCase
+{
+    bool operator()(const SI_CHAR *pLeft, const SI_CHAR *pRight) const
+    {
+        if (sizeof(SI_CHAR) == sizeof(char))
+        {
             return _mbsicmp((const unsigned char *)pLeft,
-                (const unsigned char *)pRight) < 0;
+                            (const unsigned char *)pRight) < 0;
         }
-        if (sizeof(SI_CHAR) == sizeof(wchar_t)) {
+        if (sizeof(SI_CHAR) == sizeof(wchar_t))
+        {
             return _wcsicmp((const wchar_t *)pLeft,
-                (const wchar_t *)pRight) < 0;
+                            (const wchar_t *)pRight) < 0;
         }
         return SI_GenericNoCase<SI_CHAR>()(pLeft, pRight);
     }
 };
-#endif // SI_NO_MBCS
+#    endif // SI_NO_MBCS
 
 /**
  * Converts MBCS and UTF-8 to a wchar_t (or equivalent) on Windows. This uses
@@ -2115,19 +2311,24 @@ struct SI_NoCase {
  * conversion library. It will not work on Windows 95 without using Microsoft
  * Layer for Unicode in your application.
  */
-template<class SI_CHAR>
-class SI_ConvertW {
+template <class SI_CHAR>
+class SI_ConvertW
+{
     UINT m_uCodePage;
+
 protected:
-    SI_ConvertW() { }
+    SI_ConvertW() {}
+
 public:
-    SI_ConvertW(bool a_bStoreIsUtf8) {
+    SI_ConvertW(bool a_bStoreIsUtf8)
+    {
         m_uCodePage = a_bStoreIsUtf8 ? CP_UTF8 : CP_ACP;
     }
 
     /* copy and assignment */
-    SI_ConvertW(const SI_ConvertW & rhs) { operator=(rhs); }
-    SI_ConvertW & operator=(const SI_ConvertW & rhs) {
+    SI_ConvertW(const SI_ConvertW &rhs) { operator=(rhs); }
+    SI_ConvertW &operator=(const SI_ConvertW &rhs)
+    {
         m_uCodePage = rhs.m_uCodePage;
         return *this;
     }
@@ -2146,14 +2347,14 @@ public:
      * @return              -1 cast to size_t on a conversion error.
      */
     size_t SizeFromStore(
-        const char *    a_pInputData,
-        size_t          a_uInputDataLen)
+        const char *a_pInputData,
+        size_t      a_uInputDataLen)
     {
-        assert(a_uInputDataLen != (size_t) -1);
+        assert(a_uInputDataLen != (size_t)-1);
 
         int retval = MultiByteToWideChar(
             m_uCodePage, 0,
-            a_pInputData, (int) a_uInputDataLen,
+            a_pInputData, (int)a_uInputDataLen,
             0, 0);
         return (size_t)(retval > 0 ? retval : -1);
     }
@@ -2172,15 +2373,15 @@ public:
      *                      converted.
      */
     bool ConvertFromStore(
-        const char *    a_pInputData,
-        size_t          a_uInputDataLen,
-        SI_CHAR *       a_pOutputData,
-        size_t          a_uOutputDataSize)
+        const char *a_pInputData,
+        size_t      a_uInputDataLen,
+        SI_CHAR *   a_pOutputData,
+        size_t      a_uOutputDataSize)
     {
         int nSize = MultiByteToWideChar(
             m_uCodePage, 0,
-            a_pInputData, (int) a_uInputDataLen,
-            (wchar_t *) a_pOutputData, (int) a_uOutputDataSize);
+            a_pInputData, (int)a_uInputDataLen,
+            (wchar_t *)a_pOutputData, (int)a_uOutputDataSize);
         return (nSize > 0);
     }
 
@@ -2195,13 +2396,13 @@ public:
      * @return              -1 cast to size_t on a conversion error.
      */
     size_t SizeToStore(
-        const SI_CHAR * a_pInputData)
+        const SI_CHAR *a_pInputData)
     {
         int retval = WideCharToMultiByte(
             m_uCodePage, 0,
-            (const wchar_t *) a_pInputData, -1,
+            (const wchar_t *)a_pInputData, -1,
             0, 0, 0, 0);
-        return (size_t) (retval > 0 ? retval : -1);
+        return (size_t)(retval > 0 ? retval : -1);
     }
 
     /** Convert the input string to the storage format of this data.
@@ -2218,51 +2419,55 @@ public:
      *                      converted.
      */
     bool ConvertToStore(
-        const SI_CHAR * a_pInputData,
-        char *          a_pOutputData,
-        size_t          a_uOutputDataSize)
+        const SI_CHAR *a_pInputData,
+        char *         a_pOutputData,
+        size_t         a_uOutputDataSize)
     {
         int retval = WideCharToMultiByte(
             m_uCodePage, 0,
-            (const wchar_t *) a_pInputData, -1,
-            a_pOutputData, (int) a_uOutputDataSize, 0, 0);
+            (const wchar_t *)a_pInputData, -1,
+            a_pOutputData, (int)a_uOutputDataSize, 0, 0);
         return retval > 0;
     }
 };
 
 #endif // SI_CONVERT_WIN32
 
-
 // ---------------------------------------------------------------------------
 //                                  TYPE DEFINITIONS
 // ---------------------------------------------------------------------------
 
 typedef CSimpleIniTempl<char,
-    SI_NoCase<char>,SI_ConvertA<char> >                 CSimpleIniA;
+                        SI_NoCase<char>, SI_ConvertA<char>>
+    CSimpleIniA;
 typedef CSimpleIniTempl<char,
-    SI_Case<char>,SI_ConvertA<char> >                   CSimpleIniCaseA;
+                        SI_Case<char>, SI_ConvertA<char>>
+    CSimpleIniCaseA;
 
 #if defined(SI_CONVERT_ICU)
 typedef CSimpleIniTempl<UChar,
-    SI_NoCase<UChar>,SI_ConvertW<UChar> >               CSimpleIniW;
+                        SI_NoCase<UChar>, SI_ConvertW<UChar>>
+    CSimpleIniW;
 typedef CSimpleIniTempl<UChar,
-    SI_Case<UChar>,SI_ConvertW<UChar> >                 CSimpleIniCaseW;
+                        SI_Case<UChar>, SI_ConvertW<UChar>>
+    CSimpleIniCaseW;
 #else
 typedef CSimpleIniTempl<wchar_t,
-    SI_NoCase<wchar_t>,SI_ConvertW<wchar_t> >           CSimpleIniW;
+                        SI_NoCase<wchar_t>, SI_ConvertW<wchar_t>>
+    CSimpleIniW;
 typedef CSimpleIniTempl<wchar_t,
-    SI_Case<wchar_t>,SI_ConvertW<wchar_t> >             CSimpleIniCaseW;
+                        SI_Case<wchar_t>, SI_ConvertW<wchar_t>>
+    CSimpleIniCaseW;
 #endif
 
 #ifdef _UNICODE
-# define CSimpleIni      CSimpleIniW
-# define CSimpleIniCase  CSimpleIniCaseW
-# define SI_NEWLINE      SI_NEWLINE_W
+#    define CSimpleIni     CSimpleIniW
+#    define CSimpleIniCase CSimpleIniCaseW
+#    define SI_NEWLINE     SI_NEWLINE_W
 #else // !_UNICODE
-# define CSimpleIni      CSimpleIniA
-# define CSimpleIniCase  CSimpleIniCaseA
-# define SI_NEWLINE      SI_NEWLINE_A
+#    define CSimpleIni     CSimpleIniA
+#    define CSimpleIniCase CSimpleIniCaseA
+#    define SI_NEWLINE     SI_NEWLINE_A
 #endif // _UNICODE
 
 #endif // INCLUDED_SimpleIni_h
-

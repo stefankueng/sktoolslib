@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012 - Stefan Kueng
+// Copyright (C) 2012, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,28 +20,26 @@
 #include "stdafx.h"
 #include "AeroColors.h"
 #pragma warning(push)
-#pragma warning(disable: 4458) // declaration of 'xx' hides class member
+#pragma warning(disable : 4458) // declaration of 'xx' hides class member
 #include <GdiPlus.h>
 #pragma warning(pop)
 #include <dwmapi.h>
 
 #pragma comment(lib, "dwmapi.lib")
 
-
 typedef struct tagCOLORIZATIONPARAMS
 {
-    COLORREF    clr1;
-    COLORREF    clr2;
-    UINT        nIntensity;
-    UINT        nReserved2;
-    UINT        nReserved3;
-    UINT        nReserved4;
-    BOOL        fOpaque;
+    COLORREF clr1;
+    COLORREF clr2;
+    UINT     nIntensity;
+    UINT     nReserved2;
+    UINT     nReserved3;
+    UINT     nReserved4;
+    BOOL     fOpaque;
 } COLORIZATIONPARAMS;
 
-typedef void (WINAPI *FN_DwmGetColorizationParameters) (COLORIZATIONPARAMS * parameters);
-typedef void (WINAPI *FN_DwmSetColorizationParameters) (COLORIZATIONPARAMS * parameters, BOOL unknown);
-
+typedef void(WINAPI* FN_DwmGetColorizationParameters)(COLORIZATIONPARAMS* parameters);
+typedef void(WINAPI* FN_DwmSetColorizationParameters)(COLORIZATIONPARAMS* parameters, BOOL unknown);
 
 CAeroColors::CAeroColors(void)
 {
@@ -64,7 +62,7 @@ std::wstring CAeroColors::AdjustColorsFromWallpaper()
     }
     if (oldWallpaperPath.compare(wallPaperPath) == 0)
     {
-        HANDLE hFile = CreateFile(wallPaperPath, GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+        HANDLE hFile = CreateFile(wallPaperPath, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
         if (hFile != INVALID_HANDLE_VALUE)
         {
             FILETIME create, access, write;
@@ -81,12 +79,12 @@ std::wstring CAeroColors::AdjustColorsFromWallpaper()
     BOOL bDwmEnabled = FALSE;
     if (SUCCEEDED(DwmIsCompositionEnabled(&bDwmEnabled)) && bDwmEnabled)
     {
-        Gdiplus::Bitmap * bmp = new Gdiplus::Bitmap(wallPaperPath);
+        Gdiplus::Bitmap* bmp = new Gdiplus::Bitmap(wallPaperPath);
         if (bmp == nullptr)
             return oldWallpaperPath;
 
-        Gdiplus::Bitmap * bitmap = new Gdiplus::Bitmap(1, 1, PixelFormat32bppRGB);
-        Gdiplus::Graphics * graphics = Gdiplus::Graphics::FromImage(bitmap);
+        Gdiplus::Bitmap*   bitmap   = new Gdiplus::Bitmap(1, 1, PixelFormat32bppRGB);
+        Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(bitmap);
         graphics->SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
         graphics->DrawImage(bmp, Gdiplus::RectF(0, 0, 1, 1));
         Gdiplus::Color clr;
@@ -119,7 +117,7 @@ void CAeroColors::SetRandomColor()
         FN_DwmSetColorizationParameters pDwmSetColorizationParameters = (FN_DwmSetColorizationParameters)GetProcAddress(GetModuleHandle(L"dwmapi.dll"), LPCSTR(131));
         if (pDwmGetColorizationParameters && pDwmSetColorizationParameters)
         {
-            COLORREF clr = RGB(rand() & 0xFF, rand() & 0xFF, rand() & 0xFF);
+            COLORREF           clr    = RGB(rand() & 0xFF, rand() & 0xFF, rand() & 0xFF);
             COLORIZATIONPARAMS params = {0};
             pDwmGetColorizationParameters(&params);
             params.clr1 = clr;

@@ -55,7 +55,7 @@ bool CWindowD2D::Create(DWORD dwStyles, HWND hParent /* = nullptr */, RECT* rect
     return CreateEx(WS_EX_NOREDIRECTIONBITMAP, dwStyles, hParent, rect);
 }
 
-bool CWindowD2D::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent, RECT* rect, LPCTSTR classname, HMENU hMenu)
+bool CWindowD2D::CreateEx(DWORD dwExStyles, DWORD dwStyles, HWND hParent, RECT* rect, LPCWSTR classname, HMENU hMenu)
 {
     auto ret = __super::CreateEx(dwExStyles, dwStyles, hParent, rect, classname, hMenu);
     if (ret)
