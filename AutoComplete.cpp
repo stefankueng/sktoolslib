@@ -21,7 +21,10 @@
 #include "AutoComplete.h"
 
 CAutoComplete::CAutoComplete(CSimpleIni* pIni)
-    : CRegHistory(pIni)
+    : m_pcacs(NULL)
+    , m_pac(NULL)
+    , m_pdrop(NULL)
+    , CRegHistory(pIni)
 {
 }
 
@@ -49,7 +52,9 @@ bool CAutoComplete::Init(HWND hEdit)
     {
         IUnknown* punkSource;
 
-        m_pcacs = std::make_unique<CAutoCompleteEnum>(m_arEntries);
+        if (m_pcacs)
+            delete m_pcacs;
+        m_pcacs = new CAutoCompleteEnum(m_arEntries);
 
         if (m_pcacs->QueryInterface(IID_IUnknown,
                                     (void**)&punkSource) == S_OK)
@@ -67,6 +72,7 @@ bool CAutoComplete::Init(HWND hEdit)
         }
         else
         {
+            delete m_pcacs;
             m_pcacs = NULL;
         }
     }
