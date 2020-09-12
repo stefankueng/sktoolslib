@@ -109,7 +109,6 @@ CHyperLink::CHyperLink(void)
 
 CHyperLink::~CHyperLink(void)
 {
-    delete[] m_strURL;
 }
 
 /*-----------------------------------------------------------------------------
@@ -175,13 +174,9 @@ BOOL CHyperLink::ConvertStaticToHyperlink(HWND hwndParent, UINT uiCtlId,
  */
 BOOL CHyperLink::setURL(LPCWSTR strURL)
 {
-    delete[] m_strURL;
-    if ((m_strURL = new wchar_t[lstrlen(strURL) + 1]) == 0)
-    {
-        return FALSE;
-    }
+    m_strURL = std::make_unique<wchar_t[]>(lstrlen(strURL) + 1);
 
-    lstrcpy(m_strURL, strURL);
+    lstrcpy(m_strURL.get(), strURL);
 
     return TRUE;
 }
@@ -244,7 +239,7 @@ inline void CHyperLink::Navigate(void)
     ::SecureZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
     sei.cbSize = sizeof(SHELLEXECUTEINFO); // Set Size
     sei.lpVerb = TEXT("open");             // Set Verb
-    sei.lpFile = m_strURL;                 // Set Target To Open
+    sei.lpFile = m_strURL.get();           // Set Target To Open
     sei.nShow  = SW_SHOWNORMAL;            // Show Normal
 
     LASTERRORDISPLAYR(ShellExecuteEx(&sei));
@@ -343,7 +338,7 @@ LRESULT CALLBACK CHyperLink::_HyperlinkProc(HWND hwnd, UINT message,
             // Fall through
         case WM_LBUTTONUP:
         {
-            if (pHyperLink->m_strURL && wcslen(pHyperLink->m_strURL))
+            if (pHyperLink->m_strURL && wcslen(pHyperLink->m_strURL.get()))
             {
                 pHyperLink->Navigate();
                 InvalidateRect(hwnd, nullptr, FALSE);

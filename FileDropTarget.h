@@ -110,10 +110,10 @@ public:
         {
             if (medium.pstm != NULL)
             {
-                const int               BUF_SIZE = 10000;
-                std::unique_ptr<char[]> buff(new char[BUF_SIZE + 1]);
-                ULONG                   cbRead = 0;
-                HRESULT                 hr     = medium.pstm->Read(buff.get(), BUF_SIZE, &cbRead);
+                const int BUF_SIZE = 10000;
+                auto      buff     = std::make_unique<char[]>(BUF_SIZE + 1);
+                ULONG     cbRead   = 0;
+                HRESULT   hr       = medium.pstm->Read(buff.get(), BUF_SIZE, &cbRead);
                 if (SUCCEEDED(hr) && cbRead > 0 && cbRead < BUF_SIZE)
                 {
                     buff[cbRead] = 0;
@@ -139,10 +139,10 @@ public:
         {
             if (medium.pstm != NULL)
             {
-                const int               BUF_SIZE = 10000;
-                std::unique_ptr<char[]> buff(new char[BUF_SIZE + 1]);
-                ULONG                   cbRead = 0;
-                HRESULT                 hr     = medium.pstm->Read(buff.get(), BUF_SIZE, &cbRead);
+                const int BUF_SIZE = 10000;
+                auto      buff     = std::make_unique<char[]>(BUF_SIZE + 1);
+                ULONG     cbRead   = 0;
+                HRESULT   hr       = medium.pstm->Read(buff.get(), BUF_SIZE, &cbRead);
                 if (SUCCEEDED(hr) && cbRead > 0 && cbRead < BUF_SIZE)
                 {
                     buff[cbRead] = 0;
@@ -190,7 +190,7 @@ public:
             HDROP hDrop = (HDROP)GlobalLock(medium.hGlobal);
             if (hDrop != NULL)
             {
-                std::unique_ptr<wchar_t[]> szFileName(new wchar_t[MAX_PATH_NEW]);
+                auto szFileName = std::make_unique<wchar_t[]>(MAX_PATH_NEW);
 
                 UINT         cFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
                 std::wstring concatPaths;

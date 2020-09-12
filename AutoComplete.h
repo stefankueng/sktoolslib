@@ -19,13 +19,14 @@
 
 #pragma once
 
+#include "RegHistory.h"
 #include <string>
 #include <vector>
 #include <ShlDisp.h>
 #include <ShlGuid.h>
 #include <ShObjIdl.h >
+#include <memory>
 
-#include "RegHistory.h"
 
 /**
 * Helper class for the CAutoComplete class: implements the string enumerator.
@@ -78,7 +79,7 @@ public:
     DWORD GetOptions() const;
 
 private:
-    CAutoCompleteEnum*     m_pcacs;
-    IAutoComplete2*        m_pac;
-    IAutoCompleteDropDown* m_pdrop;
+    std::unique_ptr<CAutoCompleteEnum>     m_pcacs;
+    std::unique_ptr<IAutoComplete2>        m_pac;
+    std::unique_ptr<IAutoCompleteDropDown> m_pdrop;
 };

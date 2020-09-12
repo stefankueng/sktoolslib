@@ -20,6 +20,7 @@
 
 #pragma once
 #include <windows.h>
+#include <memory>
 
 class CHyperLink
 {
@@ -31,7 +32,7 @@ public:
     BOOL ConvertStaticToHyperlink(HWND hwndParent, UINT uiCtlId, LPCWSTR strURL);
 
     BOOL    setURL(LPCWSTR strURL);
-    LPCWSTR getURL(void) const { return m_strURL; }
+    LPCWSTR getURL(void) const { return m_strURL.get(); }
 
 protected:
     /*
@@ -41,7 +42,7 @@ protected:
     virtual void OnSelect(void) {}
     virtual void OnDeselect(void) {}
 
-    LPWSTR m_strURL; // hyperlink URL
+    std::unique_ptr<wchar_t[]> m_strURL; // hyperlink URL
 
 private:
     static COLORREF g_crLinkColor, g_crVisitedColor; // Hyperlink colors

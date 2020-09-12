@@ -24,6 +24,7 @@
 #include <GdiPlus.h>
 #pragma warning(pop)
 #include <dwmapi.h>
+#include <memory>
 
 #pragma comment(lib, "dwmapi.lib")
 
@@ -79,14 +80,14 @@ std::wstring CAeroColors::AdjustColorsFromWallpaper()
     BOOL bDwmEnabled = FALSE;
     if (SUCCEEDED(DwmIsCompositionEnabled(&bDwmEnabled)) && bDwmEnabled)
     {
-        Gdiplus::Bitmap* bmp = new Gdiplus::Bitmap(wallPaperPath);
+        auto bmp = std::make_unique<Gdiplus::Bitmap>(wallPaperPath);
         if (bmp == nullptr)
             return oldWallpaperPath;
 
-        Gdiplus::Bitmap*   bitmap   = new Gdiplus::Bitmap(1, 1, PixelFormat32bppRGB);
-        Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(bitmap);
+        auto               bitmap   = std::make_unique<Gdiplus::Bitmap>(1, 1, PixelFormat32bppRGB);
+        Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(bitmap.get());
         graphics->SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
-        graphics->DrawImage(bmp, Gdiplus::RectF(0, 0, 1, 1));
+        graphics->DrawImage(bmp.get(), Gdiplus::RectF(0, 0, 1, 1));
         Gdiplus::Color clr;
         bitmap->GetPixel(0, 0, &clr);
 
@@ -102,8 +103,6 @@ std::wstring CAeroColors::AdjustColorsFromWallpaper()
         }
 
         delete graphics;
-        delete bitmap;
-        delete bmp;
     }
     return oldWallpaperPath;
 }
