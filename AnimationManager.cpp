@@ -61,7 +61,7 @@ public:
     }
 
     /// Inherited via IUIAnimationTimerEventHandler
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override
+    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void ** ppvObject) override
     {
         if (ppvObject == nullptr)
             return E_POINTER;
@@ -94,6 +94,7 @@ public:
         return ref;
     }
 
+
     virtual HRESULT STDMETHODCALLTYPE OnPreUpdate(void) override
     {
         return S_OK;
@@ -112,8 +113,8 @@ public:
     }
 
 private:
-    std::map<IUIAnimationStoryboard*, std::function<void()>> callbacks;
-    unsigned long                                            ref;
+    std::map<IUIAnimationStoryboard *, std::function<void()>> callbacks;
+    unsigned long ref;
 };
 
 /// object to handle StoryBoard events
@@ -134,7 +135,7 @@ public:
     }
 
     /// Sets the timer object event handler
-    void SetTimerObj(CTimerEventHandler* handler)
+    void SetTimerObj(CTimerEventHandler * handler)
     {
         if (timerEventHandler)
             timerEventHandler->Release();
@@ -144,7 +145,7 @@ public:
     }
 
     /// Inherited via IUIAnimationStoryboardEventHandler
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override
+    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void ** ppvObject) override
     {
         if (ppvObject == nullptr)
             return E_POINTER;
@@ -177,8 +178,9 @@ public:
         return ref;
     }
 
+
     /// IUIAnimationStoryboardEventHandler Interface implementation
-    HRESULT STDMETHODCALLTYPE OnStoryboardStatusChanged(IUIAnimationStoryboard*        storyboard,
+    HRESULT STDMETHODCALLTYPE OnStoryboardStatusChanged(IUIAnimationStoryboard* storyboard,
                                                         UI_ANIMATION_STORYBOARD_STATUS newStatus,
                                                         UI_ANIMATION_STORYBOARD_STATUS previousStatus) override
     {
@@ -201,10 +203,12 @@ public:
         return S_OK;
     }
 
+
 private:
-    CTimerEventHandler* timerEventHandler;
-    unsigned long       ref;
+    CTimerEventHandler * timerEventHandler;
+    unsigned long ref;
 };
+
 
 IUIAnimationVariablePtr Animator::CreateAnimationVariable(double start)
 {
@@ -269,10 +273,10 @@ IUIAnimationTransitionPtr Animator::CreateReversalTransition(UI_ANIMATION_SECOND
 }
 
 IUIAnimationTransitionPtr Animator::CreateSinusoidalTransitionFromRange(UI_ANIMATION_SECONDS duration,
-                                                                        double               minimumValue,
-                                                                        double               maximumValue,
+                                                                        double minimumValue,
+                                                                        double maximumValue,
                                                                         UI_ANIMATION_SECONDS period,
-                                                                        UI_ANIMATION_SLOPE   slope)
+                                                                        UI_ANIMATION_SLOPE slope)
 {
     IUIAnimationTransitionPtr trans;
     if (SUCCEEDED(pTransLib->CreateSinusoidalTransitionFromRange(duration, minimumValue, maximumValue, period, slope, &trans)))
@@ -395,7 +399,7 @@ Animator::Animator()
     // add the timer event handler: this is a global object that handles all
     // callbacks, but calls the callback functions for the StoryBoards
     timerEventHandler = new CTimerEventHandler();
-    pAnimTmr->SetTimerEventHandler(timerEventHandler); // timerEventHandler is AddRef'ed here
+    pAnimTmr->SetTimerEventHandler(timerEventHandler);  // timerEventHandler is AddRef'ed here
 
     // Create the IUIAnimationTransitionLibrary.
     hr = pTransLib.CreateInstance(CLSID_UIAnimationTransitionLibrary, 0, CLSCTX_INPROC_SERVER);
@@ -411,7 +415,7 @@ Animator::~Animator()
     pAnimMgr->Shutdown();
 }
 
-Animator& Animator::Instance()
+Animator & Animator::Instance()
 {
     if (instance == nullptr)
         instance.reset(new Animator());
@@ -423,4 +427,10 @@ void Animator::ShutDown()
     instance.reset(nullptr);
 }
 
+bool Animator::IsInstanceActive()
+{
+    return instance != nullptr;
+}
+
 std::unique_ptr<Animator> Animator::instance = nullptr;
+
