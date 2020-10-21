@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2012-2013, 2016, 2020 - Stefan Kueng
 
@@ -45,8 +45,8 @@ public:
     INT_PTR     DoModal(HINSTANCE hInstance, int resID, HWND hWndParent);
     INT_PTR     DoModal(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND hWndParent);
     INT_PTR     DoModal(HINSTANCE hInstance, int resID, HWND hWndParent, UINT idAccel);
-    void        ShowModeless(HINSTANCE hInstance, int resID, HWND hWndParent);
-    void        ShowModeless(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND hWndParent);
+    void        ShowModeless(HINSTANCE hInstance, int resID, HWND hWndParent, bool show = true);
+    void        ShowModeless(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND hWndParent, bool show = true);
     static BOOL IsDialogMessage(LPMSG lpMsg);
     HWND        Create(HINSTANCE hInstance, int resID, HWND hWndParent);
     BOOL        EndDialog(HWND hDlg, INT_PTR nResult);

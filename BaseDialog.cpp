@@ -106,26 +106,32 @@ HWND CDialog::Create(HINSTANCE hInstance, int resID, HWND hWndParent)
     return m_hwnd;
 }
 
-void CDialog::ShowModeless(HINSTANCE hInstance, int resID, HWND hWndParent)
+void CDialog::ShowModeless(HINSTANCE hInstance, int resID, HWND hWndParent, bool show/* = true*/)
 {
     if (m_hwnd == nullptr)
     {
         hResource = hInstance;
         m_hwnd    = CreateDialogParam(hInstance, MAKEINTRESOURCE(resID), hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
     }
-    ShowWindow(m_hwnd, SW_SHOW);
-    SetFocus(m_hwnd);
+    if (show)
+    {
+        ShowWindow(m_hwnd, SW_SHOW);
+        SetFocus(m_hwnd);
+    }
 }
 
-void CDialog::ShowModeless(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND hWndParent)
+void CDialog::ShowModeless(HINSTANCE hInstance, LPCDLGTEMPLATE pDlgTemplate, HWND hWndParent, bool show/* = true*/)
 {
     if (m_hwnd == nullptr)
     {
         hResource = hInstance;
         m_hwnd    = CreateDialogIndirectParam(hInstance, pDlgTemplate, hWndParent, &CDialog::stDlgFunc, (LPARAM)this);
     }
-    ShowWindow(m_hwnd, SW_SHOW);
-    SetFocus(m_hwnd);
+    if (show)
+    {
+        ShowWindow(m_hwnd, SW_SHOW);
+        SetFocus(m_hwnd);
+    }
 }
 
 void CDialog::InitDialog(HWND hwndDlg, UINT iconID, bool bPosition /* = true*/)
