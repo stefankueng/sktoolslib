@@ -96,7 +96,7 @@ void stringtok(Container& container, const std::wstring& in, bool trim,
             }
             else
             {
-                container.push_back(static_cast<Container::value_type>(_wtoi64(in.substr(i).c_str())));
+                container.push_back(static_cast<typename Container::value_type>(_wtoi64(in.substr(i).c_str())));
             }
             return;
         }
@@ -108,7 +108,7 @@ void stringtok(Container& container, const std::wstring& in, bool trim,
             }
             else
             {
-                container.push_back(static_cast<Container::value_type>(_wtoi64(in.substr(i, j - i).c_str())));
+                container.push_back(static_cast<typename Container::value_type>(_wtoi64(in.substr(i, j - i).c_str())));
             }
         }
 
@@ -148,7 +148,7 @@ void stringtokset(Container& container, const std::wstring& in, bool trim,
             }
             else
             {
-                container.insert(static_cast<Container::value_type>(_wtoi64(in.substr(i).c_str())));
+                container.insert(static_cast<typename Container::value_type>(_wtoi64(in.substr(i).c_str())));
             }
             return;
         }
@@ -160,7 +160,7 @@ void stringtokset(Container& container, const std::wstring& in, bool trim,
             }
             else
             {
-                container.insert(static_cast<Container::value_type>(_wtoi64(in.substr(i, j - i).c_str())));
+                container.insert(static_cast<typename Container::value_type>(_wtoi64(in.substr(i, j - i).c_str())));
             }
         }
 
@@ -201,7 +201,7 @@ void stringtok(Container& container, const std::string& in, bool trim,
             }
             else
             {
-                container.push_back(static_cast<Container::value_type>(_atoi64(in.substr(i).c_str())));
+                container.push_back(static_cast<typename Container::value_type>(_atoi64(in.substr(i).c_str())));
             }
             return;
         }
@@ -213,7 +213,7 @@ void stringtok(Container& container, const std::string& in, bool trim,
             }
             else
             {
-                container.push_back(static_cast<Container::value_type>(_atoi64(in.substr(i, j - i).c_str())));
+                container.push_back(static_cast<typename Container::value_type>(_atoi64(in.substr(i, j - i).c_str())));
             }
         }
 
@@ -253,7 +253,7 @@ void stringtokset(Container& container, const std::string& in, bool trim,
             }
             else
             {
-                container.insert(static_cast<Container::value_type>(_atoi64(in.substr(i).c_str())));
+                container.insert(static_cast<typename Container::value_type>(_atoi64(in.substr(i).c_str())));
             }
             return;
         }
@@ -265,7 +265,7 @@ void stringtokset(Container& container, const std::string& in, bool trim,
             }
             else
             {
-                container.insert(static_cast<Container::value_type>(_atoi64(in.substr(i, j - i).c_str())));
+                container.insert(static_cast<typename Container::value_type>(_atoi64(in.substr(i, j - i).c_str())));
             }
         }
 

@@ -289,7 +289,7 @@ public:
         }
         bool ConvertToStore(const SI_CHAR *a_pszString)
         {
-            size_t uLen = SizeToStore(a_pszString);
+            size_t uLen = SI_CONVERTER::SizeToStore(a_pszString);
             if (uLen == (size_t)(-1))
             {
                 return false;

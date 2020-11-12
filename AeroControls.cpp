@@ -814,8 +814,8 @@ void AeroControlBase::FillRect(LPRECT prc, HDC hdcPaint, Color clr) const
         auto myGraphics = std::make_unique<Graphics>(hdcPaint);
         if (myGraphics)
         {
-            myGraphics->FillRectangle(pBrush.get(), prc->left, prc->top,
-                                      prc->right - 1 - prc->left, prc->bottom - 1 - prc->top);
+            myGraphics->FillRectangle(pBrush.get(), (INT)prc->left, (INT)prc->top,
+                                      INT(prc->right - 1 - prc->left), INT(prc->bottom - 1 - prc->top));
         }
     }
 }
@@ -919,8 +919,8 @@ void AeroControlBase::DrawRect(LPRECT prc, HDC hdcPaint, DashStyle dashStyle, Co
     myPen->SetDashStyle(dashStyle);
     auto myGraphics = std::make_unique<Graphics>(hdcPaint);
 
-    myGraphics->DrawRectangle(myPen.get(), prc->left, prc->top,
-                              prc->right - 1 - prc->left, prc->bottom - 1 - prc->top);
+    myGraphics->DrawRectangle(myPen.get(), (INT)prc->left, (INT)prc->top,
+                              INT(prc->right - 1 - prc->left), INT(prc->bottom - 1 - prc->top));
 }
 
 void AeroControlBase::DrawFocusRect(LPRECT prcFocus, HDC hdcPaint)

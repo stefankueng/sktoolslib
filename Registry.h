@@ -1,4 +1,4 @@
-// sktoolslib - common files for SK tools
+﻿// sktoolslib - common files for SK tools
 
 // Copyright (C) 2012, 2017-2018, 2020 - Stefan Kueng
 
@@ -361,12 +361,12 @@ public:
 template <class T, class Base>
 void CRegTypedBase<T, Base>::HandleAutoRefresh()
 {
-    if (m_read && (lookupInterval != (ULONGLONG)(-1)))
+    if (Base::m_read && (lookupInterval != (ULONGLONG)(-1)))
     {
         auto currentTime = GetTickCount64();
         if ((currentTime < lastRead) || (currentTime > lastRead + lookupInterval))
         {
-            m_read = false;
+            Base::m_read = false;
         }
     }
 }
@@ -403,26 +403,26 @@ CRegTypedBase<T, Base>::CRegTypedBase(DWORD lookupInterval, const typename Base:
 template <class T, class Base>
 void CRegTypedBase<T, Base>::read()
 {
-    m_value  = m_defaultvalue;
-    m_exists = false;
+    m_value        = m_defaultvalue;
+    Base::m_exists = false;
 
     HKEY hKey = nullptr;
-    if ((LastError = RegOpenKeyEx(m_base, GetPlainString(m_path), 0, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE | m_sam, &hKey)) == ERROR_SUCCESS)
+    if ((Base::LastError = RegOpenKeyEx(Base::m_base, Base::GetPlainString(Base::m_path), 0, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE | Base::m_sam, &hKey)) == ERROR_SUCCESS)
     {
         T value = m_defaultvalue;
         InternalRead(hKey, value);
 
-        if (LastError == ERROR_SUCCESS)
+        if (Base::LastError == ERROR_SUCCESS)
         {
-            m_exists = true;
-            m_value  = value;
+            Base::m_exists = true;
+            m_value        = value;
         }
 
-        LastError = RegCloseKey(hKey);
+        Base::LastError = RegCloseKey(hKey);
     }
 
-    m_read   = true;
-    lastRead = GetTickCount64();
+    Base::m_read = true;
+    lastRead     = GetTickCount64();
 }
 
 template <class T, class Base>
@@ -431,18 +431,18 @@ void CRegTypedBase<T, Base>::write()
     HKEY hKey = nullptr;
 
     DWORD disp = 0;
-    if ((LastError = RegCreateKeyEx(m_base, GetPlainString(m_path), 0, L"", REG_OPTION_NON_VOLATILE, KEY_WRITE | m_sam, nullptr, &hKey, &disp)) != ERROR_SUCCESS)
+    if ((Base::LastError = RegCreateKeyEx(Base::m_base, GetPlainString(Base::m_path), 0, L"", REG_OPTION_NON_VOLATILE, KEY_WRITE | Base::m_sam, nullptr, &hKey, &disp)) != ERROR_SUCCESS)
     {
         return;
     }
 
     InternalWrite(hKey, m_value);
-    if (LastError == ERROR_SUCCESS)
+    if (Base::LastError == ERROR_SUCCESS)
     {
-        m_read   = true;
-        m_exists = true;
+        Base::m_read   = true;
+        Base::m_exists = true;
     }
-    LastError = RegCloseKey(hKey);
+    Base::LastError = RegCloseKey(hKey);
 
     lastRead = GetTickCount64();
 }
@@ -450,10 +450,10 @@ void CRegTypedBase<T, Base>::write()
 template <class T, class Base>
 bool CRegTypedBase<T, Base>::exists()
 {
-    if (!m_read && (LastError == ERROR_SUCCESS))
+    if (!Base::m_read && (Base::LastError == ERROR_SUCCESS))
         read();
 
-    return m_exists;
+    return Base::m_exists;
 }
 
 template <class T, class Base>
@@ -466,9 +466,9 @@ template <class T, class Base>
 CRegTypedBase<T, Base>::operator const T&()
 {
     HandleAutoRefresh();
-    if ((m_read) && (!m_force))
+    if ((Base::m_read) && (!Base::m_force))
     {
-        LastError = ERROR_SUCCESS;
+        Base::LastError = ERROR_SUCCESS;
     }
     else
     {
@@ -481,10 +481,10 @@ CRegTypedBase<T, Base>::operator const T&()
 template <class T, class Base>
 CRegTypedBase<T, Base>& CRegTypedBase<T, Base>::operator=(const T& d)
 {
-    if (m_read && (d == m_value) && !m_force)
+    if (Base::m_read && (d == m_value) && !Base::m_force)
     {
         //no write to the registry required, its the same value
-        LastError = ERROR_SUCCESS;
+        Base::LastError = ERROR_SUCCESS;
         return *this;
     }
     m_value = d;
@@ -595,7 +595,7 @@ void CRegDWORDCommon<Base>::InternalRead(HKEY hKey, DWORD& value)
 {
     DWORD size = sizeof(value);
     DWORD type = 0;
-    if ((LastError = RegQueryValueEx(hKey, GetPlainString(m_key), nullptr, &type, (BYTE*)&value, &size)) == ERROR_SUCCESS)
+    if ((Base::LastError = RegQueryValueEx(hKey, Base::GetPlainString(Base::m_key), nullptr, &type, (BYTE*)&value, &size)) == ERROR_SUCCESS)
     {
         ASSERT(type == REG_DWORD);
     }
@@ -604,7 +604,7 @@ void CRegDWORDCommon<Base>::InternalRead(HKEY hKey, DWORD& value)
 template <class Base>
 void CRegDWORDCommon<Base>::InternalWrite(HKEY hKey, const DWORD& value)
 {
-    LastError = RegSetValueEx(hKey, GetPlainString(m_key), 0, REG_DWORD, (const BYTE*)&value, sizeof(value));
+    Base::LastError = RegSetValueEx(hKey, Base::GetPlainString(Base::m_key), 0, REG_DWORD, (const BYTE*)&value, sizeof(value));
 }
 
 /**
@@ -678,7 +678,7 @@ public:
 
     CRegStringCommon& operator=(const typename Base::StringT& rhs)
     {
-        CRegTypedBase<StringT, Base>::operator=(rhs);
+        CRegTypedBase<Base::StringT, Base>::operator=(rhs);
         return *this;
     }
     CRegStringCommon& operator+=(const typename Base::StringT& s) { return *this = (typename Base::StringT) * this + s; }
@@ -707,17 +707,17 @@ CRegStringCommon<Base>::CRegStringCommon(DWORD lookupInterval, const typename Ba
 template <class Base>
 void CRegStringCommon<Base>::InternalRead(HKEY hKey, typename Base::StringT& value)
 {
-    DWORD size = 0;
-    DWORD type = 0;
-    LastError  = RegQueryValueEx(hKey, GetPlainString(m_key), nullptr, &type, nullptr, &size);
+    DWORD size      = 0;
+    DWORD type      = 0;
+    Base::LastError = RegQueryValueEx(hKey, Base::GetPlainString(Base::m_key), nullptr, &type, nullptr, &size);
 
-    if (LastError == ERROR_SUCCESS)
+    if (Base::LastError == ERROR_SUCCESS)
     {
         auto pStr = std::make_unique<wchar_t[]>(size);
-        if ((LastError = RegQueryValueEx(hKey, GetPlainString(m_key), nullptr, &type, (BYTE*)pStr.get(), &size)) == ERROR_SUCCESS)
+        if ((Base::LastError = RegQueryValueEx(hKey, Base::GetPlainString(Base::m_key), nullptr, &type, (BYTE*)pStr.get(), &size)) == ERROR_SUCCESS)
         {
             ASSERT(type == REG_SZ || type == REG_EXPAND_SZ);
-            value = StringT(pStr.get());
+            value = Base::StringT(pStr.get());
         }
     }
 }
@@ -725,7 +725,7 @@ void CRegStringCommon<Base>::InternalRead(HKEY hKey, typename Base::StringT& val
 template <class Base>
 void CRegStringCommon<Base>::InternalWrite(HKEY hKey, const typename Base::StringT& value)
 {
-    LastError = RegSetValueEx(hKey, GetPlainString(m_key), 0, REG_SZ, (BYTE*)GetPlainString(value), (GetLength(value) + 1) * sizeof(wchar_t));
+    Base::LastError = RegSetValueEx(hKey, Base::GetPlainString(Base::m_key), 0, REG_SZ, (BYTE*)Base::GetPlainString(value), (Base::GetLength(value) + 1) * sizeof(wchar_t));
 }
 
 /**
