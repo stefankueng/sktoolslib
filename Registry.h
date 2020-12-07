@@ -431,7 +431,7 @@ void CRegTypedBase<T, Base>::write()
     HKEY hKey = nullptr;
 
     DWORD disp = 0;
-    if ((Base::LastError = RegCreateKeyEx(Base::m_base, GetPlainString(Base::m_path), 0, L"", REG_OPTION_NON_VOLATILE, KEY_WRITE | Base::m_sam, nullptr, &hKey, &disp)) != ERROR_SUCCESS)
+    if ((Base::LastError = RegCreateKeyEx(Base::m_base, Base::GetPlainString(Base::m_path), 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE | Base::m_sam, nullptr, &hKey, &disp)) != ERROR_SUCCESS)
     {
         return;
     }
@@ -980,7 +980,7 @@ public:
 
     ~CKeyList()
     {
-        for (TElements::iterator iter = elements.begin(), end = elements.end(); iter != end; ++iter)
+        for (auto iter = elements.begin(), end = elements.end(); iter != end; ++iter)
         {
             delete iter->second;
         }
@@ -1019,19 +1019,17 @@ public:
 template <class T>
 const typename T::ValueT& CKeyList<T>::GetDefault(int index) const
 {
-    TDefaults::const_iterator iter = defaults.find(index);
+    auto iter = defaults.find(index);
     return iter == defaults.end() ? defaultValue : iter->second;
 }
 
 template <class T>
 T& CKeyList<T>::GetAt(int index) const
 {
-    TElements::iterator iter = elements.find(index);
+    auto iter = elements.find(index);
     if (iter == elements.end())
     {
-        wchar_t buffer[10];
-        _itot_s(index, buffer, 10);
-        typename T::StringT indexKey = key + _T('\\') + buffer;
+        typename T::StringT indexKey = key + '\\' + std::to_wstring(index);
 
         T* newElement = new T(indexKey, GetDefault(index), false, base);
         iter          = elements.insert(std::make_pair(index, newElement)).first;
