@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013, 2020 - Stefan Kueng
+// Copyright (C) 2012-2013, 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -39,8 +39,8 @@ struct ResizeCtrls
 class CDlgResizer
 {
 public:
-    CDlgResizer(void);
-    ~CDlgResizer(void);
+    CDlgResizer();
+    ~CDlgResizer();
 
     void Init(HWND hWndDlg);
     void AddControl(HWND hWndDlg, UINT ctrlId, UINT resizeType);
@@ -50,11 +50,15 @@ public:
 
     RECT* GetDlgRect() { return &m_dlgRect; }
     RECT* GetDlgRectScreen() { return &m_dlgRectScreen; }
-    void  UpdateGripPos();
-    void  UseSizeGrip(bool use) { m_useSizeGrip = use; ShowSizeGrip(m_useSizeGrip); }
+    void  UpdateGripPos() const;
+    void  UseSizeGrip(bool use)
+    {
+        m_useSizeGrip = use;
+        ShowSizeGrip(m_useSizeGrip);
+    }
 
 private:
-    void                     ShowSizeGrip(bool bShow = true);
+    void                     ShowSizeGrip(bool bShow = true) const;
     HWND                     m_hDlg;
     std::vector<ResizeCtrls> m_controls;
     RECT                     m_dlgRect;

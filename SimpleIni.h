@@ -145,9 +145,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef INCLUDED_SimpleIni_h
-#define INCLUDED_SimpleIni_h
-
+#pragma once
 // Disable these warnings in MSVC:
 //  4127 "conditional expression is constant" as the conversion classes trigger
 //  it with the statement if (sizeof(SI_CHAR) == sizeof(char)). This test will
@@ -2470,4 +2468,3 @@ typedef CSimpleIniTempl<wchar_t,
 #    define SI_NEWLINE     SI_NEWLINE_A
 #endif // _UNICODE
 
-#endif // INCLUDED_SimpleIni_h
