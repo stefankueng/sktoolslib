@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 #include "AeroControls.h"
+#include <memory>
 #include <vssym32.h>
 
 enum ControlType

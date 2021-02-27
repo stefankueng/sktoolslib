@@ -20,6 +20,7 @@
 #include "stdafx.h"
 #include "DlgResizer.h"
 #include <cassert>
+#include <commctrl.h>
 
 #ifndef ComboBox_GetEditSel
 #    include <windowsx.h>
