@@ -27,6 +27,7 @@
 #include "UnicodeUtils.h"
 #include "maxpath.h"
 
+// ReSharper disable once CppInconsistentNaming
 class CIDropTarget : public IDropTarget
 {
     DWORD                     m_cRefCount;
