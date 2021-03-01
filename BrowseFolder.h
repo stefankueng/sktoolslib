@@ -29,11 +29,11 @@
 class CBrowseFolder
 {
 public:
-    enum retVal
+    enum class RetVal
     {
-        CANCEL = 0, ///< the user has pressed cancel
-        NOPATH,     ///< no folder was selected
-        OK          ///< everything went just fine
+        Cancel = 0, ///< the user has pressed cancel
+        Nopath,     ///< no folder was selected
+        Ok          ///< everything went just fine
     };
 
 public:
@@ -59,15 +59,15 @@ public:
      * \param path [out] the path to the folder which the user has selected
      * \return one of CANCEL, NOPATH or OK
      */
-    CBrowseFolder::retVal Show(HWND parent, std::wstring& path, const std::wstring& sDefaultPath = std::wstring());
-    CBrowseFolder::retVal Show(HWND parent, LPWSTR path, size_t pathLen, LPCWSTR szDefaultPath = NULL);
+    CBrowseFolder::RetVal Show(HWND parent, std::wstring& path, const std::wstring& sDefaultPath = std::wstring());
+    CBrowseFolder::RetVal Show(HWND parent, LPWSTR path, size_t pathLen, LPCWSTR szDefaultPath = nullptr);
 
     /**
      * If this is set to true, then the second checkbox gets disabled as soon as the first
      * checkbox is checked. If the first checkbox is unchecked, then the second checkbox is enabled
      * again.
      */
-    void DisableCheckBox2WhenCheckbox1IsEnabled(bool bSet = true) { m_disableCheckbox2WhenCheckbox1IsChecked = bSet; }
+    static void DisableCheckBox2WhenCheckbox1IsEnabled(bool bSet = true) { m_disableCheckbox2WhenCheckbox1IsChecked = bSet; }
 
     static BOOL m_bCheck; ///< state of the checkbox on closing the dialog
     static BOOL m_bCheck2;

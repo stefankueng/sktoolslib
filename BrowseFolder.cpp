@@ -24,8 +24,8 @@
 #include <Shlwapi.h>
 #include "BrowseFolder.h"
 
-BOOL         CBrowseFolder::m_bCheck  = FALSE;
-BOOL         CBrowseFolder::m_bCheck2 = FALSE;
+BOOL         CBrowseFolder::m_bCheck    = FALSE;
+BOOL         CBrowseFolder::m_bCheck2   = FALSE;
 WNDPROC      CBrowseFolder::m_cbProc    = nullptr;
 HWND         CBrowseFolder::m_checkBox  = nullptr;
 HWND         CBrowseFolder::m_checkBox2 = nullptr;
@@ -49,20 +49,20 @@ CBrowseFolder::~CBrowseFolder()
 }
 
 //show the dialog
-CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, LPWSTR path, size_t pathLen, LPCWSTR szDefaultPath /* = nullptr */)
+CBrowseFolder::RetVal CBrowseFolder::Show(HWND parent, LPWSTR path, size_t pathLen, LPCWSTR szDefaultPath /* = nullptr */)
 {
     std::wstring temp;
     temp = path;
     std::wstring sDefault;
     if (szDefaultPath && PathFileExists(szDefaultPath))
         sDefault = szDefaultPath;
-    CBrowseFolder::retVal ret = Show(parent, temp, sDefault);
+    CBrowseFolder::RetVal ret = Show(parent, temp, sDefault);
     wcscpy_s(path, pathLen, temp.c_str());
     return ret;
 }
-CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const std::wstring& sDefaultPath /* = std::wstring() */)
+CBrowseFolder::RetVal CBrowseFolder::Show(HWND parent, std::wstring& path, const std::wstring& sDefaultPath /* = std::wstring() */)
 {
-    retVal ret     = OK; //assume OK
+    RetVal ret     = RetVal::Ok; //assume OK
     m_sDefaultPath = sDefaultPath;
     if (m_sDefaultPath.empty() && !path.empty())
     {
@@ -158,10 +158,10 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
                 }
             }
             else
-                ret = CANCEL;
+                ret = RetVal::Cancel;
         }
         else
-            ret = CANCEL;
+            ret = RetVal::Cancel;
 
         pfd->Release();
     }
@@ -186,13 +186,13 @@ CBrowseFolder::retVal CBrowseFolder::Show(HWND parent, std::wstring& path, const
 
         //is the dialog canceled?
         if (!itemIDList)
-            ret = CANCEL;
+            ret = RetVal::Cancel;
 
-        if (ret != CANCEL)
+        if (ret != RetVal::Cancel)
         {
             WCHAR p[MAX_PATH] = {0};
             if (!SHGetPathFromIDList(itemIDList, p)) // MAX_PATH ok. Explorer can't handle paths longer than MAX_PATH.
-                ret = NOPATH;
+                ret = RetVal::Nopath;
 
             path = p;
 
@@ -257,14 +257,14 @@ int CBrowseFolder::BrowseCallBackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARA
             bool bSecondCheckbox = (m_checkText2[0] != '\0');
             //Rectangles for getting the positions
             m_checkBox = CreateWindowEx(0,
-                                      WC_BUTTON,
-                                      m_checkText,
-                                      WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | BS_AUTOCHECKBOX,
-                                      0, 100, 100, 50,
-                                      hwnd,
-                                      nullptr,
-                                      nullptr,
-                                      nullptr);
+                                        WC_BUTTON,
+                                        m_checkText,
+                                        WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | BS_AUTOCHECKBOX,
+                                        0, 100, 100, 50,
+                                        hwnd,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr);
             if (m_checkBox == nullptr)
                 return 0;
 
@@ -272,14 +272,14 @@ int CBrowseFolder::BrowseCallBackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARA
             {
                 //Rectangles for getting the positions
                 m_checkBox2 = CreateWindowEx(0,
-                                           WC_BUTTON,
-                                           m_checkText2,
-                                           WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | BS_AUTOCHECKBOX,
-                                           0, 100, 100, 50,
-                                           hwnd,
-                                           nullptr,
-                                           nullptr,
-                                           nullptr);
+                                             WC_BUTTON,
+                                             m_checkText2,
+                                             WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | BS_AUTOCHECKBOX,
+                                             0, 100, 100, 50,
+                                             hwnd,
+                                             nullptr,
+                                             nullptr,
+                                             nullptr);
                 if (m_checkBox2 == nullptr)
                     return 0;
             }
