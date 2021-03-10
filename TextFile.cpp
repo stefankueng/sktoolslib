@@ -91,7 +91,7 @@ bool CTextFile::Load(LPCWSTR path, UnicodeType &type, bool bUTF8, volatile LONG 
     do
     {
         if (retryCounter)
-            Sleep(20);
+            Sleep(20 + retryCounter * 50);
         hFile = CreateFile(pathBuf.get(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                            nullptr, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
         retryCounter++;
