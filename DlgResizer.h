@@ -21,13 +21,15 @@
 
 #include <vector>
 
-#define RESIZER_TOPLEFT            0
-#define RESIZER_TOPRIGHT           1
-#define RESIZER_TOPLEFTRIGHT       2
-#define RESIZER_TOPLEFTBOTTOMRIGHT 3
-#define RESIZER_BOTTOMLEFT         4
-#define RESIZER_BOTTOMRIGHT        5
-#define RESIZER_BOTTOMLEFTRIGHT    6
+#define RESIZER_TOPLEFT             0
+#define RESIZER_TOPRIGHT            1
+#define RESIZER_TOPLEFTRIGHT        2
+#define RESIZER_TOPLEFTBOTTOMRIGHT  3
+#define RESIZER_BOTTOMLEFT          4
+#define RESIZER_BOTTOMRIGHT         5
+#define RESIZER_BOTTOMLEFTRIGHT     6
+#define RESIZER_TOPLEFTBOTTOMLEFT   7
+#define RESIZER_TOPRIGHTBOTTOMRIGHT 8
 
 struct ResizeCtrls
 {

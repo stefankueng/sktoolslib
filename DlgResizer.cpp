@@ -169,6 +169,14 @@ void CDlgResizer::DoResize(int width, int height)
                 newPos.bottom += (height - m_dlgRect.bottom);
                 newPos.right += (width - m_dlgRect.right);
                 break;
+            case RESIZER_TOPLEFTBOTTOMLEFT:
+                newPos.bottom += (height - m_dlgRect.bottom);
+                break;
+            case RESIZER_TOPRIGHTBOTTOMRIGHT:
+                newPos.left += (width - m_dlgRect.right);
+                newPos.right += (width - m_dlgRect.right);
+                newPos.bottom += (height - m_dlgRect.bottom);
+                break;
         }
         hdwp = DeferWindowPos(hdwp, ctrlInfo.hWnd, nullptr, newPos.left, newPos.top,
                               newPos.right - newPos.left, newPos.bottom - newPos.top,
