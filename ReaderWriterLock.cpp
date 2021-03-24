@@ -138,7 +138,7 @@ bool CReaderWriterLockNonReentrance::_ReaderWait(DWORD dwTimeout)
 void CReaderWriterLockNonReentrance::_ReaderRelease()
 {
     INT iNumOfReaderEntered = --m_iNumOfReaderEntered;
-    _ASSERT(0 <= _iNumOfReaderEntered);
+    _ASSERT(0 <= iNumOfReaderEntered);
 
     if ((0 == iNumOfReaderEntered) &&
         (nullptr != m_hSafeToWriteEvent))
