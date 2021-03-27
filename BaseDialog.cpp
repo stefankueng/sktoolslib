@@ -170,7 +170,7 @@ void CDialog::AddToolTip(UINT ctrlID, LPCWSTR text)
     TOOLINFO tt;
     tt.cbSize   = sizeof(TOOLINFO);
     tt.uFlags   = TTF_IDISHWND | TTF_SUBCLASS;
-    tt.hwnd     = GetDlgItem(*this, ctrlID);
+    tt.hwnd     = text == LPSTR_TEXTCALLBACK ? *this : GetDlgItem(*this, ctrlID);
     tt.uId      = reinterpret_cast<UINT_PTR>(GetDlgItem(*this, ctrlID));
     tt.lpszText = const_cast<LPWSTR>(text);
 
