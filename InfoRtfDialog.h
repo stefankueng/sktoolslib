@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -32,6 +32,7 @@ public:
     ~CInfoRtfDialog(void);
 
     INT_PTR DoModal(HINSTANCE hInstance, HWND hParent, const std::string& dlgTitle, UINT rtfId, const std::wstring& resType, UINT iconId, int width, int height);
+    INT_PTR DoModal(HINSTANCE hInstance, HWND hParent, const std::string& dlgTitle, UINT rtfId, const std::wstring& resType, UINT iconId, int x, int y, int width, int height);
     void    ShowModeless(HINSTANCE hInstance, HWND hParent, const std::string& dlgTitle, UINT rtfId, const std::wstring& resType, UINT iconId, int width, int height);
 
 protected:

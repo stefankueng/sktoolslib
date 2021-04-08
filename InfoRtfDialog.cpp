@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -36,6 +36,11 @@ CInfoRtfDialog::~CInfoRtfDialog(void)
 
 INT_PTR CInfoRtfDialog::DoModal(HINSTANCE hInstance, HWND hParent, const std::string& dlgTitle, UINT rtfId, const std::wstring& resType, UINT iconId, int width, int height)
 {
+    return DoModal(hInstance, hParent, dlgTitle, rtfId, resType, iconId, 10, 10, width, height);
+}
+
+INT_PTR CInfoRtfDialog::DoModal(HINSTANCE hInstance, HWND hParent, const std::string& dlgTitle, UINT rtfId, const std::wstring& resType, UINT iconId, int x, int y, int width, int height)
+{
     m_hParent    = hParent;
     m_rtfId      = rtfId;
     m_rtfResType = resType;
@@ -52,8 +57,8 @@ INT_PTR CInfoRtfDialog::DoModal(HINSTANCE hInstance, HWND hParent, const std::st
 
     lpdt->style = WS_POPUP | WS_BORDER | WS_SYSMENU | DS_MODALFRAME | WS_CAPTION | WS_SIZEBOX;
     lpdt->cdit  = 0; // Number of controls
-    lpdt->x     = 10;
-    lpdt->y     = 10;
+    lpdt->x     = (SHORT)x;
+    lpdt->y     = (SHORT)y;
     lpdt->cx    = (short)width;
     lpdt->cy    = (short)height;
 
