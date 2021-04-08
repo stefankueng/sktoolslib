@@ -29,14 +29,14 @@ class CInfoRtfDialog : public CDialog
 {
 public:
     CInfoRtfDialog();
-    ~CInfoRtfDialog(void);
+    ~CInfoRtfDialog();
 
     INT_PTR DoModal(HINSTANCE hInstance, HWND hParent, const std::string& dlgTitle, UINT rtfId, const std::wstring& resType, UINT iconId, int width, int height);
     INT_PTR DoModal(HINSTANCE hInstance, HWND hParent, const std::string& dlgTitle, UINT rtfId, const std::wstring& resType, UINT iconId, int x, int y, int width, int height);
     void    ShowModeless(HINSTANCE hInstance, HWND hParent, const std::string& dlgTitle, UINT rtfId, const std::wstring& resType, UINT iconId, int width, int height);
 
 protected:
-    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 private:
     HWND         m_hParent;
