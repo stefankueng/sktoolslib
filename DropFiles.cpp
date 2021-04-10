@@ -132,7 +132,6 @@ STDMETHODIMP FileDataObject::GetData(FORMATETC* pformatetcIn, STGMEDIUM* pmedium
             pszBuff++;
         }
         *pszBuff = 0;
-        pszBuff  = reinterpret_cast<wchar_t*>(reinterpret_cast<LPBYTE>(pDrop) + sizeof(DROPFILES));
         GlobalUnlock(hgDrop);
         pmedium->hGlobal        = hgDrop;
         pmedium->tymed          = TYMED_HGLOBAL;
