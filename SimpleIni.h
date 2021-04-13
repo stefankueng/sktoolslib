@@ -218,14 +218,14 @@ class CSimpleIniTempl
 {
 public:
     /** map keys to values */
-    typedef std::multimap<const SI_CHAR *, const SI_CHAR *, SI_STRLESS> TKeyVal;
+    using TKeyVal = std::multimap<const SI_CHAR *, const SI_CHAR *, SI_STRLESS>;
 
     /** map sections to key/value map */
-    typedef std::map<const SI_CHAR *, TKeyVal, SI_STRLESS> TSection;
+    using TSection = std::map<const SI_CHAR *, TKeyVal, SI_STRLESS>;
 
     /** set of dependent string pointers. Note that these pointers are
      * dependent on memory owned by CSimpleIni. */
-    typedef std::list<const SI_CHAR *> TNamesDepend;
+    using TNamesDepend = std::list<const SI_CHAR *>;
 
     /** interface definition for the OutputWriter object to pass to Save()
      * in order to output the INI file data. */
@@ -2435,12 +2435,10 @@ public:
 //                                  TYPE DEFINITIONS
 // ---------------------------------------------------------------------------
 
-typedef CSimpleIniTempl<char,
-                        SI_NoCase<char>, SI_ConvertA<char>>
-    CSimpleIniA;
-typedef CSimpleIniTempl<char,
-                        SI_Case<char>, SI_ConvertA<char>>
-    CSimpleIniCaseA;
+using CSimpleIniA = CSimpleIniTempl<char,
+                                    SI_NoCase<char>, SI_ConvertA<char>>;
+using CSimpleIniCaseA = CSimpleIniTempl<char,
+                                        SI_Case<char>, SI_ConvertA<char>>;
 
 #if defined(SI_CONVERT_ICU)
 typedef CSimpleIniTempl<UChar,
@@ -2450,12 +2448,10 @@ typedef CSimpleIniTempl<UChar,
                         SI_Case<UChar>, SI_ConvertW<UChar>>
     CSimpleIniCaseW;
 #else
-typedef CSimpleIniTempl<wchar_t,
-                        SI_NoCase<wchar_t>, SI_ConvertW<wchar_t>>
-    CSimpleIniW;
-typedef CSimpleIniTempl<wchar_t,
-                        SI_Case<wchar_t>, SI_ConvertW<wchar_t>>
-    CSimpleIniCaseW;
+using CSimpleIniW = CSimpleIniTempl<wchar_t,
+                                    SI_NoCase<wchar_t>, SI_ConvertW<wchar_t>>;
+using CSimpleIniCaseW = CSimpleIniTempl<wchar_t,
+                                        SI_Case<wchar_t>, SI_ConvertW<wchar_t>>;
 #endif
 
 #ifdef _UNICODE
