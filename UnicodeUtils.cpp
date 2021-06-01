@@ -151,15 +151,15 @@ struct STRINGRESOURCEIMAGE
 
 int LoadStringEx(HINSTANCE hInstance, UINT uID, LPWSTR lpBuffer, int nBufferMax, WORD wLanguage)
 {
-    STRINGRESOURCEIMAGE* pImage;
-    STRINGRESOURCEIMAGE* pImageEnd;
-    ULONG                nResourceSize;
-    HGLOBAL              hGlobal;
-    UINT                 iIndex;
+    STRINGRESOURCEIMAGE* pImage        = nullptr;
+    STRINGRESOURCEIMAGE* pImageEnd     = nullptr;
+    ULONG                nResourceSize = 0;
+    HGLOBAL              hGlobal       = nullptr;
+    UINT                 iIndex        = 0;
 #ifndef UNICODE
     BOOL defaultCharUsed;
 #endif
-    int ret;
+    int ret = 0;
 
     if (lpBuffer == nullptr)
         return 0;
