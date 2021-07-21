@@ -106,7 +106,6 @@ private:
     using RefreshImmersiveColorPolicyStateFn = void(WINAPI* )();
     using GetIsImmersiveColorUsingHighContrastFn = BOOL(WINAPI* )(IMMERSIVE_HC_CACHE_MODE mode);
     using FlushMenuThemesFn = void(WINAPI* )();
-    using OpenNcThemeDataFpn = HTHEME(WINAPI* )(HWND hWnd, LPCWSTR pszClassList);
     using SetWindowCompositionAttributeFpn = BOOL(WINAPI* )(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA* data);
 
     AllowDarkModeForAppFpn                 m_pAllowDarkModeForApp                  = nullptr;
