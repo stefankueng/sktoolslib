@@ -69,6 +69,8 @@ CBrowseFolder::RetVal CBrowseFolder::Show(HWND parent, std::vector<std::wstring>
         // if the result path already contains a path, use that as the default path
         m_sDefaultPath = paths[0];
     }
+    if (!PathFileExists(m_sDefaultPath.c_str()))
+        m_sDefaultPath.clear();
     paths.clear();
 
     // Create a new common open file dialog
@@ -93,7 +95,7 @@ CBrowseFolder::RetVal CBrowseFolder::Show(HWND parent, std::vector<std::wstring>
         }
 
         // set the default folder
-        if (SUCCEEDED(hr))
+        if (SUCCEEDED(hr) && !m_sDefaultPath.empty())
         {
             IShellItem* psiDefault = nullptr;
             hr                     = SHCreateItemFromParsingName(m_sDefaultPath.c_str(), nullptr, IID_PPV_ARGS(&psiDefault));
