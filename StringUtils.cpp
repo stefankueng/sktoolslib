@@ -383,7 +383,7 @@ bool WriteAsciiStringToClipboard(const wchar_t* sClipdata, HWND hOwningWnd)
                 CloseClipboard(););
             EmptyClipboard();
             size_t  sLen           = wcslen(sClipdata);
-            HGLOBAL hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(wchar_t));
+            HGLOBAL hClipboardData = GlobalAlloc(GMEM_MOVEABLE, (sLen + 1) * sizeof(wchar_t));
             if (hClipboardData)
             {
                 wchar_t* pchData = static_cast<wchar_t*>(GlobalLock(hClipboardData));
