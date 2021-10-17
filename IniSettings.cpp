@@ -20,11 +20,11 @@
 #include "IniSettings.h"
 #include "StringUtils.h"
 
-CIniSettings::CIniSettings(void)
+CIniSettings::CIniSettings()
 {
 }
 
-CIniSettings::~CIniSettings(void)
+CIniSettings::~CIniSettings()
 {
     Save();
 }

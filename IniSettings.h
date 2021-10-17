@@ -22,8 +22,8 @@
 class CIniSettings
 {
 private:
-    CIniSettings(void);
-    ~CIniSettings(void);
+    CIniSettings();
+    ~CIniSettings();
 
 public:
     static CIniSettings& Instance();

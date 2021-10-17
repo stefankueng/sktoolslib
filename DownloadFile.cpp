@@ -28,7 +28,7 @@ CDownloadFile::CDownloadFile(LPCWSTR useragent, CProgressDlg* pProgress)
     hOpenHandle = InternetOpen(useragent, INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0);
 }
 
-CDownloadFile::~CDownloadFile(void)
+CDownloadFile::~CDownloadFile()
 {
     if (hOpenHandle)
         InternetCloseHandle(hOpenHandle);
