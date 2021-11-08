@@ -155,15 +155,19 @@ LRESULT CInfoRtfDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM l
             MoveWindow(m_hwndRichEdit, 0, 0, width, height, TRUE);
         }
         break;
+        case WM_DESTROY:
+            CloseWindow(m_hwndRichEdit);
+            DestroyWindow(m_hwndRichEdit);
+            break;
         case WM_COMMAND:
             switch (LOWORD(wParam))
             {
                 case IDOK:
                 case IDCANCEL:
-                    CloseWindow(m_hwndRichEdit);
-                    DestroyWindow(m_hwndRichEdit);
                     EndDialog(*this, LOWORD(wParam));
                     return static_cast<INT_PTR>(TRUE);
+                default:
+                    break;
             }
             break;
         case WM_NOTIFY:
