@@ -220,7 +220,8 @@ BOOL CALLBACK CLanguage::TranslateWindowProc(HWND hwnd, LPARAM lParam)
     if (GetWindowText(hwnd, text.get(), length + 1))
     {
         translatedString = GetTranslatedString(text.get(), pLangMap);
-        SetWindowText(hwnd, translatedString.c_str());
+        if (translatedString != text.get())
+            SetWindowText(hwnd, translatedString.c_str());
     }
 
     wchar_t className[1024] = {0};
