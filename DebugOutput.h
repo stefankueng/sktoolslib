@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2015, 2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2012, 2015, 2017, 2020-2022 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -169,7 +169,11 @@ private:
         : m_fi(nullptr)
     {
         m_lastTick = GetTickCount64();
-        m_bActive  = !!CRegStdDWORD(DEBUGOUTPUTREGPATH, FALSE);
+#ifdef _DEBUG
+        m_bActive = true;
+#else
+        m_bActive = !!CRegStdDWORD(DEBUGOUTPUTREGPATH, FALSE);
+#endif
     }
     ~CTraceToOutputDebugString()
     {
@@ -182,7 +186,7 @@ private:
     static CTraceToOutputDebugString* m_pInstance;
 
     // Non Unicode output helper
-    void TraceV(PCSTR pszFormat, va_list args) const
+    void                              TraceV(PCSTR pszFormat, va_list args) const
     {
         // Format the output buffer
         char szBuffer[1024];
@@ -204,7 +208,7 @@ private:
 
     bool IsActive()
     {
-#ifdef DEBUG
+#ifdef _DEBUG
         return true;
 #else
         if (GetTickCount64() - m_lastTick > 10000)
