@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2013, 2017-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013, 2017-2018, 2020-2022 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -300,7 +300,7 @@ BOOL CALLBACK CLanguage::TranslateWindowProc(HWND hwnd, LPARAM lParam)
         else if (wcscmp(className, WC_EDIT) == 0)
         {
             // translate hint texts in edit controls
-            const int bufCount = 4096;
+            constexpr int bufCount = 4096;
             auto      buf      = std::make_unique<wchar_t[]>(bufCount);
             SecureZeroMemory(buf.get(), bufCount * sizeof(wchar_t));
             Edit_GetCueBannerText(hwnd, buf.get(), bufCount);
@@ -309,7 +309,7 @@ BOOL CALLBACK CLanguage::TranslateWindowProc(HWND hwnd, LPARAM lParam)
         }
         else if (wcscmp(className, TOOLTIPS_CLASS) == 0)
         {
-            const int bufCount  = 4096;
+            constexpr int bufCount  = 4096;
             auto      buf       = std::make_unique<wchar_t[]>(bufCount);
             auto      toolCount = static_cast<int>(SendMessage(hwnd, TTM_GETTOOLCOUNT, 0, 0));
             for (int i = 0; i < toolCount; ++i)

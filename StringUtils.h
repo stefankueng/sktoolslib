@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2021 - Stefan Kueng
+// Copyright (C) 2012-2022 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -47,9 +47,9 @@
  * not found
  * @endcode
  */
-int strwildcmp(const char* wild, const char* string);
-int wcswildcmp(const wchar_t* wild, const wchar_t* string);
-int wcswildicmp(const wchar_t* wild, const wchar_t* string);
+int  strwildcmp(const char* wild, const char* string);
+int  wcswildcmp(const wchar_t* wild, const wchar_t* string);
+int  wcswildicmp(const wchar_t* wild, const wchar_t* string);
 
 bool WriteAsciiStringToClipboard(const wchar_t* sClipdata, HWND hOwningWnd);
 void SearchReplace(std::wstring& str, const std::wstring& toreplace, const std::wstring& replacewith);
@@ -274,13 +274,13 @@ std::wstring to_bit_wstring(T number, bool trimSignificantClearBits)
 {
     // Unsigned version of type given.
     using UT = typename std::make_unsigned<T>::type;
-    UT                                           one  = 1;
-    UT                                           zero = 0;
-    UT                                           uNumber;
-    uNumber            = UT(number);
-    const int    nBits = std::numeric_limits<UT>::digits;
-    std::wstring bs;
-    bool         seenSetBit = false;
+    UT one   = 1;
+    UT zero  = 0;
+    UT uNumber;
+    uNumber             = UT(number);
+    constexpr int nBits = std::numeric_limits<UT>::digits;
+    std::wstring  bs;
+    bool          seenSetBit = false;
     for (int bn = nBits - 1; bn >= 0; --bn)
     {
         UT   mask  = one << bn;
@@ -300,9 +300,9 @@ std::string to_bit_string(T number, bool trimSignificantClearBits)
 {
     // Unsigned version of type given.
     using UT = typename std::make_unsigned<T>::type;
-    UT                                           one  = 1;
-    UT                                           zero = 0;
-    UT                                           uNumber;
+    UT one   = 1;
+    UT zero  = 0;
+    UT uNumber;
     uNumber           = UT(number);
     const int   nBits = std::numeric_limits<UT>::digits;
     std::string bs;
