@@ -29,7 +29,10 @@
 #include <cctype>
 #include <memory>
 #include <functional>
+#include <Uxtheme.h>
+#include <VSStyle.h>
 
+#include "DPIAware.h"
 
 #define MAX_STRING_LENGTH (64 * 1024)
 
@@ -76,7 +79,7 @@ bool CLanguage::LoadFile(const std::wstring& path)
         file.getline(line.get(), 2 * MAX_STRING_LENGTH);
         if (line.get()[0] == 0)
         {
-            //empty line means end of entry!
+            // empty line means end of entry!
             std::wstring msgId;
             std::wstring msgStr;
             int          type = 0;
@@ -84,24 +87,24 @@ bool CLanguage::LoadFile(const std::wstring& path)
             {
                 if (wcsncmp(I->c_str(), L"# ", 2) == 0)
                 {
-                    //user comment
+                    // user comment
                     type = 0;
                 }
                 if (wcsncmp(I->c_str(), L"#.", 2) == 0)
                 {
-                    //automatic comments
+                    // automatic comments
                     type = 0;
                 }
                 if (wcsncmp(I->c_str(), L"#,", 2) == 0)
                 {
-                    //flag
+                    // flag
                     type = 0;
                 }
                 if (wcsncmp(I->c_str(), L"msgid", 5) == 0)
                 {
-                    //message id
-                    msgId = I->c_str();
-                    msgId = std::wstring(msgId.substr(7, msgId.size() - 8));
+                    // message id
+                    msgId          = I->c_str();
+                    msgId          = std::wstring(msgId.substr(7, msgId.size() - 8));
 
                     std::wstring s = msgId;
                     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](wint_t c) { return !iswspace(c); }));
@@ -109,7 +112,7 @@ bool CLanguage::LoadFile(const std::wstring& path)
                 }
                 if (wcsncmp(I->c_str(), L"msgstr", 6) == 0)
                 {
-                    //message string
+                    // message string
                     msgStr = I->c_str();
                     msgStr = msgStr.substr(8, msgStr.length() - 9);
                     type   = 2;
@@ -246,9 +249,9 @@ BOOL CALLBACK CLanguage::TranslateWindowProc(HWND hwnd, LPARAM lParam)
         }
         else if (wcscmp(className, WC_BUTTON) == 0)
         {
-            LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
-            if (((style & BS_GROUPBOX) == 0) &&
-                ((style & BS_CHECKBOX) || (style & BS_AUTORADIOBUTTON) || (style & BS_RADIOBUTTON)))
+            LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE) & BS_TYPEMASK;
+            if ((style != BS_GROUPBOX) &&
+                (style == BS_CHECKBOX || style == BS_AUTORADIOBUTTON || style == BS_RADIOBUTTON))
             {
                 // adjust the width of checkbox and radio buttons
                 HDC  hDC = GetWindowDC(hwnd);
@@ -259,23 +262,41 @@ BOOL CALLBACK CLanguage::TranslateWindowProc(HWND hwnd, LPARAM lParam)
                 controlRectOrig = controlRect;
                 if (hDC)
                 {
-                    HFONT   hFont    = GetWindowFont(hwnd);
-                    HGDIOBJ hOldFont = ::SelectObject(hDC, hFont);
-                    if (DrawText(hDC, translatedString.c_str(), -1, &controlRect, DT_WORDBREAK | DT_EDITCONTROL | DT_EXPANDTABS | DT_LEFT | DT_CALCRECT))
+                    HTHEME hTheme = OpenThemeData(hwnd, L"Button");
+                    if (hTheme)
                     {
-                        // now we have the rectangle the control really needs
-                        if ((controlRectOrig.right - controlRectOrig.left) > (controlRect.right - controlRect.left))
+                        int      iPartId      = BP_CHECKBOX;
+                        LONG_PTR dwButtonType = GetWindowLongPtr(hwnd, GWL_STYLE) & BS_TYPEMASK;
+
+                        if (dwButtonType == BS_RADIOBUTTON || dwButtonType == BS_AUTORADIOBUTTON)
+                            iPartId = BP_RADIOBUTTON;
+
+                        HDC            hdcPaint     = nullptr;
+                        BP_PAINTPARAMS params       = {sizeof(BP_PAINTPARAMS)};
+                        params.dwFlags              = BPPF_ERASE;
+                        HPAINTBUFFER hBufferedPaint = BeginBufferedPaint(hDC, &controlRect, BPBF_TOPDOWNDIB, &params, &hdcPaint);
+                        if (hdcPaint)
                         {
-                            // we're dealing with radio buttons and check boxes,
-                            // which means we have to add a little space for the checkbox
-                            // the value of 3 pixels added here is necessary in case certain visual styles have
-                            // been disabled. Without this, the width is calculated too short.
-                            const int checkWidth  = GetSystemMetrics(SM_CXMENUCHECK) + 2 * GetSystemMetrics(SM_CXEDGE) + 3;
-                            controlRectOrig.right = controlRectOrig.left + (controlRect.right - controlRect.left) + checkWidth;
-                            MoveWindow(hwnd, controlRectOrig.left, controlRectOrig.top, controlRectOrig.right - controlRectOrig.left, controlRectOrig.bottom - controlRectOrig.top, TRUE);
+                            HFONT hFont    = reinterpret_cast<HFONT>(SendMessage(hwnd, WM_GETFONT, 0L, 0L));
+                            HFONT hOldFont = static_cast<HFONT>(SelectObject(hdcPaint, hFont));
+                            if (DrawThemeTextEx(hTheme, hdcPaint, iPartId, 0, translatedString.c_str(), -1, DT_WORDBREAK | DT_EDITCONTROL | DT_EXPANDTABS | DT_LEFT | DT_CALCRECT, &controlRect, nullptr))
+                            {
+                                const int checkWidth = GetSystemMetrics(SM_CXMENUCHECK) + 2 * GetSystemMetrics(SM_CXEDGE);
+                                controlRect.right += checkWidth + CDPIAware::Instance().Scale(hwnd, 3);
+                                // now we have the rectangle the control really needs
+                                if ((controlRectOrig.right - controlRectOrig.left) > (controlRect.right - controlRect.left))
+                                {
+                                    // we're dealing with radio buttons and check boxes,
+                                    // which means we have to add a little space for the checkbox
+                                    controlRectOrig.right = controlRectOrig.left + (controlRect.right - controlRect.left);
+                                    MoveWindow(hwnd, controlRectOrig.left, controlRectOrig.top, controlRectOrig.right - controlRectOrig.left, controlRectOrig.bottom - controlRectOrig.top, TRUE);
+                                }
+                            }
+                            SelectObject(hdcPaint, hOldFont);
+                            EndBufferedPaint(hBufferedPaint, TRUE);
                         }
+                        CloseThemeData(hTheme);
                     }
-                    SelectObject(hDC, hOldFont);
                     ReleaseDC(hwnd, hDC);
                 }
             }
