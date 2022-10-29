@@ -50,7 +50,7 @@ public:
     /**
      * Saves the file contents to disk at \c path.
      */
-    bool Save(LPCWSTR path) const;
+    bool Save(LPCWSTR path, bool keepFileDate) const;
 
     /**
      * modifies the contents of a file.

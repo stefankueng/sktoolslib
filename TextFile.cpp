@@ -47,20 +47,40 @@ CTextFile::~CTextFile()
     pFileBuf = nullptr;
 }
 
-bool CTextFile::Save(LPCWSTR path) const
+bool CTextFile::Save(LPCWSTR path, bool keepFileDate) const
 {
     if (pFileBuf == nullptr)
         return false;
+    FILETIME creationTime{};
+    FILETIME lastAccessTime{};
+    FILETIME lastWriteTime{};
+    if (keepFileDate)
+    {
+        HANDLE hFile = CreateFile(path, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+                                  nullptr, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
+        if (hFile != INVALID_HANDLE_VALUE)
+        {
+            GetFileTime(hFile, &creationTime, &lastAccessTime, &lastWriteTime);
+            CloseHandle(hFile);
+        }
+    }
+
     HANDLE hFile = CreateFile(path, GENERIC_WRITE, FILE_SHARE_READ,
                               nullptr, CREATE_ALWAYS, FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
     if (hFile == INVALID_HANDLE_VALUE)
+    {
+        assert(false);
         return false;
+    }
+
     DWORD byteswritten;
     if (!WriteFile(hFile, pFileBuf.get(), fileLen, &byteswritten, nullptr))
     {
         CloseHandle(hFile);
         return false;
     }
+    if (keepFileDate)
+        SetFileTime(hFile, &creationTime, &lastAccessTime, &lastWriteTime);
     CloseHandle(hFile);
     return true;
 }
