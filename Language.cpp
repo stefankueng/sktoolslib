@@ -30,7 +30,6 @@
 #include <memory>
 #include <functional>
 #include <Uxtheme.h>
-#include <VSStyle.h>
 
 #include "DPIAware.h"
 
@@ -249,9 +248,9 @@ BOOL CALLBACK CLanguage::TranslateWindowProc(HWND hwnd, LPARAM lParam)
         }
         else if (wcscmp(className, WC_BUTTON) == 0)
         {
-            LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE) & BS_TYPEMASK;
-            if ((style != BS_GROUPBOX) &&
-                (style == BS_CHECKBOX || style == BS_AUTORADIOBUTTON || style == BS_RADIOBUTTON))
+            LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
+            if (((style & BS_GROUPBOX) == 0) &&
+                ((style & BS_CHECKBOX) || (style & BS_AUTORADIOBUTTON) || (style & BS_RADIOBUTTON)))
             {
                 // adjust the width of checkbox and radio buttons
                 HDC  hDC = GetWindowDC(hwnd);
@@ -262,41 +261,22 @@ BOOL CALLBACK CLanguage::TranslateWindowProc(HWND hwnd, LPARAM lParam)
                 controlRectOrig = controlRect;
                 if (hDC)
                 {
-                    HTHEME hTheme = OpenThemeData(hwnd, L"Button");
-                    if (hTheme)
+                    HFONT   hFont    = GetWindowFont(hwnd);
+                    HGDIOBJ hOldFont = ::SelectObject(hDC, hFont);
+                    if (DrawText(hDC, translatedString.c_str(), -1, &controlRect, DT_WORDBREAK | DT_EXPANDTABS | DT_LEFT | DT_CALCRECT))
                     {
-                        int      iPartId      = BP_CHECKBOX;
-                        LONG_PTR dwButtonType = GetWindowLongPtr(hwnd, GWL_STYLE) & BS_TYPEMASK;
-
-                        if (dwButtonType == BS_RADIOBUTTON || dwButtonType == BS_AUTORADIOBUTTON)
-                            iPartId = BP_RADIOBUTTON;
-
-                        HDC            hdcPaint     = nullptr;
-                        BP_PAINTPARAMS params       = {sizeof(BP_PAINTPARAMS)};
-                        params.dwFlags              = BPPF_ERASE;
-                        HPAINTBUFFER hBufferedPaint = BeginBufferedPaint(hDC, &controlRect, BPBF_TOPDOWNDIB, &params, &hdcPaint);
-                        if (hdcPaint)
+                        // we're dealing with radio buttons and check boxes,
+                        // which means we have to add a little space for the checkbox
+                        const int checkWidth = GetSystemMetrics(SM_CXMENUCHECK) + 2 * GetSystemMetrics(SM_CXEDGE) + CDPIAware::Instance().Scale(hwnd, 3);
+                        controlRect.right += checkWidth;
+                        // now we have the rectangle the control really needs
+                        if ((controlRectOrig.right - controlRectOrig.left) > (controlRect.right - controlRect.left))
                         {
-                            HFONT hFont    = reinterpret_cast<HFONT>(SendMessage(hwnd, WM_GETFONT, 0L, 0L));
-                            HFONT hOldFont = static_cast<HFONT>(SelectObject(hdcPaint, hFont));
-                            if (DrawThemeTextEx(hTheme, hdcPaint, iPartId, 0, translatedString.c_str(), -1, DT_WORDBREAK | DT_EDITCONTROL | DT_EXPANDTABS | DT_LEFT | DT_CALCRECT, &controlRect, nullptr))
-                            {
-                                const int checkWidth = GetSystemMetrics(SM_CXMENUCHECK) + 2 * GetSystemMetrics(SM_CXEDGE);
-                                controlRect.right += checkWidth + CDPIAware::Instance().Scale(hwnd, 3);
-                                // now we have the rectangle the control really needs
-                                if ((controlRectOrig.right - controlRectOrig.left) > (controlRect.right - controlRect.left))
-                                {
-                                    // we're dealing with radio buttons and check boxes,
-                                    // which means we have to add a little space for the checkbox
-                                    controlRectOrig.right = controlRectOrig.left + (controlRect.right - controlRect.left);
-                                    MoveWindow(hwnd, controlRectOrig.left, controlRectOrig.top, controlRectOrig.right - controlRectOrig.left, controlRectOrig.bottom - controlRectOrig.top, TRUE);
-                                }
-                            }
-                            SelectObject(hdcPaint, hOldFont);
-                            EndBufferedPaint(hBufferedPaint, TRUE);
+                            controlRectOrig.right = controlRectOrig.left + (controlRect.right - controlRect.left);
+                            MoveWindow(hwnd, controlRectOrig.left, controlRectOrig.top, controlRectOrig.right - controlRectOrig.left, controlRectOrig.bottom - controlRectOrig.top, TRUE);
                         }
-                        CloseThemeData(hTheme);
                     }
+                    SelectObject(hDC, hOldFont);
                     ReleaseDC(hwnd, hDC);
                 }
             }
@@ -322,7 +302,7 @@ BOOL CALLBACK CLanguage::TranslateWindowProc(HWND hwnd, LPARAM lParam)
         {
             // translate hint texts in edit controls
             constexpr int bufCount = 4096;
-            auto      buf      = std::make_unique<wchar_t[]>(bufCount);
+            auto          buf      = std::make_unique<wchar_t[]>(bufCount);
             SecureZeroMemory(buf.get(), bufCount * sizeof(wchar_t));
             Edit_GetCueBannerText(hwnd, buf.get(), bufCount);
             auto sTranslated = GetTranslatedString(buf.get(), pLangMap);
@@ -331,8 +311,8 @@ BOOL CALLBACK CLanguage::TranslateWindowProc(HWND hwnd, LPARAM lParam)
         else if (wcscmp(className, TOOLTIPS_CLASS) == 0)
         {
             constexpr int bufCount  = 4096;
-            auto      buf       = std::make_unique<wchar_t[]>(bufCount);
-            auto      toolCount = static_cast<int>(SendMessage(hwnd, TTM_GETTOOLCOUNT, 0, 0));
+            auto          buf       = std::make_unique<wchar_t[]>(bufCount);
+            auto          toolCount = static_cast<int>(SendMessage(hwnd, TTM_GETTOOLCOUNT, 0, 0));
             for (int i = 0; i < toolCount; ++i)
             {
                 SecureZeroMemory(buf.get(), bufCount * sizeof(wchar_t));
