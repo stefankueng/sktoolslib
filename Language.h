@@ -50,5 +50,6 @@ private:
     static std::wstring  GetTranslatedString(const std::wstring& s, std::map<std::wstring, std::wstring>* pLangMap);
 
 private:
-    std::map<std::wstring, std::wstring> langmap;
+    std::map<std::wstring, std::wstring>        langmap;
+    static std::map<std::wstring, std::wstring> langmapBack;
 };
