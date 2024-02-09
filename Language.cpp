@@ -35,40 +35,35 @@
 
 #define MAX_STRING_LENGTH (64 * 1024)
 
+std::map<std::wstring, std::wstring> CLanguage::langmapBack;
+
 bool CLanguage::LoadFile(const std::wstring& path)
 {
     static std::wstring lastLangPath;
 
-    // revert to original language
+    // revert to original language, special: L1 -> L2 (fail -> L0) -> L0 (En)
     if (_wcsicmp(lastLangPath.c_str(), path.c_str()))
     {
-        std::map<std::wstring, std::wstring> langMap2;
+        langmapBack.clear();
         for (auto it = langmap.cbegin(); it != langmap.cend(); ++it)
         {
-            langMap2[it->second] = it->first;
+            langmapBack[it->second] = it->first;
         }
-        langmap = langMap2;
+        langmap.clear();
     }
-
-    if (!PathFileExists(path.c_str()))
-        return false;
-
     lastLangPath = path;
 
-    // since stream classes still expect the filepath in char and not wchar_t
-    // we need to convert the filepath to multibyte first
-
-    std::ifstream file;
-    try
+    if (!PathFileExists(path.c_str()))
     {
-    }
-    catch (std::ios_base::failure&)
-    {
+        lastLangPath = L"";
         return false;
     }
+
+    std::ifstream file;
     file.open(path);
     if (!file.good())
     {
+        lastLangPath = L"";
         return false;
     }
     auto                      line = std::make_unique<char[]>(2 * MAX_STRING_LENGTH);
@@ -163,9 +158,33 @@ std::wstring CLanguage::GetTranslatedString(const std::wstring& s)
 
 std::wstring CLanguage::GetTranslatedString(const std::wstring& s, std::map<std::wstring, std::wstring>* pLangMap)
 {
-    auto foundIt = pLangMap->find(s);
-    if ((foundIt != pLangMap->end()) && (!foundIt->second.empty()))
+    if (s.length() == 0)
+    {
+        return s;
+    }
+
+    auto foundIt = langmapBack.find(s);
+    if ((foundIt != langmapBack.end()) && (!foundIt->second.empty()))
+    {
+        if (!pLangMap->empty())
+        {
+            auto foundIt2 = pLangMap->find(foundIt->second);
+            if ((foundIt2 != pLangMap->end()) && (!foundIt2->second.empty()))
+            {
+                return foundIt2->second;
+            }
+        }
+        // msgId
         return foundIt->second;
+    }
+
+    // windows initializing
+    foundIt = pLangMap->find(s);
+    if ((foundIt != pLangMap->end()) && (!foundIt->second.empty()))
+    {
+        return foundIt->second;
+    }
+
     return s;
 }
 
