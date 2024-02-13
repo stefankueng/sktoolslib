@@ -531,37 +531,36 @@ bool CTextFile::CalculateLines(std::atomic_bool &bCancelled)
         return true;
     linePositions.clear();
     linePositions.reserve(textContent.size() / 10);
-    size_t pos = 0;
+    size_t  pos     = 0;
+    bool    bGot   = false;
     for (auto it = textContent.begin(); it != textContent.end() && !bCancelled; ++it)
     {
+        bGot = false;
         if (*it == '\r')
         {
-            ++it;
-            ++pos;
-            if (it != textContent.end())
+            // cr lineending
+            bGot = true;
+            if (it + 1 < textContent.end())
             {
-                if (*it == '\n')
+                if (it[1] == '\n')
                 {
                     // crlf lineending
-                    linePositions.push_back(pos);
-                }
-                else
-                {
-                    // cr lineending
-                    linePositions.push_back(pos - 1);
+                    ++it;
+                    ++pos;
                 }
             }
-            else
-                break;
         }
         else if (*it == '\n')
         {
             // lf lineending
-            linePositions.push_back(pos);
+            bGot = true;
         }
+        if (bGot)
+            linePositions.push_back(pos);
         ++pos;
     }
-    linePositions.push_back(pos);
+    if (!bGot)
+        linePositions.push_back(pos);
     return true;
 }
 
@@ -574,23 +573,17 @@ long CTextFile::LineFromPosition(long pos) const
 
 std::wstring CTextFile::GetLineString(long lineNumber) const
 {
-    if ((lineNumber - 2) >= static_cast<long>(linePositions.size()))
-        return std::wstring();
-    if (lineNumber <= 0)
+    if ((lineNumber <= 0) || (lineNumber > static_cast<long>(linePositions.size())))
         return std::wstring();
 
-    long startPos = 0;
+    size_t startPos = 0;
+    size_t endPos   = linePositions[lineNumber - 1];
     if (lineNumber > 1)
-        startPos = static_cast<long>(linePositions[lineNumber - 2]) + 1;
-    std::wstring endChars(L"\n\0", 2);
-    size_t       endPos = textContent.find_first_of(endChars, startPos);
-    std::wstring line;
-    if (endPos != std::wstring::npos)
-        line = std::wstring(textContent.begin() + startPos, textContent.begin() + endPos);
-    else
-        line = std::wstring(textContent.begin() + startPos, textContent.end());
+        startPos = linePositions[lineNumber - 2] + 1;
+    if (lineNumber < static_cast<long>(linePositions.size()))
+        endPos++;
 
-    return line;
+    return std::wstring(textContent.begin() + startPos, textContent.begin() + endPos);
 }
 
 std::wstring CTextFile::GetEncodingString(UnicodeType type)
