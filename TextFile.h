@@ -67,6 +67,12 @@ public:
     long                LineFromPosition(long pos) const;
 
     /**
+     * Returns the column number from a given character position inside the file.
+     * \if param line is -1, that means it has not been calculated.
+     */
+    long                ColumnFromPosition(long pos, long line) const;
+
+    /**
      * Returns the line from a given line number
      */
     std::wstring        GetLineString(long lineNumber) const;
