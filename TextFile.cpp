@@ -571,6 +571,16 @@ long CTextFile::LineFromPosition(long pos) const
     return static_cast<long>(lbLine + 1);
 }
 
+long CTextFile::ColumnFromPosition(long pos, long line) const
+{
+    if (line < 0)
+        line = LineFromPosition(pos);
+    long lastLineEnd = -1;
+    if (line > 1)
+        lastLineEnd = static_cast<long>(linePositions[line - 2]);
+    return pos - lastLineEnd;
+}
+
 std::wstring CTextFile::GetLineString(long lineNumber) const
 {
     if ((lineNumber <= 0) || (lineNumber > static_cast<long>(linePositions.size())))
