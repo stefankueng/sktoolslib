@@ -677,6 +677,11 @@ private:
         return (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n');
     }
 
+    /** Skip over a newline character (or characters) for either DOS or UNIX */
+    inline void SkipNewLine(SI_CHAR *& a_pData) const {
+        a_pData += (*a_pData == '\r' && *(a_pData+1) == '\n') ? 2 : 1;
+    }
+
     /** Does the supplied character start a comment line? */
     inline bool IsComment(SI_CHAR ch) const
     {
@@ -1053,7 +1058,7 @@ bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::FindEntry(
         pTrail = a_pData - 1;
         if (*a_pData)
         { // prepare for the next round
-            ++a_pData;
+            SkipNewLine(a_pData);
         }
         while (pTrail >= a_pVal && IsSpace(*pTrail))
         {
@@ -1117,6 +1122,7 @@ bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::IsMultiLineData(
         {
             return true;
         }
+        ++a_pData;
     }
 
     // check for suffix
@@ -1172,7 +1178,7 @@ bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::FindMultiLine(
             if (*(pLine - 1) == '\r')
             {
                 // handle Windows style newlines. This handles Unix newline files
-                // on Windows and Windows style newlines on Unix. \n\r
+                // on Windows and Windows style newlines on Unix. \r\n
                 --pLine;
             }
             *pLine = 0;
