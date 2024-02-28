@@ -1117,6 +1117,7 @@ bool CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::IsMultiLineData(
         {
             return true;
         }
+        ++a_pData;
     }
 
     // check for suffix
