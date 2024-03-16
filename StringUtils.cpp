@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2017, 2019-2021 - Stefan Kueng
+// Copyright (C) 2012-2017, 2019-2021, 2024 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -218,6 +218,51 @@ std::wstring CStringUtils::ToHexWString(BYTE* pSrc, int nSrcLen)
 {
     std::string s = ToHexString(pSrc, nSrcLen);
     return std::wstring(s.begin(), s.end());
+}
+
+std::string CStringUtils::base64_encode(const std::string& in)
+{
+    std::string out;
+
+    int         val = 0, valb = -6;
+    for (auto c : in)
+    {
+        val = (val << 8) + c;
+        valb += 8;
+        while (valb >= 0)
+        {
+            out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[(val >> valb) & 0x3F]);
+            valb -= 6;
+        }
+    }
+    if (valb > -6)
+        out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[((val << 8) >> (valb + 8)) & 0x3F]);
+    while (out.size() % 4)
+        out.push_back('=');
+    return out;
+}
+std::string CStringUtils::base64_decode(const std::string& in)
+{
+    std::string      out;
+
+    std::vector<int> T(256, -1);
+    for (int i = 0; i < 64; i++)
+        T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
+
+    int val = 0, valb = -8;
+    for (auto c : in)
+    {
+        if (T[c] == -1)
+            break;
+        val = (val << 6) + T[c];
+        valb += 6;
+        if (valb >= 0)
+        {
+            out.push_back(static_cast<char>((val >> valb) & 0xFF));
+            valb -= 8;
+        }
+    }
+    return out;
 }
 
 std::unique_ptr<char[]> CStringUtils::Decrypt(const char* text)

@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2022 - Stefan Kueng
+// Copyright (C) 2012-2022, 2024 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -474,19 +474,20 @@ public:
         return buf.get();
     }
 
-    static std::string ToHexString(BYTE* pSrc, int nSrcLen);
+    static std::string                                                                                                   ToHexString(BYTE* pSrc, int nSrcLen);
+    static bool                                                                                                          FromHexString(const std::string& src, BYTE* pDest);
+    static std::wstring                                                                                                  ToHexWString(BYTE* pSrc, int nSrcLen);
 
-    static bool FromHexString(const std::string& src, BYTE* pDest);
+    static std::string                                                                                                   base64_encode(const std::string& in);
+    static std::string                                                                                                   base64_decode(const std::string& in);
 
-    static std::wstring ToHexWString(BYTE* pSrc, int nSrcLen);
+    static std::unique_ptr<char[]>                                                                                       Decrypt(const char* text);
+    static std::unique_ptr<wchar_t[]>                                                                                    Decrypt(const wchar_t* text);
+    static std::string                                                                                                   Encrypt(const char* text);
+    static std::wstring                                                                                                  Encrypt(const wchar_t* text);
 
-    static std::unique_ptr<char[]>    Decrypt(const char* text);
-    static std::unique_ptr<wchar_t[]> Decrypt(const wchar_t* text);
-    static std::string                Encrypt(const char* text);
-    static std::wstring               Encrypt(const wchar_t* text);
-
-    static std::wstring Format(const wchar_t* frmt, ...);
-    static std::string  Format(const char* frmt, ...);
+    static std::wstring                                                                                                  Format(const wchar_t* frmt, ...);
+    static std::string                                                                                                   Format(const char* frmt, ...);
 
     [[deprecated("use case insensitive string comparison instead, or the ci_less container helper")]] static inline void emplace_to_lower(std::wstring& s)
     {
@@ -517,19 +518,19 @@ public:
         return ls;
     }
 
-    //static inline std::wstring::const_iterator find_caseinsensitive(const std::wstring& haystack, const std::wstring& needle)
+    // static inline std::wstring::const_iterator find_caseinsensitive(const std::wstring& haystack, const std::wstring& needle)
     //{
-    //    std::wstring::const_iterator it = haystack.end();
-    //    for (auto& i = haystack.begin(); i != haystack.end(); ++i)
-    //    {
-    //        if (_wcsnicmp(&(*i), needle.c_str(), needle.size()) == 0)
-    //        {
-    //            it = i;
-    //            break;
-    //        }
-    //    }
-    //    return it;
-    //}
+    //     std::wstring::const_iterator it = haystack.end();
+    //     for (auto& i = haystack.begin(); i != haystack.end(); ++i)
+    //     {
+    //         if (_wcsnicmp(&(*i), needle.c_str(), needle.size()) == 0)
+    //         {
+    //             it = i;
+    //             break;
+    //         }
+    //     }
+    //     return it;
+    // }
     static size_t find_caseinsensitive(const std::wstring& haystack, const std::wstring& needle)
     {
         auto ret = std::wstring::npos;
