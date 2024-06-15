@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2013-2015, 2017, 2020-2023 - Stefan Kueng
+// Copyright (C) 2013-2015, 2017, 2020-2024 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -130,6 +130,8 @@ std::wstring CPathUtils::AdjustForMaxPath(const std::wstring& path, bool force)
         return path;
     if (path.substr(0, 4).compare(L"\\\\?\\") == 0)
         return path;
+    if (path.substr(0, 2).compare(L"\\\\") == 0)
+        return L"\\\\?\\UNC" + path.substr(1);
     return L"\\\\?\\" + path;
 }
 
