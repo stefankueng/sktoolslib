@@ -1,6 +1,6 @@
-﻿// sktoolslib - common files for SK tools
+// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2015, 2017, 2020-2022 - Stefan Kueng
+// Copyright (C) 2012, 2015, 2017, 2020-2024 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -186,24 +186,36 @@ private:
     static CTraceToOutputDebugString* m_pInstance;
 
     // Non Unicode output helper
-    void                              TraceV(PCSTR pszFormat, va_list args) const
+    void TraceV(PCSTR pszFormat, va_list args) const
     {
         // Format the output buffer
-        char szBuffer[1024];
-        _vsnprintf_s(szBuffer, _countof(szBuffer), pszFormat, args);
-        OutputDebugStringA(szBuffer);
-        if (m_fi)
-            fputs(szBuffer, m_fi);
+        auto        len = _vscprintf(pszFormat, args);
+        std::string szBuffer;
+
+        if (len > 0)
+        {
+            szBuffer.resize(len + 1);
+            _vsnprintf_s((char *const)szBuffer.c_str(), len+1, len, pszFormat, args);
+            OutputDebugStringA(szBuffer.c_str());
+            if (m_fi)
+                fputs(szBuffer.c_str(), m_fi);
+        }
     }
 
     // Unicode output helper
     void TraceV(PCWSTR pszFormat, va_list args) const
     {
-        wchar_t szBuffer[1024];
-        _vsnwprintf_s(szBuffer, _countof(szBuffer), pszFormat, args);
-        OutputDebugStringW(szBuffer);
-        if (m_fi)
-            fputws(szBuffer, m_fi);
+        auto         len = _vscwprintf(pszFormat, args);
+        std::wstring szBuffer;
+
+        if (len > 0)
+        {
+            szBuffer.resize(len+1);
+            _vsnwprintf_s((wchar_t *const)szBuffer.c_str(), len+1, len, pszFormat, args);
+            OutputDebugStringW(szBuffer.c_str());
+            if (m_fi)
+                fputws(szBuffer.c_str(), m_fi);
+        }
     }
 
     bool IsActive()
