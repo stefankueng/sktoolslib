@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2012-2013, 2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2012-2013, 2017, 2020-2021, 2024 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -84,10 +84,31 @@ std::string WideToMultibyte(const std::wstring& wide, bool stopAtNull /* = true*
     return std::string(narrow.get(), ret);
 }
 
+std::string WideToMultibyte(const std::wstring_view& wide, bool stopAtNull /* = true*/)
+{
+    auto narrow = std::make_unique<char[]>(wide.length() * 3 + 2);
+    BOOL defaultCharUsed;
+    int  ret    = static_cast<int>(WideCharToMultiByte(CP_ACP, 0, wide.data(), static_cast<int>(wide.size()), narrow.get(), static_cast<int>(wide.length()) * 3 - 1, ".", &defaultCharUsed));
+    narrow[ret] = 0;
+    if (stopAtNull)
+        return narrow.get();
+    return std::string(narrow.get(), ret);
+}
+
 std::string WideToUTF8(const std::wstring& wide, bool stopAtNull /* = true*/)
 {
     auto narrow = std::make_unique<char[]>(wide.length() * 3 + 2);
     int  ret    = static_cast<int>(WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), static_cast<int>(wide.size()), narrow.get(), static_cast<int>(wide.length()) * 3 - 1, nullptr, nullptr));
+    narrow[ret] = 0;
+    if (stopAtNull)
+        return narrow.get();
+    return std::string(narrow.get(), ret);
+}
+
+std::string WideToUTF8(const std::wstring_view& wide, bool stopAtNull /* = true*/)
+{
+    auto narrow = std::make_unique<char[]>(wide.length() * 3 + 2);
+    int  ret    = static_cast<int>(WideCharToMultiByte(CP_UTF8, 0, wide.data(), static_cast<int>(wide.size()), narrow.get(), static_cast<int>(wide.length()) * 3 - 1, nullptr, nullptr));
     narrow[ret] = 0;
     if (stopAtNull)
         return narrow.get();
@@ -110,6 +131,22 @@ std::wstring MultibyteToWide(const std::string& multibyte, bool stopAtNull /* = 
     return std::wstring(wide.get(), ret);
 }
 
+std::wstring MultibyteToWide(const std::string_view& multibyte, bool stopAtNull /* = true*/)
+{
+    size_t length = multibyte.length();
+    if (length == 0)
+        return std::wstring();
+
+    auto wide = std::make_unique<wchar_t[]>(multibyte.length() * 2 + 2);
+    if (wide == nullptr)
+        return std::wstring();
+    int ret   = static_cast<int>(MultiByteToWideChar(CP_ACP, 0, multibyte.data(), static_cast<int>(multibyte.size()), wide.get(), static_cast<int>(length) * 2 - 1));
+    wide[ret] = 0;
+    if (stopAtNull)
+        return wide.get();
+    return std::wstring(wide.get(), ret);
+}
+
 std::wstring UTF8ToWide(const std::string& multibyte, bool stopAtNull /* = true*/)
 {
     size_t length = multibyte.length();
@@ -120,6 +157,22 @@ std::wstring UTF8ToWide(const std::string& multibyte, bool stopAtNull /* = true*
     if (wide == nullptr)
         return std::wstring();
     int ret   = static_cast<int>(MultiByteToWideChar(CP_UTF8, 0, multibyte.c_str(), static_cast<int>(multibyte.size()), wide.get(), static_cast<int>(length) * 2 - 1));
+    wide[ret] = 0;
+    if (stopAtNull)
+        return wide.get();
+    return std::wstring(wide.get(), ret);
+}
+
+std::wstring UTF8ToWide(const std::string_view& multibyte, bool stopAtNull /* = true*/)
+{
+    size_t length = multibyte.length();
+    if (length == 0)
+        return std::wstring();
+
+    auto wide = std::make_unique<wchar_t[]>(length * 2 + 2);
+    if (wide == nullptr)
+        return std::wstring();
+    int ret   = static_cast<int>(MultiByteToWideChar(CP_UTF8, 0, multibyte.data(), static_cast<int>(multibyte.size()), wide.get(), static_cast<int>(length) * 2 - 1));
     wide[ret] = 0;
     if (stopAtNull)
         return wide.get();
