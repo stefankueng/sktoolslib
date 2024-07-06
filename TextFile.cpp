@@ -1,6 +1,6 @@
 // sktoolslib - common files for SK tools
 
-// Copyright (C) 2012, 2014, 2017-2023 - Stefan Kueng
+// Copyright (C) 2012, 2014, 2017-2024 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -23,15 +23,44 @@
 #include "maxpath.h"
 #include <memory>
 
-static wchar_t WideCharSwap(wchar_t nValue)
+namespace
+{
+wchar_t WideCharSwap(wchar_t nValue)
 {
     return (((nValue >> 8)) | (nValue << 8));
 }
 
-static UINT64 WordSwapBytes(UINT64 nValue)
+UINT64 WordSwapBytes(UINT64 nValue)
 {
     return ((nValue & 0xff00ff00ff00ff) << 8) | ((nValue >> 8) & 0xff00ff00ff00ff); // swap BYTESs in WORDs
 }
+
+// provide a custom lower_bound implementation for sorted vectors
+auto sortedLowerBound(std::vector<size_t>::const_iterator first, const std::vector<size_t>::const_iterator &last, size_t val)
+{
+    auto count = std::distance(first, last);
+
+    while (0 < count)
+    {
+        // divide and conquer, find half that contains answer
+        const auto count2 = count / 2;
+        const auto mid    = _STD next(first, count2);
+        if (*mid < val)
+        {
+            // try top half
+            first = std::next(mid);
+            count -= count2 + 1;
+        }
+        else
+        {
+            count = count2;
+        }
+    }
+
+    return first;
+}
+
+} // namespace
 
 CTextFile::CTextFile()
     : pFileBuf(nullptr)
@@ -531,8 +560,8 @@ bool CTextFile::CalculateLines(std::atomic_bool &bCancelled)
         return true;
     linePositions.clear();
     linePositions.reserve(textContent.size() / 10);
-    size_t  pos     = 0;
-    bool    bGot   = false;
+    size_t pos  = 0;
+    bool   bGot = false;
     for (auto it = textContent.begin(); it != textContent.end() && !bCancelled; ++it)
     {
         bGot = false;
@@ -566,8 +595,8 @@ bool CTextFile::CalculateLines(std::atomic_bool &bCancelled)
 
 long CTextFile::LineFromPosition(long pos) const
 {
-    auto lb     = std::lower_bound(linePositions.begin(), linePositions.end(), static_cast<size_t>(pos));
-    auto lbLine = lb - linePositions.begin();
+    auto lb     = sortedLowerBound(linePositions.cbegin(), linePositions.cend(), static_cast<size_t>(pos));
+    auto lbLine = std::distance(linePositions.begin(), lb);
     return static_cast<long>(lbLine + 1);
 }
 
