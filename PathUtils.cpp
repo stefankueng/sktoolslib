@@ -28,7 +28,7 @@
 #include <memory>
 #include <assert.h>
 #include <Shlwapi.h>
-#include <Shldisp.h>
+#include <pathcch.h>
 #include <Shlobj.h>
 #include <comutil.h>
 
@@ -61,9 +61,9 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
 {
     if (path.empty())
         return path;
-    wchar_t      pathBufCanonicalized[MAX_PATH]; // MAX_PATH ok.
     DWORD        ret  = 0;
     std::wstring sRet = path;
+    PWSTR pszPathOut;
     if (!PathIsURL(path.c_str()) && PathIsRelative(path.c_str()))
     {
         ret = GetFullPathName(path.c_str(), 0, nullptr, nullptr);
@@ -76,11 +76,12 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
             }
         }
     }
-    else if (PathCanonicalize(pathBufCanonicalized, path.c_str()))
+    else if (PathAllocCanonicalize(path.c_str(),PATHCCH_ALLOW_LONG_PATHS|PATHCCH_FORCE_ENABLE_LONG_NAME_PROCESS,&pszPathOut) == S_OK)
     {
-        ret          = ::GetLongPathName(pathBufCanonicalized, nullptr, 0);
+        ret          = ::GetLongPathName(pszPathOut, nullptr, 0);
         auto pathBuf = std::make_unique<wchar_t[]>(ret + 2);
-        ret          = ::GetLongPathName(pathBufCanonicalized, pathBuf.get(), ret + 1);
+        ret          = ::GetLongPathName(pszPathOut, pathBuf.get(), ret + 1);
+        LocalFree(pszPathOut);
         // GetFullPathName() sometimes returns the full path with the wrong
         // case. This is not a problem on Windows since its filesystem is
         // case-insensitive. But for SVN that's a problem if the wrong case
