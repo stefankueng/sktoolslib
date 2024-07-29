@@ -80,7 +80,10 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
     {
         ret          = ::GetLongPathName(pszPathOut, nullptr, 0);
         auto pathBuf = std::make_unique<wchar_t[]>(ret + 2);
-        ret          = ::GetLongPathName(pszPathOut, pathBuf.get(), ret + 1);
+        if ((ret = ::GetLongPathName(pszPathOut, pathBuf.get(), ret + 1)) != 0)
+        {
+            sRet = std::wstring(pathBuf.get(), ret);
+        }
         LocalFree(pszPathOut);
         // GetFullPathName() sometimes returns the full path with the wrong
         // case. This is not a problem on Windows since its filesystem is
