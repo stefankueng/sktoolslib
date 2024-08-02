@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2017-2018, 2020-2022 Stefan Kueng
+// Copyright (C) 2017-2018, 2020-2022, 2024 Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -433,22 +433,19 @@ void CRichStatusBar::CalcRequestedWidths(int index)
     w.shortened       = false;
     w.fixed           = part.fixedWidth;
 
+
+    RECT rc           = rect;
+    DrawRichText(hdc, part.shortText.empty() ? part.text : part.shortText, rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
+    w.shortWidth = rc.right - rc.left;
     if (part.shortWidth > 0)
-        w.shortWidth = CDPIAware::Instance().Scale(*this, part.shortWidth);
-    else
-    {
-        RECT rc = rect;
-        DrawRichText(hdc, part.shortText.empty() ? part.text : part.shortText, rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
-        w.shortWidth = rc.right - rc.left;
-    }
+        w.shortWidth = max(CDPIAware::Instance().Scale(*this, part.shortWidth), w.shortWidth);
+
+    rc = rect;
+    DrawRichText(hdc, part.text, rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
+    w.defaultWidth = rc.right - rc.left;
     if (part.width > 0)
-        w.defaultWidth = CDPIAware::Instance().Scale(*this, part.width);
-    else
-    {
-        RECT rc = rect;
-        DrawRichText(hdc, part.text, rc, DT_CALCRECT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
-        w.defaultWidth = rc.right - rc.left;
-    }
+        w.defaultWidth = max(CDPIAware::Instance().Scale(*this, part.width), w.defaultWidth);
+
     if (part.icon)
     {
         w.defaultWidth += ICON_WIDTH;
@@ -508,7 +505,7 @@ std::wstring CRichStatusBar::GetPlainString(const std::wstring& text)
     return result;
 }
 
-void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring& text, RECT& rect, UINT flags)
+void CRichStatusBar::DrawRichText(HDC hdc, const std::wstring& text, RECT& rect, UINT flags) const
 {
     struct TextControls
     {

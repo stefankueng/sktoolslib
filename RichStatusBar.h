@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2017, 2020-2021 Stefan Kueng
+// Copyright (C) 2017, 2020-2021, 2024 Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -126,7 +126,7 @@ public:
 protected:
     LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     void             CalcRequestedWidths(int index);
-    void             DrawRichText(HDC hdc, const std::wstring& text, RECT& rect, UINT flags);
+    void             DrawRichText(HDC hdc, const std::wstring& text, RECT& rect, UINT flags) const;
     void             DrawSizeGrip(HDC hdc, LPCRECT lpRect);
 
 private:
