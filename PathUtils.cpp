@@ -35,6 +35,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "version.lib")
 #pragma comment(lib, "comsuppw.lib")
+#pragma comment(lib, "Pathcch.lib")
 
 // New code should probably use filesystem V3 when it is standard.
 
