@@ -41,7 +41,8 @@ public:
         , lenCharacters(0)
         , wcharBuf{}
     {
-        GetCodePoint();
+        if (text)
+            GetCodePoint();
     }
 
     value_type operator*() const noexcept
