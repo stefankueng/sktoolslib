@@ -1,6 +1,6 @@
 ﻿// sktoolslib - common files for SK tools
 
-// Copyright (C) 2013-2015, 2017, 2020-2024 - Stefan Kueng
+// Copyright (C) 2013-2015, 2017, 2020-2025 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -126,6 +126,7 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
     }
     if (ret == 0)
         return path;
+    sRet = AdjustForMaxPath(sRet);
     return sRet;
 }
 
