@@ -126,7 +126,7 @@ std::wstring CPathUtils::GetLongPathname(const std::wstring& path)
     }
     if (ret == 0)
         return path;
-    sRet = AdjustForMaxPath(sRet);
+    sRet = AdjustForMaxPath(sRet, false);
     return sRet;
 }
 
